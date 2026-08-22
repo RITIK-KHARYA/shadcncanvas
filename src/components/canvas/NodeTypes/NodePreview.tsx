@@ -19,10 +19,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import type { NodeSizeMode, NodeState } from "@/types/graph"
+
+type FormField = {
+  name: string
+  type: string
+  required?: boolean
+  placeholder?: string
+}
 
 type NodePreviewProps = {
   componentType: string
@@ -33,6 +43,7 @@ type NodePreviewProps = {
     outputKey: string,
     value: boolean | string | number,
   ) => void
+  onOutputsChange?: (outputs: NodeState) => void
 }
 
 function fieldClass(sizeMode: NodeSizeMode | undefined, extra?: string) {
@@ -59,10 +70,19 @@ export function NodePreview({
   state,
   sizeMode = "default",
   onOutputChange,
+  onOutputsChange,
 }: NodePreviewProps) {
   const disabled = wiredBoolean(props, state, "disabled")
   const active = wiredBoolean(props, state, "active", true)
   const isCustom = sizeMode === "custom"
+
+  const emit = (key: string, value: boolean | string | number) => {
+    onOutputChange?.(key, value)
+  }
+
+  const emitMany = (outputs: NodeState) => {
+    onOutputsChange?.(outputs)
+  }
 
   switch (componentType) {
     case "button":
@@ -73,11 +93,7 @@ export function NodePreview({
           disabled={disabled}
           className={isCustom ? "w-full" : undefined}
           aria-pressed={Boolean(state.pressed)}
-          data-state={state.pressed ? "on" : "off"}
-          onClick={() => {
-            const newPressed = !Boolean(state.pressed)
-            onOutputChange?.("pressed", newPressed)
-          }}
+          onClick={() => emit("pressed", !Boolean(state.pressed))}
         >
           {String(props.label ?? "Button")}
         </Button>
@@ -91,7 +107,7 @@ export function NodePreview({
           disabled={disabled}
           className={fieldClass(sizeMode, isCustom ? undefined : "w-48")}
           value={String(state.value ?? "")}
-          onChange={(e) => onOutputChange?.("value", e.target.value)}
+          onChange={(e) => emit("value", e.target.value)}
         />
       )
 
@@ -102,7 +118,7 @@ export function NodePreview({
           disabled={disabled}
           className={fieldClass(sizeMode, isCustom ? "min-h-20" : "w-48")}
           value={String(state.value ?? "")}
-          onChange={(e) => onOutputChange?.("value", e.target.value)}
+          onChange={(e) => emit("value", e.target.value)}
         />
       )
 
@@ -112,9 +128,7 @@ export function NodePreview({
           <Checkbox
             disabled={disabled}
             checked={Boolean(state.checked)}
-            onCheckedChange={(checked) =>
-              onOutputChange?.("checked", checked === true)
-            }
+            onCheckedChange={(checked) => emit("checked", checked === true)}
           />
           <span className="text-sm">{String(props.label ?? "Checkbox")}</span>
         </div>
@@ -126,9 +140,7 @@ export function NodePreview({
           <Switch
             disabled={disabled}
             checked={Boolean(state.checked)}
-            onCheckedChange={(checked) =>
-              onOutputChange?.("checked", checked === true)
-            }
+            onCheckedChange={(checked) => emit("checked", checked === true)}
           />
           <span className="text-sm">{String(props.label ?? "Switch")}</span>
         </div>
@@ -142,7 +154,7 @@ export function NodePreview({
         <Select
           disabled={disabled}
           value={String(state.value ?? "")}
-          onValueChange={(value) => onOutputChange?.("value", value)}
+          onValueChange={(value) => emit("value", value)}
         >
           <SelectTrigger className={fieldClass(sizeMode, isCustom ? undefined : "w-48")}>
             <SelectValue placeholder={String(props.placeholder ?? "Select")} />
@@ -189,7 +201,11 @@ export function NodePreview({
     case "label":
       return <Label>{String(props.text ?? "Label")}</Label>
 
-    case "form":
+    case "form": {
+      const fields = Array.isArray(props.fields)
+        ? (props.fields as FormField[])
+        : [{ name: "email", type: "email", placeholder: "Email" }]
+
       return (
         <Card
           className={cn(
@@ -203,15 +219,67 @@ export function NodePreview({
               {String(props.title ?? "Untitled Form")}
             </CardTitle>
             <CardDescription>
-              {active ? "Form fields preview" : "Form inactive"}
+              {active ? "Form ready" : "Form inactive"}
             </CardDescription>
           </CardHeader>
           <CardContent className="px-4 pt-0">
             <fieldset disabled={!active} className="space-y-2 border-0 p-0">
-              <Input placeholder="Field 1" className="w-full" />
+              {fields.map((field) => (
+                <Input
+                  key={field.name}
+                  type={field.type}
+                  name={field.name}
+                  placeholder={field.placeholder ?? field.name}
+                  required={field.required}
+                  className="w-full"
+                />
+              ))}
+              <Button
+                type="button"
+                size="sm"
+                disabled={!active}
+                onClick={() => {
+                  const isValid = fields.every(
+                    (field) => !field.required || Boolean(field.name),
+                  )
+                  emitMany({ submitted: true, isValid })
+                }}
+              >
+                Submit
+              </Button>
             </fieldset>
           </CardContent>
         </Card>
+      )
+    }
+
+    case "tabs":
+      return (
+        <Tabs defaultValue="tab-1" className={isCustom ? "w-full" : "w-56"}>
+          <TabsList>
+            <TabsTrigger value="tab-1">Tab 1</TabsTrigger>
+            <TabsTrigger value="tab-2">Tab 2</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab-1" className="text-xs text-muted-foreground">
+            Tab one content
+          </TabsContent>
+          <TabsContent value="tab-2" className="text-xs text-muted-foreground">
+            Tab two content
+          </TabsContent>
+        </Tabs>
+      )
+
+    case "separator":
+      return <Separator className={isCustom ? "w-full" : "w-48"} />
+
+    case "skeleton":
+      return (
+        <Skeleton
+          style={{
+            width: String(props.width ?? "12rem"),
+            height: String(props.height ?? "2.5rem"),
+          }}
+        />
       )
 
     default:

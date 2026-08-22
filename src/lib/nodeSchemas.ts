@@ -51,6 +51,12 @@ export const nodeSchemas: Record<string, z.ZodType> = {
   label: z.object({
     text: z.string().min(1, "Text required"),
   }),
+  tabs: z.object({}),
+  separator: z.object({}),
+  skeleton: z.object({
+    width: z.string().optional(),
+    height: z.string().optional(),
+  }),
 }
 
 export function validateNode(componentType: string, props: unknown) {

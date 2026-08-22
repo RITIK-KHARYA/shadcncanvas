@@ -7,7 +7,7 @@ import {
   type Connection,
   type NodeTypes,
 } from "@xyflow/react"
-import "@xyflow/react/dist/style.css"
+
 import { useCallback, useMemo } from "react"
 import { toast } from "sonner"
 
@@ -15,7 +15,7 @@ import { BaseNode } from "@/components/canvas/NodeTypes/BaseNode"
 import { getComponentDragData } from "@/lib/dnd"
 import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graphUtils"
 import { nodeRegistry } from "@/lib/nodeRegistry"
-import { useGraphStore } from "@/store/graphStore"
+import { useGraphStore, recordNodeDragHistory } from "@/store/graphStore"
 import type { CanvasEdge, CanvasNode } from "@/types/graph"
 
 const nodeTypes: NodeTypes = {
@@ -162,6 +162,7 @@ function CanvasFlow() {
       onDrop={onDrop}
       onDragOver={onDragOver}
       onSelectionChange={onSelectionChange}
+      onNodeDragStop={() => recordNodeDragHistory()}
       connectionRadius={24}
       snapToGrid
       snapGrid={[20, 20]}

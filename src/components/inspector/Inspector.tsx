@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { FormFieldsEditor, SelectOptionsEditor } from "@/components/inspector/FormFieldsEditor"
 import { getFieldErrors } from "@/lib/nodeSchemas"
 import { nodeRegistry } from "@/lib/nodeRegistry"
 import { useGraphStore } from "@/store/graphStore"
@@ -202,6 +203,37 @@ export function Inspector() {
           )
         })}
       </div>
+
+      {selectedNode.data.componentType === "form" && (
+        <div className="mt-4 border-t pt-3">
+          <FormFieldsEditor
+            fields={
+              Array.isArray(selectedNode.data.props.fields)
+                ? (selectedNode.data.props.fields as {
+                    name: string
+                    type: "text" | "email" | "password" | "number"
+                    required: boolean
+                    placeholder?: string
+                  }[])
+                : []
+            }
+            onChange={(fields) => setProp("fields", fields)}
+          />
+        </div>
+      )}
+
+      {selectedNode.data.componentType === "select" && (
+        <div className="mt-4 border-t pt-3">
+          <SelectOptionsEditor
+            options={
+              Array.isArray(selectedNode.data.props.options)
+                ? (selectedNode.data.props.options as string[])
+                : ["Option 1", "Option 2"]
+            }
+            onChange={(options) => setProp("options", options)}
+          />
+        </div>
+      )}
 
       {(config.inputs.length > 0 || config.outputs.length > 0) && (
         <div className="mt-4 space-y-2 border-t pt-3">

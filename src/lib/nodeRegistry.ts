@@ -59,7 +59,17 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     type: "form",
     label: "Form",
     category: "form",
-    defaultProps: { title: "Untitled Form", fields: [] },
+    defaultProps: {
+      title: "Untitled Form",
+      fields: [
+        {
+          name: "email",
+          type: "email",
+          required: true,
+          placeholder: "Email address",
+        },
+      ],
+    },
     configurableProps: [
       {
         key: "title",
@@ -218,6 +228,46 @@ export const nodeRegistry: Record<string, NodeConfig> = {
         label: "Text",
         inputType: "text",
         default: "Email address",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  tabs: {
+    type: "tabs",
+    label: "Tabs",
+    category: "layout",
+    defaultProps: { defaultValue: "tab-1" },
+    configurableProps: [],
+    inputs: [],
+    outputs: [],
+  },
+  separator: {
+    type: "separator",
+    label: "Separator",
+    category: "layout",
+    defaultProps: {},
+    configurableProps: [],
+    inputs: [],
+    outputs: [],
+  },
+  skeleton: {
+    type: "skeleton",
+    label: "Skeleton",
+    category: "feedback",
+    defaultProps: { width: "12rem", height: "2.5rem" },
+    configurableProps: [
+      {
+        key: "width",
+        label: "Width",
+        inputType: "text",
+        default: "12rem",
+      },
+      {
+        key: "height",
+        label: "Height",
+        inputType: "text",
+        default: "2.5rem",
       },
     ],
     inputs: [],

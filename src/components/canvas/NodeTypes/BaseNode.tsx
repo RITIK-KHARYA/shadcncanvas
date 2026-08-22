@@ -25,6 +25,20 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
     propagate(id, outputKey, value)
   }
 
+  const emitOutputs = (outputs: NodeState) => {
+    updateNodeState(id, outputs)
+    for (const [key, value] of Object.entries(outputs)) {
+      if (
+        value !== undefined &&
+        (typeof value === "boolean" ||
+          typeof value === "string" ||
+          typeof value === "number")
+      ) {
+        propagate(id, key, value)
+      }
+    }
+  }
+
   if (!config) {
     return (
       <div className="rounded-lg border-2 border-destructive bg-background p-3">
@@ -73,6 +87,7 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
           state={data.state}
           sizeMode={layout.sizeMode}
           onOutputChange={emitOutput}
+          onOutputsChange={emitOutputs}
         />
       </div>
 

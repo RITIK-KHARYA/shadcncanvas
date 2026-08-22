@@ -12,11 +12,26 @@ import { evalTransform } from "@/lib/graphUtils"
 import { nodeRegistry } from "@/lib/nodeRegistry"
 import type { CanvasEdge, CanvasNode, NodeLayout, NodeState } from "@/types/graph"
 
+type Snapshot = {
+  nodes: CanvasNode[]
+  edges: CanvasEdge[]
+}
+
+const MAX_HISTORY = 40
+
 type GraphStore = {
   nodes: CanvasNode[]
   edges: CanvasEdge[]
   selectedNodeId: string | null
   selectedEdgeId: string | null
+  history: Snapshot[]
+  future: Snapshot[]
+  canUndo: boolean
+  canRedo: boolean
+  hydrate: (nodes: CanvasNode[], edges: CanvasEdge[]) => void
+  pushHistory: () => void
+  undo: () => void
+  redo: () => void
   addNode: (node: CanvasNode) => void
   addEdge: (connection: Connection) => void
   onNodesChange: (changes: NodeChange<CanvasNode>[]) => void
@@ -31,7 +46,22 @@ type GraphStore = {
     nodeId: string,
     outputKey: string,
     value: boolean | string | number,
+    visited?: Set<string>,
   ) => void
+}
+
+function cloneSnapshot(nodes: CanvasNode[], edges: CanvasEdge[]): Snapshot {
+  return structuredClone({ nodes, edges })
+}
+
+function syncHistoryFlags(state: {
+  history: Snapshot[]
+  future: Snapshot[]
+}) {
+  return {
+    canUndo: state.history.length > 0,
+    canRedo: state.future.length > 0,
+  }
 }
 
 export const useGraphStore = create<GraphStore>((set, get) => ({
@@ -39,11 +69,84 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
   edges: [],
   selectedNodeId: null,
   selectedEdgeId: null,
+  history: [],
+  future: [],
+  canUndo: false,
+  canRedo: false,
 
-  addNode: (node) => set({ nodes: [...get().nodes, node] }),
+  hydrate: (nodes, edges) => {
+    set({
+      nodes,
+      edges,
+      history: [],
+      future: [],
+      ...syncHistoryFlags({ history: [], future: [] }),
+    })
+  },
+
+  pushHistory: () => {
+    const { nodes, edges, history } = get()
+    const snapshot = cloneSnapshot(nodes, edges)
+    const nextHistory = [...history, snapshot].slice(-MAX_HISTORY)
+    set({
+      history: nextHistory,
+      future: [],
+      ...syncHistoryFlags({ history: nextHistory, future: [] }),
+    })
+  },
+
+  undo: () => {
+    const { history, future, nodes, edges } = get()
+    if (history.length === 0) return
+
+    const previous = history[history.length - 1]
+    const nextHistory = history.slice(0, -1)
+    const nextFuture = [cloneSnapshot(nodes, edges), ...future].slice(
+      0,
+      MAX_HISTORY,
+    )
+
+    set({
+      nodes: previous.nodes,
+      edges: previous.edges,
+      history: nextHistory,
+      future: nextFuture,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+      ...syncHistoryFlags({ history: nextHistory, future: nextFuture }),
+    })
+  },
+
+  redo: () => {
+    const { history, future, nodes, edges } = get()
+    if (future.length === 0) return
+
+    const next = future[0]
+    const nextFuture = future.slice(1)
+    const nextHistory = [...history, cloneSnapshot(nodes, edges)].slice(
+      -MAX_HISTORY,
+    )
+
+    set({
+      nodes: next.nodes,
+      edges: next.edges,
+      history: nextHistory,
+      future: nextFuture,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+      ...syncHistoryFlags({ history: nextHistory, future: nextFuture }),
+    })
+  },
+
+  addNode: (node) => {
+    get().pushHistory()
+    set({ nodes: [...get().nodes, node] })
+  },
 
   addEdge: (connection) => {
     if (!connection.source || !connection.target) return
+
+    get().pushHistory()
 
     const newEdge: CanvasEdge = {
       id: crypto.randomUUID(),
@@ -84,17 +187,25 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     }
   },
 
-  onNodesChange: (changes) =>
-    set({ nodes: applyNodeChanges(changes, get().nodes) }),
+  onNodesChange: (changes) => {
+    const shouldRecord = changes.some(
+      (change) => change.type === "remove" || change.type === "add",
+    )
+    if (shouldRecord) get().pushHistory()
+    set({ nodes: applyNodeChanges(changes, get().nodes) })
+  },
 
-  onEdgesChange: (changes) =>
-    set({ edges: applyEdgeChanges(changes, get().edges) }),
+  onEdgesChange: (changes) => {
+    const shouldRecord = changes.some((change) => change.type === "remove")
+    if (shouldRecord) get().pushHistory()
+    set({ edges: applyEdgeChanges(changes, get().edges) })
+  },
 
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
 
   setSelectedEdgeId: (id) => set({ selectedEdgeId: id }),
 
-  updateNodeProps: (nodeId, props) =>
+  updateNodeProps: (nodeId, props) => {
     set({
       nodes: get().nodes.map((node) =>
         node.id === nodeId
@@ -107,9 +218,10 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
             }
           : node,
       ),
-    }),
+    })
+  },
 
-  updateNodeLayout: (nodeId, layout) =>
+  updateNodeLayout: (nodeId, layout) => {
     set({
       nodes: get().nodes.map((node) =>
         node.id === nodeId
@@ -122,7 +234,8 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
             }
           : node,
       ),
-    }),
+    })
+  },
 
   updateNodeState: (nodeId, newState) =>
     set({
@@ -140,6 +253,7 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     }),
 
   updateEdgeTransform: (edgeId, transform) => {
+    get().pushHistory()
     set({
       edges: get().edges.map((edge) =>
         edge.id === edgeId
@@ -155,12 +269,21 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     if (!sourceNode) return
 
     const value = sourceNode.data.state[edge.sourceHandle]
-    if (value !== undefined && (typeof value === "boolean" || typeof value === "string" || typeof value === "number")) {
+    if (
+      value !== undefined &&
+      (typeof value === "boolean" ||
+        typeof value === "string" ||
+        typeof value === "number")
+    ) {
       get().propagate(edge.source, edge.sourceHandle, value)
     }
   },
 
-  propagate: (nodeId, outputKey, value) => {
+  propagate: (nodeId, outputKey, value, visited = new Set()) => {
+    const hopKey = `${nodeId}:${outputKey}:${String(value)}`
+    if (visited.has(hopKey)) return
+    visited.add(hopKey)
+
     const { edges } = get()
     const relevantEdges = edges.filter(
       (edge) => edge.source === nodeId && edge.sourceHandle === outputKey,
@@ -193,6 +316,28 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
             : node,
         ),
       })
+
+      const targetNode = get().nodes.find((n) => n.id === edge.target)
+      const targetConfig = targetNode
+        ? nodeRegistry[targetNode.data.componentType]
+        : null
+
+      for (const output of targetConfig?.outputs ?? []) {
+        const outValue = get().nodes.find((n) => n.id === edge.target)?.data
+          .state[output.key]
+        if (
+          outValue !== undefined &&
+          (typeof outValue === "boolean" ||
+            typeof outValue === "string" ||
+            typeof outValue === "number")
+        ) {
+          get().propagate(edge.target, output.key, outValue, visited)
+        }
+      }
     }
   },
 }))
+
+export function recordNodeDragHistory() {
+  useGraphStore.getState().pushHistory()
+}
