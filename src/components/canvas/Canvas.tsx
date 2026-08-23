@@ -8,10 +8,11 @@ import {
   type NodeTypes,
 } from "@xyflow/react"
 
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
 
 import { BaseNode } from "@/components/canvas/NodeTypes/BaseNode"
+import { cn } from "@/lib/utils"
 import { getComponentDragData } from "@/lib/dnd"
 import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graphUtils"
 import { nodeRegistry } from "@/lib/nodeRegistry"
@@ -32,6 +33,7 @@ function CanvasFlow() {
   const setSelectedNodeId = useGraphStore((s) => s.setSelectedNodeId)
   const setSelectedEdgeId = useGraphStore((s) => s.setSelectedEdgeId)
   const { screenToFlowPosition } = useReactFlow()
+  const [isDragOver, setIsDragOver] = useState(false)
 
   const styledEdges = useMemo(
     () =>
@@ -49,11 +51,17 @@ function CanvasFlow() {
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = "move"
+    setIsDragOver(true)
+  }, [])
+
+  const onDragLeave = useCallback(() => {
+    setIsDragOver(false)
   }, [])
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault()
+      setIsDragOver(false)
 
       const componentType = getComponentDragData(event.dataTransfer)
       if (!componentType) {
@@ -152,7 +160,10 @@ function CanvasFlow() {
 
   return (
     <ReactFlow
-      className="h-full w-full bg-background"
+      className={cn(
+        "h-full w-full bg-background transition-all duration-200",
+        isDragOver && "ring-2 ring-primary/40 ring-inset bg-accent/25"
+      )}
       nodes={nodes}
       edges={styledEdges}
       nodeTypes={nodeTypes}
@@ -161,11 +172,11 @@ function CanvasFlow() {
       onConnect={onConnect}
       onDrop={onDrop}
       onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
       onSelectionChange={onSelectionChange}
       onNodeDragStop={() => recordNodeDragHistory()}
       connectionRadius={24}
-      snapToGrid
-      snapGrid={[20, 20]}
+      snapToGrid={false}
       proOptions={{ hideAttribution: true }}
     >
       <Background gap={20} size={1} color="var(--border)" />

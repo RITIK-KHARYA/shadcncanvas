@@ -245,3 +245,14 @@ body {
 @utility scrollbar-gutter-both {
   scrollbar-gutter: stable both-edges;
 }
+
+.react-flow__node.dragging > div {
+  box-shadow: var(--shadow-xl) !important;
+  transform: scale(1.02);
+  border-color: var(--color-primary) !important;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.15s ease !important;
+}
+
+.react-flow__node > div {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
+}

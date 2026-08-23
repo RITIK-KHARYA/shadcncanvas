@@ -13,14 +13,29 @@ import { generateFullCode, generateNodeCode } from "@/lib/codegen"
 import { exportProjectZip } from "@/lib/exportZip"
 import { loadProject, saveProject } from "@/lib/persistence"
 import { useGraphStore } from "@/store/graphStore"
-import {
-  themeTokensToStyle,
-  useThemeStore,
-} from "@/store/themeStore"
+import { useEditorStore } from "@/store/editor-store"
+import { applyThemeToElement } from "@/utils/apply-theme"
 
 export function BuilderPage() {
-  const tokens = useThemeStore((s) => s.tokens)
-  const themeStyle = themeTokensToStyle(tokens)
+  const themeState = useEditorStore((s) => s.themeState)
+  const activeMode = themeState.currentMode
+  const activeStyles = themeState.styles[activeMode]
+
+  const tokens = useMemo(() => ({
+    primary: activeStyles.primary,
+    secondary: activeStyles.secondary,
+    background: activeStyles.background,
+    radius: activeStyles.radius,
+  }), [activeStyles])
+
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (containerRef.current) {
+      applyThemeToElement(themeState, containerRef.current)
+    }
+  }, [themeState])
+
   const hydrated = useRef(false)
 
   const [projectName, setProjectName] = useState("Untitled shadcn canvas")
@@ -44,7 +59,26 @@ export function BuilderPage() {
     const saved = loadProject()
     if (saved) {
       hydrate(saved.nodes, saved.edges)
-      useThemeStore.setState({ tokens: saved.theme })
+      if (saved.theme) {
+        useEditorStore.setState((prev) => {
+          const nextStyles = { ...prev.themeState.styles }
+          const mode = prev.themeState.currentMode
+          nextStyles[mode] = {
+            ...nextStyles[mode],
+            primary: saved.theme.primary || nextStyles[mode].primary,
+            secondary: saved.theme.secondary || nextStyles[mode].secondary,
+            background: saved.theme.background || nextStyles[mode].background,
+            radius: saved.theme.radius || nextStyles[mode].radius,
+          }
+          return {
+            ...prev,
+            themeState: {
+              ...prev.themeState,
+              styles: nextStyles
+            }
+          }
+        })
+      }
       setProjectName(saved.projectName)
       setLastSaved(saved.savedAt)
     }
@@ -158,8 +192,8 @@ export function BuilderPage() {
         </aside>
 
         <section
-          className="canvas-theme dark relative h-full min-h-0 overflow-hidden bg-background text-foreground"
-          style={themeStyle}
+          ref={containerRef}
+          className="canvas-theme relative h-full min-h-0 overflow-hidden bg-background text-foreground"
         >
           <Canvas />
         </section>
