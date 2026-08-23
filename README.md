@@ -272,7 +272,7 @@ Shadcn Canvas uses a comprehensive OKLCH-based design token system with full lig
 
 ---
 
-## 🚀 Installation & Local Setup Guide
+##  Installation & Local Setup Guide
 
 ### Prerequisites
 
@@ -388,5 +388,5 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more informa
 ---
 
 <p align="center">
-  Built with ❤️ by <a href="https://github.com/RITIK-KHARYA">Ritik Kharya</a>
+  Built by <a href="https://github.com/RITIK-KHARYA">Ritik Kharya</a>
 </p>
