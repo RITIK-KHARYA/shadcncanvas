@@ -24,6 +24,30 @@ const UI_COMPONENTS: Record<string, { exportName: string; importPath: string }> 
   tabs: { exportName: "Tabs", importPath: "tabs" },
   separator: { exportName: "Separator", importPath: "separator" },
   skeleton: { exportName: "Skeleton", importPath: "skeleton" },
+  "button-group": { exportName: "ButtonGroup", importPath: "button-group" },
+  calendar: { exportName: "Calendar", importPath: "calendar" },
+  field: { exportName: "Field", importPath: "field" },
+  "native-select": {
+    exportName: "NativeSelect",
+    importPath: "native-select",
+  },
+  carousel: { exportName: "Carousel", importPath: "carousel" },
+  item: { exportName: "Item", importPath: "item" },
+  dialog: { exportName: "Dialog", importPath: "dialog" },
+  drawer: { exportName: "Drawer", importPath: "drawer" },
+  "hover-card": { exportName: "HoverCard", importPath: "hover-card" },
+  command: { exportName: "Command", importPath: "command" },
+  bubble: { exportName: "Bubble", importPath: "bubble" },
+  message: { exportName: "Message", importPath: "message" },
+  "message-scroller": {
+    exportName: "MessageScroller",
+    importPath: "message-scroller",
+  },
+  empty: { exportName: "Empty", importPath: "empty" },
+  chart: { exportName: "ChartContainer", importPath: "chart" },
+  kbd: { exportName: "Kbd", importPath: "kbd" },
+  marker: { exportName: "Marker", importPath: "marker" },
+  direction: { exportName: "DirectionProvider", importPath: "direction" },
 }
 
 function formatJsxProp(key: string, value: unknown): string {
@@ -135,6 +159,135 @@ ${fields
 
     case "skeleton":
       return `<Skeleton className="h-10 w-48" />`
+
+    case "bubble":
+      return `<Bubble variant="${String(props.variant ?? "received")}">
+  ${String(props.text ?? "")}
+</Bubble>`
+
+    case "message":
+      return `<Message>
+  <MessageAvatar name="${String(props.role ?? "User")}" />
+  <MessageContent variant="${String(props.variant ?? "received")}">
+    <MessageBody variant="${String(props.variant ?? "received")}">${String(props.text ?? "")}</MessageBody>
+  </MessageContent>
+</Message>`
+
+    case "message-scroller":
+      return `<MessageScroller>
+  {/* Message components */}
+</MessageScroller>`
+
+    case "empty":
+      return `<Empty>
+  <EmptyHeader>
+    <EmptyMedia variant="icon">Inbox</EmptyMedia>
+    <EmptyTitle>${String(props.title ?? "No results")}</EmptyTitle>
+    <EmptyDescription>${String(props.description ?? "")}</EmptyDescription>
+  </EmptyHeader>
+</Empty>`
+
+    case "kbd":
+      return `<KbdGroup>
+${String(props.keys ?? "Ctrl K")
+  .split(/\s+/)
+  .map((key) => `  <Kbd>${key}</Kbd>`)
+  .join("\n")}
+</KbdGroup>`
+
+    case "marker": {
+      const text = String(props.text ?? "")
+      const highlight = String(props.highlight ?? "")
+      const index = highlight ? text.toLowerCase().indexOf(highlight.toLowerCase()) : -1
+      if (index === -1) return text
+      return `${text.slice(0, index)}<Marker>${text.slice(index, index + highlight.length)}</Marker>${text.slice(index + highlight.length)}`
+    }
+
+    case "field":
+      return `<Field>
+  <FieldLabel>${String(props.label ?? "Label")}</FieldLabel>
+  <Input placeholder="..." />
+  ${props.error ? `<FieldError>${String(props.error)}</FieldError>` : `<FieldDescription>${String(props.description ?? "")}</FieldDescription>`}
+</Field>`
+
+    case "native-select":
+      return `<NativeSelect defaultValue="">
+  <option value="" disabled>${String(props.placeholder ?? "Select…")}</option>
+</NativeSelect>`
+
+    case "carousel":
+      return `<Carousel className="w-full max-w-xs">
+  <CarouselContent>
+    <CarouselItem>Slide 1</CarouselItem>
+    <CarouselItem>Slide 2</CarouselItem>
+  </CarouselContent>
+  <CarouselPrevious />
+  <CarouselNext />
+</Carousel>`
+
+    case "item":
+      return `<Item variant="outline">
+  <ItemMedia variant="icon">Icon</ItemMedia>
+  <ItemContent>
+    <ItemTitle>${String(props.title ?? "Title")}</ItemTitle>
+    <ItemDescription>${String(props.description ?? "")}</ItemDescription>
+  </ItemContent>
+  <ItemActions>{/* controls */}</ItemActions>
+</Item>`
+
+    case "dialog":
+      return `<Dialog>
+  <DialogTrigger asChild>
+    <Button variant="outline">${String(props.triggerLabel ?? "Open Dialog")}</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>${String(props.title ?? "Dialog")}</DialogTitle>
+      <DialogDescription>${String(props.description ?? "")}</DialogDescription>
+    </DialogHeader>
+    <DialogFooter>{/* actions */}</DialogFooter>
+  </DialogContent>
+</Dialog>`
+
+    case "drawer":
+      return `<Drawer>
+  <DrawerTrigger asChild>
+    <Button variant="outline">${String(props.triggerLabel ?? "Open Drawer")}</Button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>${String(props.title ?? "Drawer")}</DrawerTitle>
+      <DrawerDescription>${String(props.description ?? "")}</DrawerDescription>
+    </DrawerHeader>
+  </DrawerContent>
+</Drawer>`
+
+    case "hover-card":
+      return `<HoverCard>
+  <HoverCardTrigger href="#">${String(props.trigger ?? "@trigger")}</HoverCardTrigger>
+  <HoverCardContent>${String(props.heading ?? "")} — ${String(props.bio ?? "")}</HoverCardContent>
+</HoverCard>`
+
+    case "command":
+      return `<Command className="rounded-lg border shadow-none">
+  <CommandInput placeholder="${String(props.placeholder ?? "Type a command...")}" />
+  <CommandList>
+    <CommandEmpty>No results found.</CommandEmpty>
+    <CommandGroup heading="Suggestions">
+      <CommandItem>Calendar</CommandItem>
+    </CommandGroup>
+  </CommandList>
+</Command>`
+
+    case "chart":
+      return `<ChartContainer config={chartConfig} className="aspect-video">
+  <BarChart data={data}>
+    <CartesianGrid vertical={false} />
+    <XAxis dataKey="month" tickLine={false} axisLine={false} />
+    <ChartTooltip content={<ChartTooltipContent />} />
+    <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+  </BarChart>
+</ChartContainer>`
 
     default:
       return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`

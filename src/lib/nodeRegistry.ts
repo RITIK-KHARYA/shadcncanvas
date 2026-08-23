@@ -15,7 +15,13 @@ export type PortDef = {
 export type NodeConfig = {
   type: string
   label: string
-  category: "form" | "layout" | "feedback" | "navigation"
+  category:
+    | "form"
+    | "layout"
+    | "feedback"
+    | "navigation"
+    | "overlay"
+    | "display"
   defaultProps: Record<string, unknown>
   configurableProps: ConfigurableProp[]
   inputs: PortDef[]
@@ -273,6 +279,341 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     inputs: [],
     outputs: [],
   },
+  "button-group": {
+    type: "button-group",
+    label: "Button Group",
+    category: "form",
+    defaultProps: {},
+    configurableProps: [],
+    inputs: [],
+    outputs: [],
+  },
+  calendar: {
+    type: "calendar",
+    label: "Calendar",
+    category: "form",
+    defaultProps: {},
+    configurableProps: [],
+    inputs: [{ key: "disabled", label: "Disabled", type: "boolean" }],
+    outputs: [{ key: "value", label: "Selected Date", type: "string" }],
+  },
+  field: {
+    type: "field",
+    label: "Field",
+    category: "form",
+    defaultProps: {
+      label: "Username",
+      description: "Choose a unique handle.",
+      error: "",
+    },
+    configurableProps: [
+      { key: "label", label: "Label", inputType: "text", default: "Username" },
+      {
+        key: "description",
+        label: "Description",
+        inputType: "text",
+        default: "Choose a unique handle.",
+      },
+      { key: "error", label: "Error", inputType: "text", default: "" },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "native-select": {
+    type: "native-select",
+    label: "Native Select",
+    category: "form",
+    defaultProps: {
+      placeholder: "Fruit",
+      options: ["Apple", "Banana", "Cherry"],
+    },
+    configurableProps: [
+      {
+        key: "placeholder",
+        label: "Placeholder",
+        inputType: "text",
+        default: "Fruit",
+      },
+    ],
+    inputs: [{ key: "disabled", label: "Disabled", type: "boolean" }],
+    outputs: [{ key: "value", label: "Value", type: "string" }],
+  },
+  carousel: {
+    type: "carousel",
+    label: "Carousel",
+    category: "layout",
+    defaultProps: { slides: 4 },
+    configurableProps: [
+      { key: "slides", label: "Slides", inputType: "number", default: 4 },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  item: {
+    type: "item",
+    label: "Item",
+    category: "layout",
+    defaultProps: {
+      title: "Permissions",
+      description: "Manage who can access this project.",
+    },
+    configurableProps: [
+      { key: "title", label: "Title", inputType: "text", default: "Permissions" },
+      {
+        key: "description",
+        label: "Description",
+        inputType: "text",
+        default: "Manage who can access this project.",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  dialog: {
+    type: "dialog",
+    label: "Dialog",
+    category: "overlay",
+    defaultProps: {
+      triggerLabel: "Open Dialog",
+      title: "Delete project?",
+      description:
+        "This action cannot be undone. The project will be permanently deleted.",
+    },
+    configurableProps: [
+      {
+        key: "triggerLabel",
+        label: "Trigger",
+        inputType: "text",
+        default: "Open Dialog",
+      },
+      { key: "title", label: "Title", inputType: "text", default: "Delete project?" },
+      {
+        key: "description",
+        label: "Description",
+        inputType: "text",
+        default:
+          "This action cannot be undone. The project will be permanently deleted.",
+      },
+    ],
+    inputs: [],
+    outputs: [{ key: "confirmed", label: "Confirmed", type: "boolean" }],
+  },
+  drawer: {
+    type: "drawer",
+    label: "Drawer",
+    category: "overlay",
+    defaultProps: {
+      triggerLabel: "Open Drawer",
+      title: "Drawer Title",
+      description: "Drag the handle or press Esc to close.",
+    },
+    configurableProps: [
+      {
+        key: "triggerLabel",
+        label: "Trigger",
+        inputType: "text",
+        default: "Open Drawer",
+      },
+      { key: "title", label: "Title", inputType: "text", default: "Drawer Title" },
+      {
+        key: "description",
+        label: "Description",
+        inputType: "text",
+        default: "Drag the handle or press Esc to close.",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "hover-card": {
+    type: "hover-card",
+    label: "Hover Card",
+    category: "overlay",
+    defaultProps: {
+      trigger: "@shadcn",
+      heading: "shadcn/ui",
+      bio: "The foundation for your design system and component library.",
+    },
+    configurableProps: [
+      { key: "trigger", label: "Trigger", inputType: "text", default: "@shadcn" },
+      { key: "heading", label: "Heading", inputType: "text", default: "shadcn/ui" },
+      {
+        key: "bio",
+        label: "Bio",
+        inputType: "text",
+        default:
+          "The foundation for your design system and component library.",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  command: {
+    type: "command",
+    label: "Command Menu",
+    category: "navigation",
+    defaultProps: { placeholder: "Type a command or search..." },
+    configurableProps: [
+      {
+        key: "placeholder",
+        label: "Placeholder",
+        inputType: "text",
+        default: "Type a command or search...",
+      },
+    ],
+    inputs: [],
+    outputs: [{ key: "selected", label: "Selected", type: "string" }],
+  },
+  bubble: {
+    type: "bubble",
+    label: "Chat Bubble",
+    category: "display",
+    defaultProps: {
+      text: "Looks great — shipping it!",
+      variant: "received",
+    },
+    configurableProps: [
+      {
+        key: "text",
+        label: "Text",
+        inputType: "text",
+        default: "Looks great — shipping it!",
+      },
+      {
+        key: "variant",
+        label: "Variant",
+        inputType: "select",
+        options: ["sent", "received"],
+        default: "received",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  message: {
+    type: "message",
+    label: "Message",
+    category: "display",
+    defaultProps: {
+      text: "Can you review the latest mockups?",
+      role: "Ada",
+      variant: "received",
+    },
+    configurableProps: [
+      {
+        key: "text",
+        label: "Text",
+        inputType: "text",
+        default: "Can you review the latest mockups?",
+      },
+      { key: "role", label: "Author", inputType: "text", default: "Ada" },
+      {
+        key: "variant",
+        label: "Variant",
+        inputType: "select",
+        options: ["sent", "received"],
+        default: "received",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "message-scroller": {
+    type: "message-scroller",
+    label: "Message Scroller",
+    category: "display",
+    defaultProps: {},
+    configurableProps: [],
+    inputs: [],
+    outputs: [],
+  },
+  empty: {
+    type: "empty",
+    label: "Empty State",
+    category: "feedback",
+    defaultProps: {
+      title: "No results found",
+      description: "Try adjusting your filters or a different query.",
+    },
+    configurableProps: [
+      {
+        key: "title",
+        label: "Title",
+        inputType: "text",
+        default: "No results found",
+      },
+      {
+        key: "description",
+        label: "Description",
+        inputType: "text",
+        default: "Try adjusting your filters or a different query.",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  chart: {
+    type: "chart",
+    label: "Bar Chart",
+    category: "display",
+    defaultProps: {},
+    configurableProps: [],
+    inputs: [],
+    outputs: [],
+  },
+  kbd: {
+    type: "kbd",
+    label: "Keyboard Key",
+    category: "display",
+    defaultProps: { keys: "Ctrl K" },
+    configurableProps: [
+      { key: "keys", label: "Keys", inputType: "text", default: "Ctrl K" },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  marker: {
+    type: "marker",
+    label: "Highlight",
+    category: "display",
+    defaultProps: {
+      text: "Design tokens keep the system consistent.",
+      highlight: "design tokens",
+    },
+    configurableProps: [
+      {
+        key: "text",
+        label: "Text",
+        inputType: "text",
+        default: "Design tokens keep the system consistent.",
+      },
+      {
+        key: "highlight",
+        label: "Highlight",
+        inputType: "text",
+        default: "design tokens",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  direction: {
+    type: "direction",
+    label: "Direction",
+    category: "layout",
+    defaultProps: { dir: "ltr" },
+    configurableProps: [
+      {
+        key: "dir",
+        label: "Direction",
+        inputType: "select",
+        options: ["ltr", "rtl"],
+        default: "ltr",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
 }
 
 export const categoryLabels: Record<NodeConfig["category"], string> = {
@@ -280,6 +621,8 @@ export const categoryLabels: Record<NodeConfig["category"], string> = {
   layout: "Layout",
   feedback: "Feedback",
   navigation: "Navigation",
+  overlay: "Overlay",
+  display: "Display",
 }
 
 export function getNodesByCategory() {

@@ -57,6 +57,67 @@ export const nodeSchemas: Record<string, z.ZodType> = {
     width: z.string().optional(),
     height: z.string().optional(),
   }),
+  "button-group": z.object({}),
+  calendar: z.object({}),
+  field: z.object({
+    label: z.string().min(1, "Label required"),
+    description: z.string().optional(),
+    error: z.string().optional(),
+  }),
+  "native-select": z.object({
+    placeholder: z.string().min(1, "Placeholder required"),
+    options: z.array(z.string()).optional(),
+  }),
+  carousel: z.object({
+    slides: z.number().min(2).max(10),
+  }),
+  item: z.object({
+    title: z.string().min(1, "Title required"),
+    description: z.string().min(1, "Description required"),
+  }),
+  dialog: z.object({
+    triggerLabel: z.string().min(1, "Trigger label required"),
+    title: z.string().min(1, "Title required"),
+    description: z.string(),
+  }),
+  drawer: z.object({
+    triggerLabel: z.string().min(1, "Trigger label required"),
+    title: z.string().min(1, "Title required"),
+    description: z.string(),
+  }),
+  "hover-card": z.object({
+    trigger: z.string().min(1, "Trigger required"),
+    heading: z.string().min(1, "Heading required"),
+    bio: z.string(),
+  }),
+  command: z.object({
+    placeholder: z.string().min(1, "Placeholder required"),
+  }),
+  bubble: z.object({
+    text: z.string().min(1, "Text required"),
+    variant: z.enum(["sent", "received"]),
+  }),
+  message: z.object({
+    text: z.string().min(1, "Text required"),
+    role: z.string().min(1, "Author required"),
+    variant: z.enum(["sent", "received"]),
+  }),
+  "message-scroller": z.object({}),
+  empty: z.object({
+    title: z.string().min(1, "Title required"),
+    description: z.string(),
+  }),
+  chart: z.object({}),
+  kbd: z.object({
+    keys: z.string().min(1, "Keys required"),
+  }),
+  marker: z.object({
+    text: z.string().min(1, "Text required"),
+    highlight: z.string(),
+  }),
+  direction: z.object({
+    dir: z.enum(["ltr", "rtl"]),
+  }),
 }
 
 export function validateNode(componentType: string, props: unknown) {
