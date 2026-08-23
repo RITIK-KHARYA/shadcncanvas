@@ -39,25 +39,25 @@ export function EdgeInspector() {
   const transform = String(edge.data?.transform ?? "passthrough")
 
   return (
-    <section className="rounded-lg border border-primary/40 bg-background/60 p-3">
-      <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    <section className="border-b bg-primary/5 px-4 py-3">
+      <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
         Wire
       </h3>
-      <p className="mt-1 text-sm font-medium">
+      <p className="truncate text-xs font-medium">
         {sourceConfig?.label ?? edge.source}.{sourcePort?.label ?? edge.sourceHandle}
         {" → "}
         {targetConfig?.label ?? edge.target}.{targetPort?.label ?? edge.targetHandle}
       </p>
 
-      <div className="mt-3 space-y-1.5">
-        <Label htmlFor="edge-transform" className="text-xs">
+      <div className="mt-3 grid grid-cols-[88px_minmax(0,1fr)] items-center gap-2">
+        <Label htmlFor="edge-transform" className="text-[11px] font-normal text-muted-foreground">
           Transform
         </Label>
         <Select
           value={transform}
           onValueChange={(value) => updateEdgeTransform(edge.id, value)}
         >
-          <SelectTrigger id="edge-transform" className="h-8">
+          <SelectTrigger id="edge-transform" className="h-7 w-full bg-background text-xs shadow-none">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -68,12 +68,12 @@ export function EdgeInspector() {
             ))}
           </SelectContent>
         </Select>
-        <p className="text-[11px] text-muted-foreground">
-          <span className="inline-block h-2 w-2 rounded-full bg-green-500" /> Passthrough
-          {" · "}
-          <span className="inline-block h-2 w-2 rounded-full bg-orange-500" /> Invert
-        </p>
       </div>
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500" /> Passthrough
+        {" · "}
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-orange-500" /> Invert
+      </p>
     </section>
   )
 }

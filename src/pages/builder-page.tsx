@@ -1,4 +1,4 @@
-import { Box, Copy, Download, Redo2, Undo2 } from "lucide-react"
+import { Box, Copy, Download, Redo2, Trash2, Undo2 } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 
@@ -28,7 +28,7 @@ export function BuilderPage() {
     radius: activeStyles.radius,
   }), [activeStyles])
 
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     if (containerRef.current) {
@@ -48,7 +48,10 @@ export function BuilderPage() {
   const canRedo = useGraphStore((s) => s.canRedo)
   const undo = useGraphStore((s) => s.undo)
   const redo = useGraphStore((s) => s.redo)
+  const clearCanvas = useGraphStore((s) => s.clearCanvas)
   const hydrate = useGraphStore((s) => s.hydrate)
+
+  const hasCanvasContent = nodes.length > 0 || edges.length > 0
 
   const selectedNode = useMemo(
     () => nodes.find((node) => node.id === selectedNodeId) ?? null,
@@ -100,6 +103,13 @@ export function BuilderPage() {
 
     return () => window.clearTimeout(timer)
   }, [nodes, edges, tokens, projectName])
+
+  const handleClearCanvas = useCallback(() => {
+    if (!hasCanvasContent) return
+
+    clearCanvas()
+    toast.success("Canvas cleared")
+  }, [clearCanvas, hasCanvasContent])
 
   const handleCopyCode = useCallback(async () => {
     const code = selectedNode
@@ -173,6 +183,17 @@ export function BuilderPage() {
           >
             <Redo2 aria-hidden="true" />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Remove all components from canvas"
+            title="Remove all components from canvas"
+            className="text-destructive hover:text-destructive"
+            disabled={!hasCanvasContent}
+            onClick={handleClearCanvas}
+          >
+            <Trash2 aria-hidden="true" />
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleCopyCode}>
@@ -199,13 +220,12 @@ export function BuilderPage() {
         </section>
 
         <aside className="flex min-h-0 flex-col border-l bg-sidebar text-sidebar-foreground">
-          <div className="border-b p-4">
-            <h2 className="text-sm font-semibold">Inspector</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Select a node or wire to edit.
-            </p>
+          <div className="flex h-10 shrink-0 items-center border-b px-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Inspector
+            </h2>
           </div>
-          <div className="scrollbar-thin grid min-h-0 flex-1 gap-4 overflow-y-auto p-4">
+          <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto">
             <EdgeInspector />
             <Inspector />
             <ThemePanel />

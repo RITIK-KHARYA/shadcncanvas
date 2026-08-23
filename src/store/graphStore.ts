@@ -34,6 +34,7 @@ type GraphStore = {
   redo: () => void
   addNode: (node: CanvasNode) => void
   addEdge: (connection: Connection) => void
+  clearCanvas: () => void
   onNodesChange: (changes: NodeChange<CanvasNode>[]) => void
   onEdgesChange: (changes: EdgeChange<CanvasEdge>[]) => void
   setSelectedNodeId: (id: string | null) => void
@@ -185,6 +186,19 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     ) {
       get().propagate(connection.source, connection.sourceHandle, value)
     }
+  },
+
+  clearCanvas: () => {
+    const { nodes, edges } = get()
+    if (nodes.length === 0 && edges.length === 0) return
+
+    get().pushHistory()
+    set({
+      nodes: [],
+      edges: [],
+      selectedNodeId: null,
+      selectedEdgeId: null,
+    })
   },
 
   onNodesChange: (changes) => {

@@ -257,32 +257,84 @@ export function applyThemeColors(root: HTMLElement, themeState: ThemeEditorState
   })
 }
 
+// Geometry of each shadow level relative to the base values edited by the user
+// (base defaults: offset-y 1px, blur 3px, opacity 0.08 — matches shadcn/ui).
+const SHADOW_SCALE: { key: string; offsetYFactor: number; blurFactor: number; opacity: number }[] = [
+  { key: "shadow-2xs", offsetYFactor: 1, blurFactor: 2 / 3, opacity: 0.04 },
+  { key: "shadow-xs", offsetYFactor: 1, blurFactor: 2 / 3, opacity: 0.05 },
+  { key: "shadow-sm", offsetYFactor: 1, blurFactor: 1, opacity: 0.06 },
+  { key: "shadow", offsetYFactor: 1, blurFactor: 1, opacity: 0.08 },
+  { key: "shadow-md", offsetYFactor: 6, blurFactor: 6, opacity: 0.08 },
+  { key: "shadow-lg", offsetYFactor: 12, blurFactor: 10, opacity: 0.1 },
+  { key: "shadow-xl", offsetYFactor: 20, blurFactor: 15, opacity: 0.12 },
+  { key: "shadow-2xl", offsetYFactor: 24, blurFactor: 20, opacity: 0.16 },
+]
+
+function parsePx(value: string | undefined, fallback: number): number {
+  const parsed = parseFloat(String(value ?? ""))
+  return Number.isNaN(parsed) ? fallback : parsed
+}
+
+export function toHexColor(value: string): string | null {
+  const hsl = colorFormatter(String(value).trim(), "hsl", 4)
+  const match = hsl.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+))?\)/i)
+  if (!match) return null
+
+  const h = ((((parseFloat(match[1]) % 360) + 360) % 360) / 360)
+  const s = Math.max(0, Math.min(100, parseFloat(match[2]))) / 100
+  const l = Math.max(0, Math.min(100, parseFloat(match[3]))) / 100
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+  const p = 2 * l - q
+  const channel = (t: number) => {
+    let x = t
+    if (x < 0) x += 1
+    if (x > 1) x -= 1
+    if (x < 1 / 6) return p + (q - p) * 6 * x
+    if (x < 1 / 2) return q
+    if (x < 2 / 3) return p + (q - p) * (2 / 3 - x) * 6
+    return p
+  }
+
+  const r = Math.round(channel(h + 1 / 3) * 255)
+  const g = Math.round(channel(h) * 255)
+  const b = Math.round(channel(h - 1 / 3) * 255)
+
+  return `#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`
+}
+
 export function setShadowVariables(themeState: ThemeEditorState, root: HTMLElement) {
-  const mode = themeState.currentMode
-  const styles = themeState.styles[mode]
-  const color = styles["shadow-color"] || "oklch(0 0 0)"
-  const opacity = styles["shadow-opacity"] || "0.08"
-  const blur = styles["shadow-blur"] || "3px"
-  const spread = styles["shadow-spread"] || "0px"
-  const offsetX = styles["shadow-offset-x"] || "0px"
-  const offsetY = styles["shadow-offset-y"] || "1px"
+  const styles = themeState.styles[themeState.currentMode]
+  const adjustments =
+    themeState.hslAdjustments || { hueShift: 0, saturationScale: 1, lightnessScale: 1 }
 
-  applyStyleToElement(root, "shadow-color", color)
-  applyStyleToElement(root, "shadow-opacity", opacity)
-  applyStyleToElement(root, "shadow-blur", blur)
-  applyStyleToElement(root, "shadow-spread", spread)
-  applyStyleToElement(root, "shadow-offset-x", offsetX)
-  applyStyleToElement(root, "shadow-offset-y", offsetY)
+  const offsetX = parsePx(styles["shadow-offset-x"], 0)
+  const offsetY = parsePx(styles["shadow-offset-y"], 1)
+  const blur = parsePx(styles["shadow-blur"], 3)
+  const spread = parsePx(styles["shadow-spread"], 0)
+  const baseOpacity = parsePx(styles["shadow-opacity"], 0.08)
 
-  const formattedColor = colorFormatter(color, "hsl", 4)
-  const shadowValue = `${offsetX} ${offsetY} ${blur} ${spread} ${formattedColor}`
-  applyStyleToElement(root, "shadow", shadowValue)
+  // Canonical hsl() without alpha — per-level alpha is injected below.
+  let color = colorFormatter(styles["shadow-color"] || "oklch(0 0 0)", "hsl", 4)
+  color = adjustHslColor(color, adjustments)
+  if (/\/\s*[\d.]+\)$/.test(color)) {
+    color = color.replace(/\/\s*[\d.]+\)$/, ")")
+  }
+  const colorWithAlpha = (alpha: number) => color.replace(/\)$/, ` / ${alpha})`)
+
+  SHADOW_SCALE.forEach((level) => {
+    const opacity = Math.max(0, Math.min(1, level.opacity * (baseOpacity / 0.08)))
+    const value =
+      `${Math.round(offsetX)}px ${Math.round(offsetY * level.offsetYFactor)}px ` +
+      `${Math.round(blur * level.blurFactor)}px ${spread}px ${colorWithAlpha(opacity)}`
+    applyStyleToElement(root, level.key, value)
+  })
 }
 
 export function applyThemeToElement(themeState: ThemeEditorState, rootElement: HTMLElement) {
   const mode = themeState.currentMode
   updateThemeClass(rootElement, mode)
-  applyCommonStyles(rootElement, themeState.styles.light)
+  applyCommonStyles(rootElement, themeState.styles[mode])
   applyThemeColors(rootElement, themeState)
   setShadowVariables(themeState, rootElement)
 }

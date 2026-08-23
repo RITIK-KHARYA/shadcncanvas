@@ -177,6 +177,14 @@ function CanvasFlow() {
       onNodeDragStop={() => recordNodeDragHistory()}
       connectionRadius={24}
       snapToGrid={false}
+      fitView
+      minZoom={0.1}
+      maxZoom={2.5}
+      panOnDrag
+      zoomOnScroll
+      zoomOnPinch
+      panOnScroll={false}
+      selectionOnDrag={false}
       proOptions={{ hideAttribution: true }}
     >
       <Background gap={20} size={1} color="var(--border)" />
