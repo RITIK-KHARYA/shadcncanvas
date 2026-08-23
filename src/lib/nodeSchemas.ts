@@ -118,6 +118,10 @@ export const nodeSchemas: Record<string, z.ZodType> = {
   direction: z.object({
     dir: z.enum(["ltr", "rtl"]),
   }),
+  toast: z.object({
+    message: z.string().min(1, "Message required"),
+    variant: z.enum(["success", "error"]),
+  }),
 }
 
 export function validateNode(componentType: string, props: unknown) {

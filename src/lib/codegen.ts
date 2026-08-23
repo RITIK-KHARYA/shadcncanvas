@@ -48,6 +48,7 @@ const UI_COMPONENTS: Record<string, { exportName: string; importPath: string }> 
   kbd: { exportName: "Kbd", importPath: "kbd" },
   marker: { exportName: "Marker", importPath: "marker" },
   direction: { exportName: "DirectionProvider", importPath: "direction" },
+  toast: { exportName: "Button", importPath: "button" },
 }
 
 function formatJsxProp(key: string, value: unknown): string {
@@ -288,6 +289,12 @@ ${String(props.keys ?? "Ctrl K")
     <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
   </BarChart>
 </ChartContainer>`
+
+    case "toast":
+      return `{/* import { toast } from "sonner" — fires on wired trigger or click */}
+<Button variant="${props.variant === "error" ? "destructive" : "outline"}" onClick={() => toast.${props.variant === "error" ? "error" : "success"}("${String(props.message ?? "")}")}>
+  Fire toast
+</Button>`
 
     default:
       return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`

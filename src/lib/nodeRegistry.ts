@@ -614,6 +614,40 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     inputs: [],
     outputs: [],
   },
+  toast: {
+    type: "toast",
+    label: "Toast",
+    category: "feedback",
+    defaultProps: {
+      message: "Changes saved",
+      variant: "success",
+    },
+    configurableProps: [
+      {
+        key: "message",
+        label: "Message",
+        inputType: "text",
+        default: "Changes saved",
+      },
+      {
+        key: "variant",
+        label: "Variant",
+        inputType: "select",
+        options: ["success", "error"],
+        default: "success",
+      },
+    ],
+    inputs: [{ key: "trigger", label: "Trigger", type: "boolean" }],
+    outputs: [{ key: "fired", label: "Fired", type: "boolean" }],
+  },
+}
+
+// Every component supports loading logic: wire any boolean output into
+// the standard `loading` port to show its skeleton form while loading.
+for (const config of Object.values(nodeRegistry)) {
+  if (!config.inputs.some((input) => input.key === "loading")) {
+    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" })
+  }
 }
 
 export const categoryLabels: Record<NodeConfig["category"], string> = {

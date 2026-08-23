@@ -1,4 +1,6 @@
 import type { VariantProps } from "class-variance-authority"
+import { useEffect, useRef } from "react"
+import { toast } from "sonner"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import {
   CalendarDays,
@@ -791,6 +793,33 @@ export function NodePreview({
           </div>
         </DirectionProvider>
       )
+
+    case "toast": {
+      const message = String(props.message ?? "")
+      const isError = props.variant === "error"
+      const trigger = Boolean(props.trigger ?? state.trigger)
+      const fire = () => {
+        if (isError) toast.error(message || "Something went wrong")
+        else toast.success(message || "Changes saved")
+        emit("fired", true)
+      }
+
+      // Fire on the rising edge of a wired trigger signal.
+      const prevTrigger = useRef(trigger)
+      useEffect(() => {
+        if (trigger && !prevTrigger.current) {
+          fire()
+        }
+        prevTrigger.current = trigger
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- fire is stable per render inputs
+      }, [trigger])
+
+      return (
+        <Button size="sm" variant={isError ? "destructive" : "outline"} disabled={disabled} onClick={fire}>
+          {trigger && !isError ? "Firing…" : isError ? "Fire error" : "Fire toast"}
+        </Button>
+      )
+    }
 
     default:
       return (
