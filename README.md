@@ -9,13 +9,15 @@ Visual builder for [shadcn/ui](https://ui.shadcn.com/) components. Drag componen
 ## Features
 
 - Infinite pan/zoom canvas via React Flow
-- 33+ shadcn/ui components (Layout, Form, Feedback, Navigation)
-- Node wiring for state flow and event routing
+- 54+ shadcn/ui components (Layout, Form, Feedback, Navigation, and more)
+- Node wiring for state flow and event routing via typed edges
 - Zod schema validation with react-hook-form
-- JSX copy to clipboard or ZIP export
+- JSX code generation and ZIP export
 - Live props inspector with theme token editing
 - Dark mode with OKLCH color tokens
 - Undo/redo history
+- Drag-and-drop palette to canvas
+- Local project persistence (localStorage)
 
 ---
 
@@ -67,8 +69,22 @@ flowchart LR
 | Styling | Tailwind CSS 4, OKLCH tokens |
 | State | Zustand |
 | Forms | React Hook Form, Zod |
-| Export | JSZip, FileSaver |
+| Export | JSZip, FileSaver, codegen |
 | Routing | React Router DOM |
+| DnD | React Flow built-in |
+
+---
+
+## Code Generation
+
+Generate production-ready React JSX from your canvas layout. The code generator:
+
+- Maps 30+ shadcn/ui component types to JSX
+- Handles props, states, and wired event connections
+- Outputs formatted code with proper imports
+- Supports ZIP export with graph and theme data
+
+See the [Export](/docs/export) section for usage details.
 
 ---
 
@@ -76,7 +92,7 @@ flowchart LR
 
 ```
 src/
-  components/ui/   -- 33 shadcn/ui components
+  components/ui/   -- 54+ shadcn/ui components
   hooks/           -- useIsMobile
   lib/             -- cn() utility
   pages/

@@ -1,18 +1,15 @@
-import type { CanvasEdge, CanvasNode } from "@/types/graph";
-import type { ThemeTokens } from "@/store/themeStore";
-import { themeTokensToStyle } from "@/store/themeStore";
+import type { CanvasEdge, CanvasNode } from "@/types/graph"
+import type { ThemeTokens } from "@/store/themeStore"
+import { themeTokensToStyle } from "@/store/themeStore"
 
 type FormField = {
-  name: string;
-  type: string;
-  required?: boolean;
-  placeholder?: string;
-};
+  name: string
+  type: string
+  required?: boolean
+  placeholder?: string
+}
 
-const UI_COMPONENTS: Record<
-  string,
-  { exportName: string; importPath: string }
-> = {
+const UI_COMPONENTS: Record<string, { exportName: string; importPath: string }> = {
   button: { exportName: "Button", importPath: "button" },
   input: { exportName: "Input", importPath: "input" },
   textarea: { exportName: "Textarea", importPath: "textarea" },
@@ -51,17 +48,17 @@ const UI_COMPONENTS: Record<
   marker: { exportName: "Marker", importPath: "marker" },
   direction: { exportName: "DirectionProvider", importPath: "direction" },
   toast: { exportName: "toast", importPath: "sonner" },
-};
+}
 
 function formatJsxProp(key: string, value: unknown): string {
-  if (key === "options" || key === "fields") return "";
+  if (key === "options" || key === "fields") return ""
   if (typeof value === "string") {
-    return `${key}="${value.replace(/"/g, '\\"')}"`;
+    return `${key}="${value.replace(/"/g, '\\"')}"`
   }
   if (typeof value === "boolean") {
-    return value ? key : `${key}={false}`;
+    return value ? key : `${key}={false}`
   }
-  return `${key}={${JSON.stringify(value)}}`;
+  return `${key}={${JSON.stringify(value)}}`
 }
 
 function buildPropsString(props: Record<string, unknown>): string {
@@ -71,11 +68,11 @@ function buildPropsString(props: Record<string, unknown>): string {
         value !== undefined && key !== "options" && key !== "fields",
     )
     .map(([key, value]) => formatJsxProp(key, value))
-    .join(" ");
+    .join(" ")
 }
 
 function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 function deriveStateName(
@@ -84,177 +81,165 @@ function deriveStateName(
   index: number,
   labels: Map<string, string>,
 ): string {
-  const userLabel = labels.get(nodeId) || "";
-  const base = userLabel ? userLabel : componentType;
-  const suffix = index > 0 ? `_${index}` : "";
-  return `${base}${suffix}`;
+  const userLabel = labels.get(nodeId) || ""
+  const base = userLabel ? userLabel : componentType
+  const suffix = index > 0 ? `_${index}` : ""
+  return `${base}${suffix}`
 }
 
 function buildWiringBlock(edges: CanvasEdge[], nodes: CanvasNode[]): string {
-  if (edges.length === 0) return "";
+  if (edges.length === 0) return ""
 
-  const labels = new Map(nodes.map((n) => [n.id, n.data.label ?? ""]));
+  const labels = new Map(nodes.map((n) => [n.id, n.data.label ?? ""]))
 
-  const sourceNodeIndices = new Map<string, number>();
-  const targetNodeStateMap = new Map<
-    string,
-    Array<{ sourceState: string; transform: string }>
-  >();
+  const sourceNodeIndices = new Map<string, number>()
+  const targetNodeStateMap = new Map<string, Array<{ sourceState: string; transform: string }>>()
 
   for (const edge of edges) {
-    const sourceId = edge.source!.id;
-    const targetId = edge.target!.id;
-    const transform = edge.data?.transform ?? "passthrough";
+    const sourceId = edge.source!.id
+    const targetId = edge.target!.id
+    const transform = edge.data?.transform ?? "passthrough"
 
     if (!sourceNodeIndices.has(sourceId)) {
-      sourceNodeIndices.set(sourceId, 0);
+      sourceNodeIndices.set(sourceId, 0)
     }
-    sourceNodeIndices.set(sourceId, sourceNodeIndices.get(sourceId)! + 1);
+    sourceNodeIndices.set(sourceId, sourceNodeIndices.get(sourceId)! + 1)
 
-    const compType =
-      nodes.find((n) => n.id === sourceId)?.data.componentType ?? "";
-    const stateIndex = sourceNodeIndices.get(sourceId)!;
-    const stateName = deriveStateName(compType, sourceId, stateIndex, labels);
+    const compType = nodes.find((n) => n.id === sourceId)?.data.componentType ?? ""
+    const stateIndex = sourceNodeIndices.get(sourceId)!
+    const stateName = deriveStateName(compType, sourceId, stateIndex, labels)
 
     if (!targetNodeStateMap.has(targetId)) {
-      targetNodeStateMap.set(targetId, []);
+      targetNodeStateMap.set(targetId, [])
     }
     targetNodeStateMap.get(targetId)!.push({
       sourceState: stateName,
       transform,
-    });
+    })
   }
 
-  const parts: string[] = [];
+  const parts: string[] = []
 
   // useState hooks
-  const useStateLines: string[] = [];
+  const useStateLines: string[] = []
   sourceNodeIndices.forEach((count, id, _) => {
-    const comp = nodes.find((n) => n.id === id)?.data.componentType ?? "";
+    const comp = nodes.find((n) => n.id === id)?.data.componentType ?? ""
     for (let i = 1; i <= count; i++) {
-      const stateName = deriveStateName(comp, id, i, labels);
-      useStateLines.push(
-        `  const [${stateName}, set${capitalize(stateName)}] = useState(false)`,
-      );
+      const stateName = deriveStateName(comp, id, i, labels)
+      useStateLines.push(`  const [${stateName}, set${capitalize(stateName)}] = useState(false)`)
     }
-  });
+  })
   if (useStateLines.length > 0) {
-    parts.push(`const useStateHooks = {\n${useStateLines.join(",\n")}\n}`);
+    parts.push(`const useStateHooks = {\n${useStateLines.join(",\n")}\n}`)
   }
 
   // event handlers
-  const handlerLines: string[] = [];
+  const handlerLines: string[] = []
   sourceNodeIndices.forEach((count, id) => {
-    const comp = nodes.find((n) => n.id === id)?.data.componentType ?? "";
-    const capitalized = capitalize(comp);
+    const comp = nodes.find((n) => n.id === id)?.data.componentType ?? ""
+    const capitalized = capitalize(comp)
     for (let i = 1; i <= count; i++) {
-      const stateName = deriveStateName(comp, id, i, labels);
-      handlerLines.push(
-        `  const handle${capitalized}${i} = () => set${capitalize(stateName)}(prev => !prev)`,
-      );
+      const stateName = deriveStateName(comp, id, i, labels)
+      handlerLines.push(`  const handle${capitalized}${i} = () => set${capitalize(stateName)}(prev => !prev)`)
     }
-  });
+  })
   if (handlerLines.length > 0) {
-    parts.push(`const eventHandlers = {\n${handlerLines.join(",\n")}\n}`);
+    parts.push(`const eventHandlers = {\n${handlerLines.join(",\n")}\n}`)
   }
 
   // target node props
-  const targetLines: string[] = [];
+  const targetLines: string[] = []
   targetNodeStateMap.forEach((stateEntries, targetId) => {
-    const targetNode = nodes.find((n) => n.id === targetId);
-    if (!targetNode) return;
+    const targetNode = nodes.find((n) => n.id === targetId)
+    if (!targetNode) return
 
-    const props = targetNode.data.props as Record<string, unknown>;
+    const props = targetNode.data.props as Record<string, unknown>
 
     for (const entry of stateEntries) {
-      const { sourceState, transform } = entry;
-      let propKey: string | undefined;
+      const { sourceState, transform } = entry
+      let propKey: string | undefined
 
       if (transform === "invert") {
-        propKey = "active";
+        propKey = "active"
       } else if (transform === "negate") {
-        continue;
+        continue
       } else {
-        propKey = "active";
+        propKey = "active"
       }
 
       if (propKey && props[propKey] !== undefined) {
-        const transformSymbol = transform === "invert" ? "!" : "";
-        targetLines.push(
-          `  ${targetNode.id}: { ${propKey}: ${transformSymbol}${sourceState} }`,
-        );
+        const transformSymbol = transform === "invert" ? "!" : ""
+        targetLines.push(`  ${targetNode.id}: { ${propKey}: ${transformSymbol}${sourceState} }`)
       }
     }
-  });
+  })
   if (targetLines.length > 0) {
-    parts.push(`const wireProps = {\n${targetLines.join(",\n")}\n}`);
+    parts.push(`const wireProps = {\n${targetLines.join(",\n")}\n}`)
   }
 
   // useEffect for chains
-  const effectLines: string[] = [];
-  const targetIdsWithEdges = new Set(targetNodeStateMap.keys());
+  const effectLines: string[] = []
+  const targetIdsWithEdges = new Set(targetNodeStateMap.keys())
 
   for (const targetId of targetIdsWithEdges) {
-    const targetNode = nodes.find((n) => n.id === targetId);
-    if (!targetNode) continue;
+    const targetNode = nodes.find((n) => n.id === targetId)
+    if (!targetNode) continue
 
     const outgoingEdges = edges.filter(
       (e) => e.source!.id === targetId && e.target!.id !== targetId,
-    );
+    )
     if (outgoingEdges.length > 0) {
-      const entries = targetNodeStateMap.get(targetId) || [];
+      const entries = targetNodeStateMap.get(targetId) || []
       if (entries.length > 0) {
-        const stateName = entries[0].sourceState;
-        effectLines.push(
-          `  useEffect(() => { set${capitalize(stateName)}(prev => !prev) }, [${stateName}])`,
-        );
+        const stateName = entries[0].sourceState
+        effectLines.push(`  useEffect(() => { set${capitalize(stateName)}(prev => !prev) }, [${stateName}])`)
       }
     }
   }
   if (effectLines.length > 0) {
-    parts.push(`\n  useEffects = {\n${effectLines.join(",\n")}\n  }`);
+    parts.push(`\n  useEffects = {\n${effectLines.join(",\n")}\n  }`)
   }
 
-  return `\n${parts.join("\n")}`;
+  return `\n${parts.join("\n")}`
 }
 
 function buildThemeBlock(theme?: ThemeTokens): string {
-  if (!theme) return "";
-  const vars = themeTokensToStyle(theme);
+  if (!theme) return ""
+  const vars = themeTokensToStyle(theme)
   const css = Object.entries(vars)
     .map(([k, v]) => `  ${k}: ${v};`)
-    .join("\n");
+    .join("\n")
   return `\n/* Canvas theme tokens */\n/*
 :root {
 ${css}
 }
-*/\n`;
+*/\n`
 }
 
 export function generateNodeCode(node: CanvasNode): string {
-  const { componentType, props } = node.data;
-  const ui = UI_COMPONENTS[componentType];
+  const { componentType, props } = node.data
+  const ui = UI_COMPONENTS[componentType]
 
   if (!ui || !nodeRegistry?.[componentType]) {
-    return `{/* Unknown node: ${componentType} */}`;
+    return `{/* Unknown node: ${componentType} */}`
   }
 
-  const propsString = buildPropsString(props as Record<string, unknown>);
+  const propsString = buildPropsString(props as Record<string, unknown>)
 
   switch (componentType) {
     case "button":
-      return `<Button${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Button")}</Button>`;
+      return `<Button${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Button")}</Button>`
 
     case "label":
-      return `<Label${propsString ? ` ${propsString}` : ""}>${String(props.text ?? "Label")}</Label>`;
+      return `<Label${propsString ? ` ${propsString}` : ""}>${String(props.text ?? "Label")}</Label>`
 
     case "badge":
-      return `<Badge${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Badge")}</Badge>`;
+      return `<Badge${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Badge")}</Badge>`
 
     case "select": {
       const options = Array.isArray(props.options)
         ? (props.options as string[])
-        : ["Option 1"];
+        : ["Option 1"]
       return `<Select>
   <SelectTrigger className="w-48">
     <SelectValue placeholder="${String(props.placeholder ?? "Select")}" />
@@ -262,14 +247,14 @@ export function generateNodeCode(node: CanvasNode): string {
   <SelectContent>
 ${options.map((o) => `    <SelectItem value="${o}">${o}</SelectItem>`).join("\n")}
   </SelectContent>
-</Select>`;
+</Select>`
     }
 
     case "form": {
       const fields = Array.isArray(props.fields)
         ? (props.fields as FormField[])
-        : [{ name: "field1", type: "text", placeholder: "Field 1" }];
-      const active = props.active !== undefined ? Boolean(props.active) : true;
+        : [{ name: "field1", type: "text", placeholder: "Field 1" }]
+      const active = props.active !== undefined ? Boolean(props.active) : true
       return `<Card className="p-4">
   <CardHeader>
     <CardTitle>${String(props.title ?? "Untitled Form")}</CardTitle>
@@ -285,7 +270,7 @@ ${fields
       <Button type="submit">Submit</Button>
     </fieldset>
   </CardContent>
-</Card>`;
+</Card>`
     }
 
     case "card":
@@ -294,7 +279,7 @@ ${fields
     <CardTitle>${String(props.title ?? "Card Title")}</CardTitle>
     <CardDescription>${String(props.description ?? "")}</CardDescription>
   </CardHeader>
-</Card>`;
+</Card>`
 
     case "tabs":
       return `<Tabs defaultValue="tab-1" className="w-56">
@@ -304,18 +289,18 @@ ${fields
   </TabsList>
   <TabsContent value="tab-1">Tab one content</TabsContent>
   <TabsContent value="tab-2">Tab two content</TabsContent>
-</Tabs>`;
+</Tabs>`
 
     case "separator":
-      return `<Separator className="my-2" />`;
+      return `<Separator className="my-2" />`
 
     case "skeleton":
-      return `<Skeleton className="h-10 w-48" />`;
+      return `<Skeleton className="h-10 w-48" />`
 
     case "bubble":
       return `<Bubble variant="${String(props.variant ?? "received")}">
   ${String(props.text ?? "")}
-</Bubble>`;
+</Bubble>`
 
     case "message":
       return `<Message>
@@ -323,12 +308,12 @@ ${fields
   <MessageContent variant="${String(props.variant ?? "received")}">
     <MessageBody variant="${String(props.variant ?? "received")}">${String(props.text ?? "")}</MessageBody>
   </MessageContent>
-</Message>`;
+</Message>`
 
     case "message-scroller":
       return `<MessageScroller>
   {/* Message components */}
-</MessageScroller>`;
+</MessageScroller>`
 
     case "empty":
       return `<Empty>
@@ -337,7 +322,7 @@ ${fields
     <EmptyTitle>${String(props.title ?? "No results")}</EmptyTitle>
     <EmptyDescription>${String(props.description ?? "")}</EmptyDescription>
   </EmptyHeader>
-</Empty>`;
+</Empty>`
 
     case "kbd":
       return `<KbdGroup>
@@ -345,16 +330,14 @@ ${String(props.keys ?? "Ctrl K")
   .split(/\s+/)
   .map((key) => `  <Kbd>${key}</Kbd>`)
   .join("\n")}
-</KbdGroup>`;
+</KbdGroup>`
 
     case "marker": {
-      const text = String(props.text ?? "");
-      const highlight = String(props.highlight ?? "");
-      const index = highlight
-        ? text.toLowerCase().indexOf(highlight.toLowerCase())
-        : -1;
-      if (index === -1) return text;
-      return `${text.slice(0, index)}<Marker>${text.slice(index, index + highlight.length)}</Marker>${text.slice(index + highlight.length)}`;
+      const text = String(props.text ?? "")
+      const highlight = String(props.highlight ?? "")
+      const index = highlight ? text.toLowerCase().indexOf(highlight.toLowerCase()) : -1
+      if (index === -1) return text
+      return `${text.slice(0, index)}<Marker>${text.slice(index, index + highlight.length)}</Marker>${text.slice(index + highlight.length)}`
     }
 
     case "field":
@@ -362,12 +345,12 @@ ${String(props.keys ?? "Ctrl K")
   <FieldLabel>${String(props.label ?? "Label")}</FieldLabel>
   <Input placeholder="..." />
   ${props.error ? `<FieldError>${String(props.error)}</FieldError>` : `<FieldDescription>${String(props.description ?? "")}</FieldDescription>`}
-</Field>`;
+</Field>`
 
     case "native-select":
       return `<NativeSelect defaultValue="">
   <option value="" disabled>${String(props.placeholder ?? "Select…")}</option>
-</NativeSelect>`;
+</NativeSelect>`
 
     case "carousel":
       return `<Carousel className="w-full max-w-xs">
@@ -377,7 +360,7 @@ ${String(props.keys ?? "Ctrl K")
   </CarouselContent>
   <CarouselPrevious />
   <CarouselNext />
-</Carousel>`;
+</Carousel>`
 
     case "item":
       return `<Item variant="outline">
@@ -387,7 +370,7 @@ ${String(props.keys ?? "Ctrl K")
     <ItemDescription>${String(props.description ?? "")}</ItemDescription>
   </ItemContent>
   <ItemActions>{/* controls */}</ItemActions>
-</Item>`;
+</Item>`
 
     case "dialog":
       return `<Dialog>
@@ -401,7 +384,7 @@ ${String(props.keys ?? "Ctrl K")
     </DialogHeader>
     <DialogFooter>{/* actions */}</DialogFooter>
   </DialogContent>
-</Dialog>`;
+</Dialog>`
 
     case "drawer":
       return `<Drawer>
@@ -414,13 +397,13 @@ ${String(props.keys ?? "Ctrl K")
       <DrawerDescription>${String(props.description ?? "")}</DrawerDescription>
     </DrawerHeader>
   </DrawerContent>
-</Drawer>`;
+</Drawer>`
 
     case "hover-card":
       return `<HoverCard>
   <HoverCardTrigger href="#">${String(props.trigger ?? "@trigger")}</HoverCardTrigger>
   <HoverCardContent>${String(props.heading ?? "")} — ${String(props.bio ?? "")}</HoverCardContent>
-</HoverCard>`;
+</HoverCard>`
 
     case "command":
       return `<Command className="rounded-lg border shadow-none">
@@ -431,7 +414,7 @@ ${String(props.keys ?? "Ctrl K")
       <CommandItem>Calendar</CommandItem>
     </CommandGroup>
   </CommandList>
-</Command>`;
+</Command>`
 
     case "chart":
       return `<ChartContainer config={chartConfig} className="aspect-video">
@@ -441,13 +424,13 @@ ${String(props.keys ?? "Ctrl K")
     <ChartTooltip content={<ChartTooltipContent />} />
     <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
   </BarChart>
-</ChartContainer>`;
+</ChartContainer>`
 
     case "toast":
-      return "";
+      return ""
 
     default:
-      return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`;
+      return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`
   }
 }
 
@@ -456,11 +439,11 @@ export function generateFullCode(
   edges: CanvasEdge[],
   theme?: ThemeTokens,
 ): string {
-  const types = [...new Set(nodes.map((n) => n.data.componentType))];
-  const imports = buildImports(types);
+  const types = [...new Set(nodes.map((n) => n.data.componentType))]
+  const imports = buildImports(types)
   const componentsCode = nodes
     .map((node) => indent(generateNodeCode(node), 6))
-    .join("\n");
+    .join("\n")
 
   return `${imports}
 ${buildThemeBlock(theme)}
@@ -471,38 +454,37 @@ ${componentsCode}
     </div>
   )
 }
-`;
-}
+`
 
 function buildImports(types: string[]): string {
-  const lines = new Set<string>();
+  const lines = new Set<string>()
 
   for (const type of types) {
-    const ui = UI_COMPONENTS[type];
-    if (!ui) continue;
+    const ui = UI_COMPONENTS[type]
+    if (!ui) continue
 
     if (type === "card" || type === "form") {
       lines.add(
         `import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"`,
-      );
+      )
       if (type === "form") {
-        lines.add(`import { Button } from "@/components/ui/button"`);
-        lines.add(`import { Input } from "@/components/ui/input"`);
+        lines.add(`import { Button } from "@/components/ui/button"`)
+        lines.add(`import { Input } from "@/components/ui/input"`)
       }
     } else if (type === "select") {
       lines.add(
         `import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"`,
-      );
+      )
     } else if (type === "tabs") {
       lines.add(
         `import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"`,
-      );
+      )
     } else {
       lines.add(
         `import { ${ui.exportName} } from "@/components/ui/${ui.importPath}"`,
-      );
+      )
     }
   }
 
-  return [...lines].join("\n");
+  return [...lines].join("\n")
 }

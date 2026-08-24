@@ -1,40 +1,46 @@
-import { Handle, NodeResizer, Position, type NodeProps, type OnResize } from "@xyflow/react"
-import { useCallback } from "react"
+import {
+  Handle,
+  NodeResizer,
+  Position,
+  type NodeProps,
+  type OnResize,
+} from "@xyflow/react";
+import { useCallback } from "react";
 
-import { nodeRegistry } from "@/lib/nodeRegistry"
-import { useGraphStore, recordNodeDragHistory } from "@/store/graphStore"
-import type { CanvasNode, NodeLayout, NodeState } from "@/types/graph"
-import { cn } from "@/lib/utils"
+import { nodeRegistry } from "@/lib/nodeRegistry";
+import { useGraphStore, recordNodeDragHistory } from "@/store/graphStore";
+import type { CanvasNode, NodeLayout, NodeState } from "@/types/graph";
+import { cn } from "@/lib/utils";
 
-import { NodePreview } from "./NodePreview"
-import { NodeSkeleton } from "./NodeSkeleton"
+import { NodePreview } from "./NodePreview";
+import { NodeSkeleton } from "./NodeSkeleton";
 
 const handleClass =
-  "!h-3 !w-3 !border-2 !border-primary !bg-background hover:!bg-primary hover:!scale-110 transition-transform"
+  "!h-3 !w-3 !border-2 !border-primary !bg-background hover:!bg-primary hover:!scale-110 transition-transform";
 
-export const DEFAULT_NODE_WIDTH = 240
-export const DEFAULT_NODE_HEIGHT = 120
-export const MIN_NODE_WIDTH = 120
-export const MIN_NODE_HEIGHT = 48
+export const DEFAULT_NODE_WIDTH = 240;
+export const DEFAULT_NODE_HEIGHT = 120;
+export const MIN_NODE_WIDTH = 120;
+export const MIN_NODE_HEIGHT = 48;
 
 function resolveLayout(layout?: NodeLayout): NodeLayout {
-  return layout ?? { sizeMode: "default" }
+  return layout ?? { sizeMode: "default" };
 }
 
 export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
-  const updateNodeState = useGraphStore((s) => s.updateNodeState)
-  const updateNodeLayout = useGraphStore((s) => s.updateNodeLayout)
-  const propagate = useGraphStore((s) => s.propagate)
-  const config = nodeRegistry[data.componentType]
-  const layout = resolveLayout(data.layout)
+  const updateNodeState = useGraphStore((s) => s.updateNodeState);
+  const updateNodeLayout = useGraphStore((s) => s.updateNodeLayout);
+  const propagate = useGraphStore((s) => s.propagate);
+  const config = nodeRegistry[data.componentType];
+  const layout = resolveLayout(data.layout);
 
   const emitOutput = (outputKey: string, value: boolean | string | number) => {
-    updateNodeState(id, { [outputKey]: value })
-    propagate(id, outputKey, value)
-  }
+    updateNodeState(id, { [outputKey]: value });
+    propagate(id, outputKey, value);
+  };
 
   const emitOutputs = (outputs: NodeState) => {
-    updateNodeState(id, outputs)
+    updateNodeState(id, outputs);
     for (const [key, value] of Object.entries(outputs)) {
       if (
         value !== undefined &&
@@ -42,14 +48,14 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
           typeof value === "string" ||
           typeof value === "number")
       ) {
-        propagate(id, key, value)
+        propagate(id, key, value);
       }
     }
-  }
+  };
 
   const handleResizeStart = useCallback(() => {
-    recordNodeDragHistory()
-  }, [])
+    recordNodeDragHistory();
+  }, []);
 
   const handleResize = useCallback<OnResize>(
     (_event, params) => {
@@ -57,24 +63,24 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
         sizeMode: "custom",
         customWidth: Math.max(MIN_NODE_WIDTH, Math.round(params.width)),
         customHeight: Math.max(MIN_NODE_HEIGHT, Math.round(params.height)),
-      })
+      });
     },
     [id, updateNodeLayout],
-  )
+  );
 
   if (!config) {
     return (
       <div className="rounded-lg border-2 border-destructive bg-background p-3">
         Unknown type: {data.componentType}
       </div>
-    )
+    );
   }
 
-  const inputCount = config.inputs.length
-  const outputCount = config.outputs.length
-  const handleCount = Math.max(inputCount, outputCount, 1)
-  const isCustom = layout.sizeMode === "custom"
-  const isLoading = Boolean(data.props.loading ?? data.state.loading)
+  const inputCount = config.inputs.length;
+  const outputCount = config.outputs.length;
+  const handleCount = Math.max(inputCount, outputCount, 1);
+  const isCustom = layout.sizeMode === "custom";
+  const isLoading = Boolean(data.props.loading ?? data.state.loading);
 
   return (
     <>
@@ -93,14 +99,17 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
           isCustom ? "overflow-hidden" : "w-fit",
           selected ? "border-primary ring-2 ring-primary/20" : "border-border",
         )}
-        style={
-          isCustom
+        style={{
+          ...(isCustom
             ? {
                 width: layout.customWidth ?? DEFAULT_NODE_WIDTH,
                 height: layout.customHeight ?? DEFAULT_NODE_HEIGHT,
               }
-            : undefined
-        }
+            : undefined),
+          ...(layout.rotation
+            ? { transform: `rotate(${layout.rotation}deg)` }
+            : undefined),
+        }}
       >
         {config.inputs.map((input, i) => (
           <Handle
@@ -142,5 +151,5 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
         ))}
       </div>
     </>
-  )
+  );
 }

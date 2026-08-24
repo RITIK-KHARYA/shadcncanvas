@@ -1,137 +1,119 @@
-import {
-  ArrowRight,
-  Boxes,
-  Cable,
-  Code2,
-  Github,
-  ShieldCheck,
-} from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
+import { NodeFlowIllustration } from "@/components/landing/node-flow-illustration";
+import { Button } from "@/components/ui/button";
+import { features, stack, steps } from "./constant";
+import { ArrowRight, Github } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-
-const features = [
-  {
-    title: "Visual Canvas",
-    description:
-      "Drop real shadcn/ui components onto an infinite workspace and compose screens by sight.",
-    icon: Boxes,
-  },
-  {
-    title: "Logic Wiring",
-    description:
-      "Connect component handles to model interactions, state flow, and UI behavior before export.",
-    icon: Cable,
-  },
-  {
-    title: "Zod Validation",
-    description:
-      "Describe props and form fields with schemas so generated UI keeps its contracts explicit.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Export as Code",
-    description:
-      "Copy JSX or download a project structure ready for a shadcn/ui codebase.",
-    icon: Code2,
-  },
-]
-
-const steps = [
-  "Drag shadcn components onto the canvas.",
-  "Connect logic between nodes with typed wires.",
-  "Export clean React code when the design is ready.",
-]
 
 export function LandingPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <section className="mx-auto flex min-h-[72vh] w-full max-w-6xl flex-col justify-center px-6 py-16 sm:px-8 lg:px-10">
-        <div className="max-w-3xl">
-          <p className="mb-5 text-sm font-medium uppercase tracking-wide text-muted-foreground">
-            Shadcn Canvas
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6 sm:px-8 lg:px-10">
+        <span className="text-sm font-medium tracking-tight">
+          Shadcn Canvas
+        </span>
+        <nav className="flex items-center gap-6">
+          <a
+            href="https://github.com/RITIK-KHARYA/shadcncanvas"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex sm:items-center sm:gap-1.5"
+          >
+            <Github className="size-4" aria-hidden="true" />
+            GitHub
+          </a>
+          <Button asChild size="sm">
+            <Link to="/app">Open Builder</Link>
+          </Button>
+        </nav>
+      </header>
+
+      <section className="mx-auto grid w-full max-w-5xl gap-12 px-6 py-16 sm:px-8 md:grid-cols-2 md:items-center md:gap-8 md:py-24 lg:px-10">
+        <div>
+          <p className="mb-5 inline-flex items-center gap-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <span className="size-1.5 rounded-full bg-foreground" />
+            Client-side · Open source
           </p>
-          <h1 className="text-4xl font-semibold tracking-normal text-balance sm:text-5xl lg:text-6xl">
+          <h1 className="text-4xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl">
             Build shadcn UIs visually
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-            Shadcn Canvas is a visual builder for developers who want to sketch
-            real shadcn/ui components, wire behavior, validate forms, and export
-            production-friendly React code.
+          <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
+            Sketch real shadcn/ui components on an infinite canvas, wire
+            behavior between them, validate with Zod, and export
+            production-ready React code.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild size="lg">
               <Link to="/app">
-                Start Building
+                Start building
                 <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="ghost" size="lg">
               <a
                 href="https://github.com/RITIK-KHARYA/shadcncanvas"
                 target="_blank"
                 rel="noreferrer"
               >
                 <Github aria-hidden="true" />
-                GitHub
+                View source
               </a>
             </Button>
           </div>
         </div>
+
+        <NodeFlowIllustration />
       </section>
 
-      <section className="border-y bg-card/30">
-        <div className="mx-auto grid max-w-6xl gap-4 px-6 py-12 sm:px-8 md:grid-cols-2 lg:grid-cols-4 lg:px-10">
+      <section className="border-t">
+        <div className="mx-auto grid w-full max-w-5xl gap-x-8 gap-y-10 px-6 py-16 sm:px-8 sm:grid-cols-2 lg:px-10 lg:grid-cols-4">
           {features.map((feature) => (
-            <Card key={feature.title} className="rounded-lg bg-card/80">
-              <CardHeader>
-                <feature.icon
-                  className="mb-3 size-5 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription>{feature.description}</CardDescription>
-              </CardHeader>
-            </Card>
+            <div key={feature.title}>
+              <feature.icon
+                className="mb-3 size-5 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <h3 className="text-sm font-medium">{feature.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {feature.description}
+              </p>
+            </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14 sm:px-8 lg:px-10">
-        <div className="grid gap-6 md:grid-cols-[0.8fr_1.2fr] md:items-start">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-normal">
-              How it works
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              A short path from canvas sketch to reusable component code.
-            </p>
-          </div>
-          <div className="grid gap-3">
+      <section className="border-t">
+        <div className="mx-auto w-full max-w-5xl px-6 py-16 sm:px-8 lg:px-10">
+          <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+            How it works
+          </h2>
+          <div className="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-6">
             {steps.map((step, index) => (
-              <Card key={step} className="rounded-lg">
-                <CardContent className="flex items-center gap-4 p-4">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-sm font-medium">
-                    {index + 1}
-                  </span>
-                  <p className="text-sm text-muted-foreground">{step}</p>
-                </CardContent>
-              </Card>
+              <div key={step.title} className="relative pl-0">
+                <span className="text-2xl font-semibold tabular-nums text-muted-foreground/40">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-3 text-base font-medium">{step.title}</h3>
+                <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
+                  {step.description}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
+      <section className="border-t">
+        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-10 text-xs text-muted-foreground sm:px-8 lg:px-10">
+          {stack.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      </section>
+
       <footer className="border-t px-6 py-6">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span>Shadcn Canvas</span>
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <span>Built by Ritik Kharya · MIT License</span>
           <a
             className="inline-flex items-center gap-2 hover:text-foreground"
             href="https://github.com/RITIK-KHARYA/shadcncanvas"
@@ -144,5 +126,5 @@ export function LandingPage() {
         </div>
       </footer>
     </main>
-  )
+  );
 }
