@@ -11,7 +11,7 @@ import {
 import { ColorField } from "@/components/inspector/ColorField";
 import { useEditorStore, THEME_PRESETS } from "@/store/editor-store";
 import { ThemeStyleProps } from "@/types/theme";
-import { isColorProperty } from "@/utils/apply-theme";
+import { isColorProperty } from "@/theme/colors";
 
 function TextField({
   id,

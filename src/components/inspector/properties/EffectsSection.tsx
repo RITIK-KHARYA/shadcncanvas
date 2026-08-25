@@ -1,5 +1,5 @@
 import { CollapsibleSection } from "@/components/inspector/CollapsibleSection"
-import type { NodeConfig } from "@/lib/nodeRegistry"
+import type { NodeConfig } from "@/lib/registry"
 import type { CanvasNode } from "@/types/graph"
 import { cn } from "@/lib/utils"
 

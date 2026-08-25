@@ -1,6 +1,6 @@
 import { CommentInput } from "@/components/inspector/comments/CommentInput";
 import { CommentList } from "@/components/inspector/comments/CommentList";
-import { useCommentsStore } from "@/store/commentsStore";
+import { useCommentsStore } from "@/store/comments-store";
 
 export function CommentsPanel({ targetId }: { targetId: string }) {
   const comments = useCommentsStore((s) => s.commentsByTarget[targetId] ?? []);

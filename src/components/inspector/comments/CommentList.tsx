@@ -1,5 +1,5 @@
 import { CommentItem } from "@/components/inspector/comments/CommentItem"
-import type { Comment } from "@/store/commentsStore"
+import type { Comment } from "@/store/comments-store"
 
 export function CommentList({
   comments,

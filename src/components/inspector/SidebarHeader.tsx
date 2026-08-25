@@ -10,8 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { nodeRegistry } from "@/lib/nodeRegistry"
-import { useGraphStore } from "@/store/graphStore"
+import { nodeRegistry } from "@/lib/registry"
+import { useGraphStore } from "@/store/graph-store"
 import type { CanvasNode } from "@/types/graph"
 
 export function SidebarHeader({

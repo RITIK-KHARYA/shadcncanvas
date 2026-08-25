@@ -6,7 +6,7 @@ import { PropertiesPanel } from "@/components/inspector/properties/PropertiesPan
 import { SidebarHeader } from "@/components/inspector/SidebarHeader"
 import { SidebarTabs, type SidebarTab } from "@/components/inspector/SidebarTabs"
 import { ThemePanel } from "@/components/inspector/ThemePanel"
-import { useGraphStore } from "@/store/graphStore"
+import { useGraphStore } from "@/store/graph-store"
 
 export function EditorSidebar() {
   const [tab, setTab] = useState<SidebarTab>("design")

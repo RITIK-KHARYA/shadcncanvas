@@ -1,7 +1,8 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { ThemeEditorState, ThemeHistoryEntry, ThemeStyles, themeStylesSchema } from "@/types/theme"
-import { defaultThemeState, defaultLightThemeStyles, defaultDarkThemeStyles } from "@/config/theme"
+import type { ThemeEditorState, ThemeHistoryEntry, ThemeStyles } from "@/types/theme"
+import { themeStylesSchema } from "@/types/theme"
+import { defaultThemeState, defaultLightThemeStyles, defaultDarkThemeStyles } from "@/theme/config"
 
 export const THEME_PRESETS: Record<string, ThemeStyles> = {
   default: {
@@ -90,14 +91,12 @@ export const useEditorStore = create<EditorStore>()(
         const currentState = get().themeState
         const nextState = typeof updater === "function" ? updater(currentState) : updater
 
-        // Runtime validation using Zod
         const validation = themeStylesSchema.safeParse(nextState.styles)
         if (!validation.success) {
           console.error("Theme validation failed:", validation.error)
           return
         }
 
-        // Compare style content and adjustments (ignoring mode or preset name only)
         const stylesChanged =
           JSON.stringify(currentState.styles) !== JSON.stringify(nextState.styles) ||
           JSON.stringify(currentState.hslAdjustments) !== JSON.stringify(nextState.hslAdjustments)

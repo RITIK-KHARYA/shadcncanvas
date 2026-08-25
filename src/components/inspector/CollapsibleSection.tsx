@@ -5,7 +5,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { useInspectorUiStore } from "@/store/inspectorUiStore"
+import { useInspectorUiStore } from "@/store/inspector-ui-store"
 import { cn } from "@/lib/utils"
 
 export function CollapsibleSection({

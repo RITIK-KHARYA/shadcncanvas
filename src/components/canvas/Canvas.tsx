@@ -14,9 +14,9 @@ import { toast } from "sonner";
 import { BaseNode } from "@/components/canvas/NodeTypes/BaseNode";
 import { cn } from "@/lib/utils";
 import { getComponentDragData } from "@/lib/dnd";
-import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graphUtils";
-import { nodeRegistry } from "@/lib/nodeRegistry";
-import { useGraphStore, recordNodeDragHistory } from "@/store/graphStore";
+import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graph";
+import { nodeRegistry } from "@/lib/registry";
+import { useGraphStore, recordNodeDragHistory } from "@/store/graph-store";
 import type { CanvasEdge, CanvasNode } from "@/types/graph";
 
 const nodeTypes: NodeTypes = {

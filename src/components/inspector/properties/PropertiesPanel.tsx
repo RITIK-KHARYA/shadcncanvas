@@ -5,7 +5,7 @@ import { AppearanceSection } from "@/components/inspector/properties/AppearanceS
 import { ContentSection } from "@/components/inspector/properties/ContentSection";
 import { EffectsSection } from "@/components/inspector/properties/EffectsSection";
 import { PositionSection } from "@/components/inspector/properties/PositionSection";
-import { nodeRegistry } from "@/lib/nodeRegistry";
+import { nodeRegistry } from "@/lib/registry";
 import type { CanvasNode } from "@/types/graph";
 
 export function PropertiesPanel({ node }: { node: CanvasNode | null }) {

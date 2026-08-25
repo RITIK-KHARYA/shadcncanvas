@@ -1,26 +1,28 @@
-import type { Edge, Node } from "@xyflow/react";
+import type { Edge, Node } from "@xyflow/react"
 
-export type PortType = "boolean" | "string" | "number";
+export type PortType = "boolean" | "string" | "number"
 
-export type NodeState = Record<string, boolean | string | number | undefined>;
+export type NodeState = Record<string, boolean | string | number | undefined>
 
-export type NodeSizeMode = "default" | "custom";
+export type NodeSizeMode = "default" | "custom"
 
 export type NodeLayout = {
-  sizeMode: NodeSizeMode;
-  customWidth?: number;
-  customHeight?: number;
-  rotation?: number;
-  aspectLocked?: boolean;
-};
+  sizeMode: NodeSizeMode
+  customWidth?: number
+  customHeight?: number
+  rotation?: number
+  aspectLocked?: boolean
+}
 
 export type GraphNodeData = {
-  componentType: string;
-  props: Record<string, unknown>;
-  state: NodeState;
-  layout: NodeLayout;
-  name?: string;
-};
+  componentType: string
+  props: Record<string, unknown>
+  state: NodeState
+  layout: NodeLayout
+  name?: string
+}
 
-export type CanvasNode = Node<GraphNodeData, "baseNode">;
-export type CanvasEdge = Edge;
+export type CanvasNode = Node<GraphNodeData, "baseNode">
+export type CanvasEdge = Edge
+
+export type TransformType = "passthrough" | "invert" | "negate" | "isLoading" | "isError" | "isSuccess"

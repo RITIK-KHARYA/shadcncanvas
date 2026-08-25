@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/select";
 import { Segmented } from "@/components/inspector/Segmented";
 import { Textarea } from "@/components/ui/textarea";
-import { getFieldErrors } from "@/lib/nodeSchemas";
-import { useGraphStore } from "@/store/graphStore";
+import { getFieldErrors } from "@/lib/registry";
+import { useGraphStore } from "@/store/graph-store";
 import type { CanvasNode } from "@/types/graph";
 import { cn } from "@/lib/utils";
 

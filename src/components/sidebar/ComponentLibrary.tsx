@@ -7,7 +7,7 @@ import {
   categoryLabels,
   getNodesByCategory,
   type NodeConfig,
-} from "@/lib/nodeRegistry"
+} from "@/lib/registry"
 
 function DraggableComponentItem({ config }: { config: NodeConfig }) {
   const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {

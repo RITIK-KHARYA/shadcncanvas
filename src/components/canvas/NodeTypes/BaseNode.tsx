@@ -7,8 +7,8 @@ import {
 } from "@xyflow/react";
 import { useCallback } from "react";
 
-import { nodeRegistry } from "@/lib/nodeRegistry";
-import { useGraphStore, recordNodeDragHistory } from "@/store/graphStore";
+import { nodeRegistry } from "@/lib/registry";
+import { useGraphStore, recordNodeDragHistory } from "@/store/graph-store";
 import type { CanvasNode, NodeLayout, NodeState } from "@/types/graph";
 import { cn } from "@/lib/utils";
 

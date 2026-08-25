@@ -3,7 +3,7 @@ import {
   FormFieldsEditor,
   SelectOptionsEditor,
 } from "@/components/inspector/FormFieldsEditor";
-import { useGraphStore } from "@/store/graphStore";
+import { useGraphStore } from "@/store/graph-store";
 import type { CanvasNode } from "@/types/graph";
 
 export function ContentSection({ node }: { node: CanvasNode }) {

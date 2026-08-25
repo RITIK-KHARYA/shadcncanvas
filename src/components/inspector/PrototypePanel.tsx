@@ -7,9 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { EDGE_TRANSFORMS } from "@/lib/graphUtils"
-import { nodeRegistry } from "@/lib/nodeRegistry"
-import { useGraphStore } from "@/store/graphStore"
+import { EDGE_TRANSFORMS } from "@/lib/graph"
+import { nodeRegistry } from "@/lib/registry"
+import { useGraphStore } from "@/store/graph-store"
 import type { CanvasNode } from "@/types/graph"
 
 export function PrototypePanel({ node }: { node: CanvasNode | null }) {

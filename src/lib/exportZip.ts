@@ -3,7 +3,7 @@ import JSZip from "jszip";
 
 import { generateFullCode } from "@/lib/codegen";
 import type { CanvasEdge, CanvasNode } from "@/types/graph";
-import type { ThemeTokens } from "@/store/themeStore";
+import type { ThemeTokens } from "@/store/theme-store";
 
 export async function exportProjectZip(options: {
   nodes: CanvasNode[];

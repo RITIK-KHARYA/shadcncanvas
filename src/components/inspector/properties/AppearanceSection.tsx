@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { getFieldErrors } from "@/lib/nodeSchemas"
-import type { NodeConfig } from "@/lib/nodeRegistry"
-import { useGraphStore } from "@/store/graphStore"
+import { getFieldErrors } from "@/lib/registry"
+import type { NodeConfig } from "@/lib/registry"
+import { useGraphStore } from "@/store/graph-store"
 import type { CanvasNode } from "@/types/graph"
 import { cn } from "@/lib/utils"
 

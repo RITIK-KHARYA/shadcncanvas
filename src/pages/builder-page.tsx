@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/input";
 import { generateFullCode, generateNodeCode } from "@/lib/codegen";
 import { exportProjectZip } from "@/lib/exportZip";
 import { loadProject, saveProject } from "@/lib/persistence";
-import { useGraphStore } from "@/store/graphStore";
+import { useGraphStore } from "@/store/graph-store";
 import { useEditorStore } from "@/store/editor-store";
-import { applyThemeToElement } from "@/utils/apply-theme";
+import { applyThemeToElement } from "@/theme/apply";
 
 export function BuilderPage() {
   const themeState = useEditorStore((s) => s.themeState);

@@ -1,5 +1,5 @@
 import type { CanvasEdge, CanvasNode } from "@/types/graph"
-import type { ThemeTokens } from "@/store/themeStore"
+import type { ThemeTokens } from "@/store/theme-store"
 
 const STORAGE_KEY = "shadcncanvas-project-v1"
 

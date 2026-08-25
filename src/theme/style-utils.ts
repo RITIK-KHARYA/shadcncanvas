@@ -1,6 +1,5 @@
 export function applyStyleToElement(element: HTMLElement, key: string, value: string): void {
   const currentStyle = element.getAttribute("style") || ""
-  // Match "--key: value;" or "--key: value" with optional spaces/semicolons
   const regex = new RegExp(`--${escapeRegExp(key)}\\s*:[^;]+;?\\s*`, "g")
   let cleanedStyle = currentStyle.replace(regex, "").trim()
   if (cleanedStyle && !cleanedStyle.endsWith(";")) {

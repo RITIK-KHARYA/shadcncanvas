@@ -13,7 +13,7 @@ import {
   MIN_NODE_HEIGHT,
   MIN_NODE_WIDTH,
 } from "@/components/canvas/NodeTypes/BaseNode"
-import { useGraphStore } from "@/store/graphStore"
+import { useGraphStore } from "@/store/graph-store"
 import type { CanvasNode } from "@/types/graph"
 
 function NumberField({

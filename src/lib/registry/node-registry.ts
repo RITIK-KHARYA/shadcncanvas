@@ -1,33 +1,4 @@
-export type ConfigurableProp = {
-  key: string;
-  label: string;
-  inputType: "text" | "select" | "boolean" | "number" | "color";
-  options?: string[];
-  default: unknown;
-};
-
-export type PortDef = {
-  key: string;
-  label: string;
-  type: "boolean" | "string" | "number";
-};
-
-export type NodeConfig = {
-  type: string;
-  label: string;
-  category:
-    | "form"
-    | "layout"
-    | "feedback"
-    | "navigation"
-    | "overlay"
-    | "display"
-    | "data";
-  defaultProps: Record<string, unknown>;
-  configurableProps: ConfigurableProp[];
-  inputs: PortDef[];
-  outputs: PortDef[];
-};
+import type { NodeConfig } from "@/types/registry"
 
 export const nodeRegistry: Record<string, NodeConfig> = {
   button: {
@@ -716,13 +687,11 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       { key: "error", label: "Error Message", type: "string" },
     ],
   },
-};
+}
 
-// Every component supports loading logic: wire any boolean output into
-// the standard `loading` port to show its skeleton form while loading.
 for (const config of Object.values(nodeRegistry)) {
   if (!config.inputs.some((input) => input.key === "loading")) {
-    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" });
+    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" })
   }
 }
 
@@ -734,16 +703,16 @@ export const categoryLabels: Record<NodeConfig["category"], string> = {
   overlay: "Overlay",
   display: "Display",
   data: "Data",
-};
+}
 
 export function getNodesByCategory() {
-  const groups = new Map<NodeConfig["category"], NodeConfig[]>();
+  const groups = new Map<NodeConfig["category"], NodeConfig[]>()
 
   for (const config of Object.values(nodeRegistry)) {
-    const list = groups.get(config.category) ?? [];
-    list.push(config);
-    groups.set(config.category, list);
+    const list = groups.get(config.category) ?? []
+    list.push(config)
+    groups.set(config.category, list)
   }
 
-  return groups;
+  return groups
 }

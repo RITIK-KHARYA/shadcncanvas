@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { Comment } from "@/store/commentsStore";
+import type { Comment } from "@/store/comments-store";
 import { cn } from "@/lib/utils";
 
 function timeAgo(timestamp: number): string {
