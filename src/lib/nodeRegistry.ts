@@ -1,20 +1,20 @@
 export type ConfigurableProp = {
-  key: string
-  label: string
-  inputType: "text" | "select" | "boolean" | "number" | "color"
-  options?: string[]
-  default: unknown
-}
+  key: string;
+  label: string;
+  inputType: "text" | "select" | "boolean" | "number" | "color";
+  options?: string[];
+  default: unknown;
+};
 
 export type PortDef = {
-  key: string
-  label: string
-  type: "boolean" | "string" | "number"
-}
+  key: string;
+  label: string;
+  type: "boolean" | "string" | "number";
+};
 
 export type NodeConfig = {
-  type: string
-  label: string
+  type: string;
+  label: string;
   category:
     | "form"
     | "layout"
@@ -22,11 +22,12 @@ export type NodeConfig = {
     | "navigation"
     | "overlay"
     | "display"
-  defaultProps: Record<string, unknown>
-  configurableProps: ConfigurableProp[]
-  inputs: PortDef[]
-  outputs: PortDef[]
-}
+    | "data";
+  defaultProps: Record<string, unknown>;
+  configurableProps: ConfigurableProp[];
+  inputs: PortDef[];
+  outputs: PortDef[];
+};
 
 export const nodeRegistry: Record<string, NodeConfig> = {
   button: {
@@ -358,7 +359,12 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       description: "Manage who can access this project.",
     },
     configurableProps: [
-      { key: "title", label: "Title", inputType: "text", default: "Permissions" },
+      {
+        key: "title",
+        label: "Title",
+        inputType: "text",
+        default: "Permissions",
+      },
       {
         key: "description",
         label: "Description",
@@ -386,7 +392,12 @@ export const nodeRegistry: Record<string, NodeConfig> = {
         inputType: "text",
         default: "Open Dialog",
       },
-      { key: "title", label: "Title", inputType: "text", default: "Delete project?" },
+      {
+        key: "title",
+        label: "Title",
+        inputType: "text",
+        default: "Delete project?",
+      },
       {
         key: "description",
         label: "Description",
@@ -414,7 +425,12 @@ export const nodeRegistry: Record<string, NodeConfig> = {
         inputType: "text",
         default: "Open Drawer",
       },
-      { key: "title", label: "Title", inputType: "text", default: "Drawer Title" },
+      {
+        key: "title",
+        label: "Title",
+        inputType: "text",
+        default: "Drawer Title",
+      },
       {
         key: "description",
         label: "Description",
@@ -435,14 +451,23 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       bio: "The foundation for your design system and component library.",
     },
     configurableProps: [
-      { key: "trigger", label: "Trigger", inputType: "text", default: "@shadcn" },
-      { key: "heading", label: "Heading", inputType: "text", default: "shadcn/ui" },
+      {
+        key: "trigger",
+        label: "Trigger",
+        inputType: "text",
+        default: "@shadcn",
+      },
+      {
+        key: "heading",
+        label: "Heading",
+        inputType: "text",
+        default: "shadcn/ui",
+      },
       {
         key: "bio",
         label: "Bio",
         inputType: "text",
-        default:
-          "The foundation for your design system and component library.",
+        default: "The foundation for your design system and component library.",
       },
     ],
     inputs: [],
@@ -640,13 +665,64 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     inputs: [{ key: "trigger", label: "Trigger", type: "boolean" }],
     outputs: [{ key: "fired", label: "Fired", type: "boolean" }],
   },
-}
+  apiCall: {
+    type: "apiCall",
+    label: "API Call",
+    category: "data",
+    defaultProps: {
+      url: "",
+      method: "POST",
+      headers: [],
+      bodyMode: "bound",
+      staticBody: "{}",
+      timeoutMs: 10000,
+    },
+    configurableProps: [
+      { key: "url", label: "Endpoint URL", inputType: "text", default: "" },
+      {
+        key: "method",
+        label: "Method",
+        inputType: "select",
+        options: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        default: "POST",
+      },
+      {
+        key: "bodyMode",
+        label: "Body Source",
+        inputType: "select",
+        options: ["bound", "static"],
+        default: "bound",
+      },
+      {
+        key: "staticBody",
+        label: "Static Body (JSON)",
+        inputType: "text",
+        default: "{}",
+      },
+      {
+        key: "timeoutMs",
+        label: "Timeout (ms)",
+        inputType: "number",
+        default: 10000,
+      },
+    ],
+    inputs: [
+      { key: "trigger", label: "Trigger", type: "boolean" },
+      { key: "payload", label: "Payload", type: "string" },
+    ],
+    outputs: [
+      { key: "status", label: "Status", type: "string" },
+      { key: "data", label: "Response Data", type: "string" },
+      { key: "error", label: "Error Message", type: "string" },
+    ],
+  },
+};
 
 // Every component supports loading logic: wire any boolean output into
 // the standard `loading` port to show its skeleton form while loading.
 for (const config of Object.values(nodeRegistry)) {
   if (!config.inputs.some((input) => input.key === "loading")) {
-    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" })
+    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" });
   }
 }
 
@@ -657,16 +733,17 @@ export const categoryLabels: Record<NodeConfig["category"], string> = {
   navigation: "Navigation",
   overlay: "Overlay",
   display: "Display",
-}
+  data: "Data",
+};
 
 export function getNodesByCategory() {
-  const groups = new Map<NodeConfig["category"], NodeConfig[]>()
+  const groups = new Map<NodeConfig["category"], NodeConfig[]>();
 
   for (const config of Object.values(nodeRegistry)) {
-    const list = groups.get(config.category) ?? []
-    list.push(config)
-    groups.set(config.category, list)
+    const list = groups.get(config.category) ?? [];
+    list.push(config);
+    groups.set(config.category, list);
   }
 
-  return groups
+  return groups;
 }

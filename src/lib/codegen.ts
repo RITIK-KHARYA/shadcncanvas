@@ -1,4 +1,5 @@
 import type { CanvasEdge, CanvasNode } from "@/types/graph";
+import { nodeRegistry } from "@/lib/nodeRegistry";
 import type { ThemeTokens } from "@/store/themeStore";
 import { themeTokensToStyle } from "@/store/themeStore";
 
@@ -51,6 +52,7 @@ const UI_COMPONENTS: Record<
   marker: { exportName: "Marker", importPath: "marker" },
   direction: { exportName: "DirectionProvider", importPath: "direction" },
   toast: { exportName: "toast", importPath: "sonner" },
+  apiCall: { exportName: "Button", importPath: "button" },
 };
 
 function formatJsxProp(key: string, value: unknown): string {
@@ -78,144 +80,80 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/** Indents every non-empty line of `code` by `spaces` spaces. */
+function indent(code: string, spaces: number): string {
+  const pad = " ".repeat(spaces);
+  return code
+    .split("\n")
+    .map((line) => (line ? pad + line : line))
+    .join("\n");
+}
+
 function deriveStateName(
   componentType: string,
   nodeId: string,
   index: number,
-  labels: Map<string, string>,
+  names: Map<string, string>,
 ): string {
-  const userLabel = labels.get(nodeId) || "";
-  const base = userLabel ? userLabel : componentType;
-  const suffix = index > 0 ? `_${index}` : "";
-  return `${base}${suffix}`;
+  const userName = names.get(nodeId) || "";
+  const base = userName || componentType || "node";
+  const safeBase = base.replace(/[^a-zA-Z0-9]/g, "") || "node";
+  const suffix = index > 1 ? `_${index}` : "";
+  return `${safeBase}${suffix}`;
 }
 
-function buildWiringBlock(edges: CanvasEdge[], nodes: CanvasNode[]): string {
-  if (edges.length === 0) return "";
+/**
+ * Wires are documented as `useState` hooks for each source output plus a
+ * comment describing what it feeds into. Wiring does not (yet) rewrite the
+ * target component's JSX props automatically — that mapping is left as a
+ * clear comment for the developer to wire up.
+ */
+function buildWiringBlock(
+  edges: CanvasEdge[],
+  nodes: CanvasNode[],
+): { declarations: string; hasState: boolean } {
+  if (edges.length === 0) return { declarations: "", hasState: false };
 
-  const labels = new Map(nodes.map((n) => [n.id, n.data.label ?? ""]));
-
-  const sourceNodeIndices = new Map<string, number>();
-  const targetNodeStateMap = new Map<
-    string,
-    Array<{ sourceState: string; transform: string }>
-  >();
+  const names = new Map(nodes.map((n) => [n.id, n.data.name ?? ""]));
+  const sourceOccurrence = new Map<string, number>();
+  const stateLines: string[] = [];
+  const wiringComments: string[] = [];
 
   for (const edge of edges) {
-    const sourceId = edge.source!.id;
-    const targetId = edge.target!.id;
-    const transform = edge.data?.transform ?? "passthrough";
+    const sourceId = edge.source;
+    const targetId = edge.target;
+    if (!sourceId || !targetId) continue;
 
-    if (!sourceNodeIndices.has(sourceId)) {
-      sourceNodeIndices.set(sourceId, 0);
-    }
-    sourceNodeIndices.set(sourceId, sourceNodeIndices.get(sourceId)! + 1);
+    const sourceNode = nodes.find((n) => n.id === sourceId);
+    const targetNode = nodes.find((n) => n.id === targetId);
+    const sourceType = sourceNode?.data.componentType ?? "node";
+    const targetType = targetNode?.data.componentType ?? "node";
+    const transform = String(edge.data?.transform ?? "passthrough");
 
-    const compType =
-      nodes.find((n) => n.id === sourceId)?.data.componentType ?? "";
-    const stateIndex = sourceNodeIndices.get(sourceId)!;
-    const stateName = deriveStateName(compType, sourceId, stateIndex, labels);
+    const occurrence = (sourceOccurrence.get(sourceId) ?? 0) + 1;
+    sourceOccurrence.set(sourceId, occurrence);
 
-    if (!targetNodeStateMap.has(targetId)) {
-      targetNodeStateMap.set(targetId, []);
-    }
-    targetNodeStateMap.get(targetId)!.push({
-      sourceState: stateName,
-      transform,
-    });
-  }
+    const stateName = deriveStateName(sourceType, sourceId, occurrence, names);
 
-  const parts: string[] = [];
-
-  // useState hooks
-  const useStateLines: string[] = [];
-  sourceNodeIndices.forEach((count, id, _) => {
-    const comp = nodes.find((n) => n.id === id)?.data.componentType ?? "";
-    for (let i = 1; i <= count; i++) {
-      const stateName = deriveStateName(comp, id, i, labels);
-      useStateLines.push(
+    if (occurrence === 1) {
+      stateLines.push(
         `  const [${stateName}, set${capitalize(stateName)}] = useState(false)`,
       );
     }
-  });
-  if (useStateLines.length > 0) {
-    parts.push(`const useStateHooks = {\n${useStateLines.join(",\n")}\n}`);
-  }
 
-  // event handlers
-  const handlerLines: string[] = [];
-  sourceNodeIndices.forEach((count, id) => {
-    const comp = nodes.find((n) => n.id === id)?.data.componentType ?? "";
-    const capitalized = capitalize(comp);
-    for (let i = 1; i <= count; i++) {
-      const stateName = deriveStateName(comp, id, i, labels);
-      handlerLines.push(
-        `  const handle${capitalized}${i} = () => set${capitalize(stateName)}(prev => !prev)`,
-      );
-    }
-  });
-  if (handlerLines.length > 0) {
-    parts.push(`const eventHandlers = {\n${handlerLines.join(",\n")}\n}`);
-  }
-
-  // target node props
-  const targetLines: string[] = [];
-  targetNodeStateMap.forEach((stateEntries, targetId) => {
-    const targetNode = nodes.find((n) => n.id === targetId);
-    if (!targetNode) return;
-
-    const props = targetNode.data.props as Record<string, unknown>;
-
-    for (const entry of stateEntries) {
-      const { sourceState, transform } = entry;
-      let propKey: string | undefined;
-
-      if (transform === "invert") {
-        propKey = "active";
-      } else if (transform === "negate") {
-        continue;
-      } else {
-        propKey = "active";
-      }
-
-      if (propKey && props[propKey] !== undefined) {
-        const transformSymbol = transform === "invert" ? "!" : "";
-        targetLines.push(
-          `  ${targetNode.id}: { ${propKey}: ${transformSymbol}${sourceState} }`,
-        );
-      }
-    }
-  });
-  if (targetLines.length > 0) {
-    parts.push(`const wireProps = {\n${targetLines.join(",\n")}\n}`);
-  }
-
-  // useEffect for chains
-  const effectLines: string[] = [];
-  const targetIdsWithEdges = new Set(targetNodeStateMap.keys());
-
-  for (const targetId of targetIdsWithEdges) {
-    const targetNode = nodes.find((n) => n.id === targetId);
-    if (!targetNode) continue;
-
-    const outgoingEdges = edges.filter(
-      (e) => e.source!.id === targetId && e.target!.id !== targetId,
+    wiringComments.push(
+      `  // ${sourceType}.${edge.sourceHandle ?? "output"} (${stateName}) --[${transform}]--> ${targetType}.${edge.targetHandle ?? "prop"}`,
     );
-    if (outgoingEdges.length > 0) {
-      const entries = targetNodeStateMap.get(targetId) || [];
-      if (entries.length > 0) {
-        const stateName = entries[0].sourceState;
-        effectLines.push(
-          `  useEffect(() => { set${capitalize(stateName)}(prev => !prev) }, [${stateName}])`,
-        );
-      }
-    }
-  }
-  if (effectLines.length > 0) {
-    parts.push(`\n  useEffects = {\n${effectLines.join(",\n")}\n  }`);
   }
 
-  return `\n${parts.join("\n")}`;
+  const sections = [stateLines.join("\n"), wiringComments.join("\n")].filter(
+    Boolean,
+  );
+
+  return {
+    declarations: sections.join("\n\n"),
+    hasState: stateLines.length > 0,
+  };
 }
 
 function buildThemeBlock(theme?: ThemeTokens): string {
@@ -235,7 +173,7 @@ export function generateNodeCode(node: CanvasNode): string {
   const { componentType, props } = node.data;
   const ui = UI_COMPONENTS[componentType];
 
-  if (!ui || !nodeRegistry?.[componentType]) {
+  if (!ui || !nodeRegistry[componentType]) {
     return `{/* Unknown node: ${componentType} */}`;
   }
 
@@ -446,6 +384,53 @@ ${String(props.keys ?? "Ctrl K")
     case "toast":
       return "";
 
+    case "apiCall": {
+      const url = String(props.url ?? "");
+      const method = String(props.method ?? "POST");
+      const headers = Array.isArray(props.headers)
+        ? (props.headers as { key: string; value: string }[])
+        : [];
+      const bodyMode = String(props.bodyMode ?? "bound");
+      const staticBody = String(props.staticBody ?? "{}");
+      const timeoutMs = Number(props.timeoutMs ?? 10000);
+      const headerLines = headers
+        .filter((h) => h.key)
+        .map((h) => `    "${h.key}": ${JSON.stringify(h.value)},`)
+        .join("\n");
+      const bodyExpr =
+        method === "GET"
+          ? "undefined"
+          : bodyMode === "bound"
+            ? "JSON.stringify(payload)"
+            : JSON.stringify(staticBody);
+
+      return `{/* API Call: ${method} ${url || "<endpoint>"} */}
+<Button
+  variant="outline"
+  onClick={async () => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), ${timeoutMs})
+    try {
+      const response = await fetch(${JSON.stringify(url)}, {
+        method: ${JSON.stringify(method)},
+        headers: {
+          "Content-Type": "application/json",
+${headerLines}
+        },
+        body: ${bodyExpr},
+        signal: controller.signal,
+      })
+      const data = await response.text()
+      console.log(data)
+    } finally {
+      clearTimeout(timer)
+    }
+  }}
+>
+  Send request
+</Button>`;
+    }
+
     default:
       return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`;
   }
@@ -462,11 +447,19 @@ export function generateFullCode(
     .map((node) => indent(generateNodeCode(node), 6))
     .join("\n");
 
-  return `${imports}
+  const wiring = buildWiringBlock(edges, nodes);
+  const reactImport = wiring.hasState
+    ? `import { useState } from "react"\n`
+    : "";
+  const wiringBlock = wiring.declarations
+    ? `${indent(wiring.declarations, 0)}\n\n`
+    : "";
+
+  return `${reactImport}${imports}
 ${buildThemeBlock(theme)}
 export default function GeneratedComponent() {
-  return (
-    <div className="space-y-4 p-4">${buildWiringBlock(edges, nodes)}
+${wiringBlock}  return (
+    <div className="space-y-4 p-4">
 ${componentsCode}
     </div>
   )

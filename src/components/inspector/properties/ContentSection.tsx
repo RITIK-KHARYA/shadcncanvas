@@ -1,16 +1,20 @@
-import { CollapsibleSection } from "@/components/inspector/CollapsibleSection"
+import { CollapsibleSection } from "@/components/inspector/CollapsibleSection";
 import {
   FormFieldsEditor,
   SelectOptionsEditor,
-} from "@/components/inspector/FormFieldsEditor"
-import { useGraphStore } from "@/store/graphStore"
-import type { CanvasNode } from "@/types/graph"
+} from "@/components/inspector/FormFieldsEditor";
+import {
+  HeadersEditor,
+  type ApiHeader,
+} from "@/components/inspector/HeadersEditor";
+import { useGraphStore } from "@/store/graphStore";
+import type { CanvasNode } from "@/types/graph";
 
 export function ContentSection({ node }: { node: CanvasNode }) {
-  const updateNodeProps = useGraphStore((s) => s.updateNodeProps)
+  const updateNodeProps = useGraphStore((s) => s.updateNodeProps);
   const setProp = (key: string, value: unknown) => {
-    updateNodeProps(node.id, { [key]: value })
-  }
+    updateNodeProps(node.id, { [key]: value });
+  };
 
   if (node.data.componentType === "form") {
     return (
@@ -19,17 +23,17 @@ export function ContentSection({ node }: { node: CanvasNode }) {
           fields={
             Array.isArray(node.data.props.fields)
               ? (node.data.props.fields as {
-                  name: string
-                  type: "text" | "email" | "password" | "number"
-                  required: boolean
-                  placeholder?: string
+                  name: string;
+                  type: "text" | "email" | "password" | "number";
+                  required: boolean;
+                  placeholder?: string;
                 }[])
               : []
           }
           onChange={(fields) => setProp("fields", fields)}
         />
       </CollapsibleSection>
-    )
+    );
   }
 
   if (node.data.componentType === "select") {
@@ -44,8 +48,23 @@ export function ContentSection({ node }: { node: CanvasNode }) {
           onChange={(options) => setProp("options", options)}
         />
       </CollapsibleSection>
-    )
+    );
   }
 
-  return null
+  if (node.data.componentType === "apiCall") {
+    return (
+      <CollapsibleSection id="content" title="Headers">
+        <HeadersEditor
+          headers={
+            Array.isArray(node.data.props.headers)
+              ? (node.data.props.headers as ApiHeader[])
+              : []
+          }
+          onChange={(headers) => setProp("headers", headers)}
+        />
+      </CollapsibleSection>
+    );
+  }
+
+  return null;
 }

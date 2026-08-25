@@ -1,44 +1,44 @@
-import type { Connection } from "@xyflow/react"
+import type { Connection } from "@xyflow/react";
 
-import type { CanvasEdge } from "@/types/graph"
+import type { CanvasEdge } from "@/types/graph";
 
 export function wouldCreateCycle(
   connection: Pick<Connection, "source" | "target">,
   edges: CanvasEdge[],
 ): boolean {
-  if (!connection.source || !connection.target) return false
-  if (connection.source === connection.target) return true
+  if (!connection.source || !connection.target) return false;
+  if (connection.source === connection.target) return true;
 
-  const adjacency = new Map<string, string[]>()
+  const adjacency = new Map<string, string[]>();
 
   for (const edge of edges) {
-    if (!edge.source || !edge.target) continue
-    const next = adjacency.get(edge.source) ?? []
-    next.push(edge.target)
-    adjacency.set(edge.source, next)
+    if (!edge.source || !edge.target) continue;
+    const next = adjacency.get(edge.source) ?? [];
+    next.push(edge.target);
+    adjacency.set(edge.source, next);
   }
 
-  const proposed = adjacency.get(connection.source) ?? []
-  proposed.push(connection.target)
-  adjacency.set(connection.source, proposed)
+  const proposed = adjacency.get(connection.source) ?? [];
+  proposed.push(connection.target);
+  adjacency.set(connection.source, proposed);
 
-  const visited = new Set<string>()
-  const stack = [connection.target]
+  const visited = new Set<string>();
+  const stack = [connection.target];
 
   while (stack.length > 0) {
-    const current = stack.pop()!
-    if (current === connection.source) return true
-    if (visited.has(current)) continue
-    visited.add(current)
+    const current = stack.pop()!;
+    if (current === connection.source) return true;
+    if (visited.has(current)) continue;
+    visited.add(current);
     for (const next of adjacency.get(current) ?? []) {
-      stack.push(next)
+      stack.push(next);
     }
   }
 
-  return false
+  return false;
 }
 
-export type TransformType = "passthrough" | "invert" | "negate"
+export type TransformType = "passthrough" | "invert" | "negate";
 
 export function evalTransform(
   transform: string,
@@ -46,25 +46,34 @@ export function evalTransform(
 ): boolean | string | number {
   switch (transform) {
     case "invert":
-      return typeof value === "boolean" ? !value : value
+      return typeof value === "boolean" ? !value : value;
     case "negate":
-      return typeof value === "number" ? -value : value
+      return typeof value === "number" ? -value : value;
+    case "isLoading":
+      return value === "loading";
+    case "isError":
+      return value === "error";
+    case "isSuccess":
+      return value === "success";
     case "passthrough":
     default:
-      return value
+      return value;
   }
 }
 
 /** @deprecated use evalTransform */
-export const applyTransform = evalTransform
+export const applyTransform = evalTransform;
 
 export function edgeStrokeColor(transform?: string): string {
-  if (transform === "invert") return "#f97316"
-  return "#22c55e"
+  if (transform === "invert") return "#f97316";
+  return "#22c55e";
 }
 
 export const EDGE_TRANSFORMS = [
   { value: "passthrough", label: "Passthrough" },
   { value: "invert", label: "Invert" },
   { value: "negate", label: "Negate (numbers)" },
-] as const
+  { value: "isLoading", label: "Is Loading (status check)" },
+  { value: "isError", label: "Is Error (status check)" },
+  { value: "isSuccess", label: "Is Success (status check)" },
+] as const;

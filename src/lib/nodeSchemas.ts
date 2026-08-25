@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const nodeSchemas: Record<string, z.ZodType> = {
   button: z.object({
@@ -122,28 +122,43 @@ export const nodeSchemas: Record<string, z.ZodType> = {
     message: z.string().min(1, "Message required"),
     variant: z.enum(["success", "error"]),
   }),
-}
+  apiCall: z.object({
+    url: z.string().url("Must be a valid URL"),
+    method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
+    headers: z.array(z.object({ key: z.string(), value: z.string() })),
+    bodyMode: z.enum(["bound", "static"]),
+    staticBody: z.string().refine((v) => {
+      try {
+        JSON.parse(v);
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Must be valid JSON"),
+    timeoutMs: z.number().min(1000).max(60000),
+  }),
+};
 
 export function validateNode(componentType: string, props: unknown) {
-  const schema = nodeSchemas[componentType]
-  if (!schema) return { success: true as const, data: props }
-  return schema.safeParse(props)
+  const schema = nodeSchemas[componentType];
+  if (!schema) return { success: true as const, data: props };
+  return schema.safeParse(props);
 }
 
 export function getFieldErrors(
   componentType: string,
   props: unknown,
 ): Record<string, string> {
-  const schema = nodeSchemas[componentType]
-  if (!schema) return {}
+  const schema = nodeSchemas[componentType];
+  if (!schema) return {};
 
-  const result = schema.safeParse(props)
-  if (result.success) return {}
+  const result = schema.safeParse(props);
+  if (result.success) return {};
 
-  const errors: Record<string, string> = {}
+  const errors: Record<string, string> = {};
   for (const issue of result.error.issues) {
-    const key = String(issue.path[0] ?? "root")
-    if (!errors[key]) errors[key] = issue.message
+    const key = String(issue.path[0] ?? "root");
+    if (!errors[key]) errors[key] = issue.message;
   }
-  return errors
+  return errors;
 }

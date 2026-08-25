@@ -63,6 +63,7 @@ type GraphStore = {
     value: boolean | string | number,
     visited?: Set<string>,
   ) => void;
+  triggerApiCall: (nodeId: string) => Promise<void>;
 };
 
 function cloneSnapshot(nodes: CanvasNode[], edges: CanvasEdge[]): Snapshot {
@@ -363,6 +364,71 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     }
   },
 
+  triggerApiCall: async (nodeId) => {
+    const node = get().nodes.find((n) => n.id === nodeId);
+    if (!node || node.data.componentType !== "apiCall") return;
+
+    const { url, method, headers, bodyMode, staticBody, timeoutMs } = node.data
+      .props as {
+      url?: string;
+      method?: string;
+      headers?: { key: string; value: string }[];
+      bodyMode?: string;
+      staticBody?: string;
+      timeoutMs?: number;
+    };
+
+    get().updateNodeState(nodeId, { status: "loading" });
+    get().propagate(nodeId, "status", "loading");
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs ?? 10000);
+
+    try {
+      const headerObj = Object.fromEntries(
+        (headers ?? []).map((h) => [h.key, h.value]),
+      );
+
+      const body =
+        bodyMode === "bound"
+          ? (get().nodes.find((n) => n.id === nodeId)?.data.state.payload as
+              string | undefined)
+          : staticBody;
+
+      const res = await fetch(url ?? "", {
+        method,
+        headers: { "Content-Type": "application/json", ...headerObj },
+        body: method === "GET" ? undefined : body,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const errMsg = `HTTP ${res.status}: ${res.statusText}`;
+        get().updateNodeState(nodeId, { status: "error", error: errMsg });
+        get().propagate(nodeId, "status", "error");
+        get().propagate(nodeId, "error", errMsg);
+        return;
+      }
+
+      const dataStr = JSON.stringify(json);
+      get().updateNodeState(nodeId, { status: "success", data: dataStr });
+      get().propagate(nodeId, "status", "success");
+      get().propagate(nodeId, "data", dataStr);
+    } catch (err) {
+      clearTimeout(timeout);
+      const errMsg =
+        err instanceof Error && err.name === "AbortError"
+          ? "Request timed out"
+          : String(err);
+      get().updateNodeState(nodeId, { status: "error", error: errMsg });
+      get().propagate(nodeId, "status", "error");
+      get().propagate(nodeId, "error", errMsg);
+    }
+  },
+
   propagate: (nodeId, outputKey, value, visited = new Set()) => {
     const hopKey = `${nodeId}:${outputKey}:${String(value)}`;
     if (visited.has(hopKey)) return;
@@ -405,6 +471,14 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
       const targetConfig = targetNode
         ? nodeRegistry[targetNode.data.componentType]
         : null;
+
+      if (
+        targetNode?.data.componentType === "apiCall" &&
+        edge.targetHandle === "trigger" &&
+        transformed === true
+      ) {
+        void get().triggerApiCall(edge.target);
+      }
 
       for (const output of targetConfig?.outputs ?? []) {
         const outValue = get().nodes.find((n) => n.id === edge.target)?.data

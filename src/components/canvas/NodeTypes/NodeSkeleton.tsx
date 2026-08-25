@@ -1,11 +1,11 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 type NodeSkeletonProps = {
-  componentType: string
+  componentType: string;
   /** Fill the full node body width (custom-size nodes). */
-  fill?: boolean
-}
+  fill?: boolean;
+};
 
 function Lines({ count, className }: { count?: number; className?: string }) {
   return (
@@ -17,7 +17,7 @@ function Lines({ count, className }: { count?: number; className?: string }) {
         />
       ))}
     </div>
-  )
+  );
 }
 
 /**
@@ -25,20 +25,20 @@ function Lines({ count, className }: { count?: number; className?: string }) {
  * Shown by BaseNode while a `loading` signal is wired into the node.
  */
 export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
-  const wide = fill || undefined
+  const wide = fill || undefined;
 
   switch (componentType) {
     case "button":
     case "badge":
-      return <Skeleton className={cn("h-8 w-24 rounded-md", wide)} />
+      return <Skeleton className={cn("h-8 w-24 rounded-md", wide)} />;
 
     case "input":
     case "select":
     case "native-select":
-      return <Skeleton className={cn("h-9 w-48 rounded-md", wide)} />
+      return <Skeleton className={cn("h-9 w-48 rounded-md", wide)} />;
 
     case "textarea":
-      return <Skeleton className={cn("h-20 w-48 rounded-md", wide)} />
+      return <Skeleton className={cn("h-20 w-48 rounded-md", wide)} />;
 
     case "checkbox":
     case "switch":
@@ -48,24 +48,26 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           <Skeleton className="size-4 rounded-sm" />
           <Skeleton className="h-3 w-28" />
         </div>
-      )
+      );
 
     case "label":
     case "kbd":
     case "marker":
-      return <Skeleton className="h-4 w-32" />
+      return <Skeleton className="h-4 w-32" />;
 
     case "separator":
-      return <Skeleton className="h-px w-48" />
+      return <Skeleton className="h-px w-48" />;
 
     case "skeleton":
-      return <Skeleton className="h-10 w-full" />
+      return <Skeleton className="h-10 w-full" />;
 
     case "card":
     case "form":
     case "empty":
       return (
-        <div className={cn("w-56 space-y-3 rounded-lg border bg-card p-4", wide)}>
+        <div
+          className={cn("w-56 space-y-3 rounded-lg border bg-card p-4", wide)}
+        >
           <div className="space-y-2">
             <Skeleton className="h-4 w-1/2" />
             <Skeleton className="h-3 w-3/4" />
@@ -87,7 +89,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
             </>
           )}
         </div>
-      )
+      );
 
     case "tabs":
       return (
@@ -98,7 +100,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           </div>
           <Skeleton className="h-12 w-full rounded-md" />
         </div>
-      )
+      );
 
     case "button-group":
       return (
@@ -110,11 +112,16 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
             />
           ))}
         </div>
-      )
+      );
 
     case "calendar":
       return (
-        <div className={cn("w-64 space-y-2 rounded-lg border bg-background p-3", wide)}>
+        <div
+          className={cn(
+            "w-64 space-y-2 rounded-lg border bg-background p-3",
+            wide,
+          )}
+        >
           <div className="flex items-center justify-between">
             <Skeleton className="size-6 rounded-sm" />
             <Skeleton className="h-4 w-24" />
@@ -126,7 +133,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
             ))}
           </div>
         </div>
-      )
+      );
 
     case "carousel":
       return (
@@ -135,7 +142,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           <Skeleton className="aspect-video flex-1 rounded-lg" />
           <Skeleton className="size-8 shrink-0 rounded-full" />
         </div>
-      )
+      );
 
     case "chart":
       return (
@@ -153,7 +160,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
             />
           ))}
         </div>
-      )
+      );
 
     case "command":
       return (
@@ -161,12 +168,12 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           <Skeleton className="h-9 w-full rounded-sm" />
           <Lines count={4} className="px-1" />
         </div>
-      )
+      );
 
     case "dialog":
     case "drawer":
     case "hover-card":
-      return <Skeleton className="h-8 w-28 rounded-md" />
+      return <Skeleton className="h-8 w-28 rounded-md" />;
 
     case "item":
       return (
@@ -185,10 +192,10 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
             </div>
           ))}
         </div>
-      )
+      );
 
     case "bubble":
-      return <Skeleton className="h-10 w-44 rounded-2xl" />
+      return <Skeleton className="h-10 w-44 rounded-2xl" />;
 
     case "message":
     case "message-scroller":
@@ -209,7 +216,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
             </div>
           )}
         </div>
-      )
+      );
 
     case "direction":
       return (
@@ -217,7 +224,7 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           <Skeleton className="size-8 rounded-md" />
           <Skeleton className="h-8 w-24 rounded-md" />
         </div>
-      )
+      );
 
     case "toast":
       return (
@@ -225,13 +232,25 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           <Skeleton className="size-4 shrink-0 rounded-full" />
           <Skeleton className="h-3 w-28" />
         </div>
-      )
+      );
+
+    case "apiCall":
+      return (
+        <div className={cn("w-64 space-y-2", wide)}>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-14 rounded-full" />
+            <Skeleton className="h-4 w-14 rounded-full" />
+          </div>
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-8 w-full rounded-md" />
+        </div>
+      );
 
     default:
       return (
         <div className={cn("w-48", wide)}>
           <Lines />
         </div>
-      )
+      );
   }
 }
