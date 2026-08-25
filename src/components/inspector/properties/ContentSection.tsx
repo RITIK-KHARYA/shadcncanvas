@@ -3,10 +3,6 @@ import {
   FormFieldsEditor,
   SelectOptionsEditor,
 } from "@/components/inspector/FormFieldsEditor";
-import {
-  HeadersEditor,
-  type ApiHeader,
-} from "@/components/inspector/HeadersEditor";
 import { useGraphStore } from "@/store/graphStore";
 import type { CanvasNode } from "@/types/graph";
 
@@ -46,21 +42,6 @@ export function ContentSection({ node }: { node: CanvasNode }) {
               : ["Option 1", "Option 2"]
           }
           onChange={(options) => setProp("options", options)}
-        />
-      </CollapsibleSection>
-    );
-  }
-
-  if (node.data.componentType === "apiCall") {
-    return (
-      <CollapsibleSection id="content" title="Headers">
-        <HeadersEditor
-          headers={
-            Array.isArray(node.data.props.headers)
-              ? (node.data.props.headers as ApiHeader[])
-              : []
-          }
-          onChange={(headers) => setProp("headers", headers)}
         />
       </CollapsibleSection>
     );

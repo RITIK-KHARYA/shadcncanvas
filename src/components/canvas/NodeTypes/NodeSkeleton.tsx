@@ -236,13 +236,9 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
 
     case "apiCall":
       return (
-        <div className={cn("w-64 space-y-2", wide)}>
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-14 rounded-full" />
-            <Skeleton className="h-4 w-14 rounded-full" />
-          </div>
+        <div className={cn("w-56 space-y-2 rounded-lg border p-3", wide)}>
+          <Skeleton className="h-3 w-16" />
           <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-8 w-full rounded-md" />
         </div>
       );
 

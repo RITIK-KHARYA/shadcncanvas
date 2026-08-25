@@ -102,22 +102,68 @@ function deriveStateName(
   return `${safeBase}${suffix}`;
 }
 
+/** Short, stable variable-name prefix for an apiCall node's generated hooks. */
+function apiVarBase(nodeId: string): string {
+  return `api${nodeId.slice(0, 4)}`;
+}
+
+/** Generates the `useState` hooks + `trigger...()` function for one apiCall node. */
+function buildApiCallHook(node: CanvasNode): string {
+  const varBase = apiVarBase(node.id);
+  const cap = capitalize(varBase);
+  const url = String(node.data.props.url ?? "");
+  const method = String(node.data.props.method ?? "POST");
+
+  return `const [${varBase}Status, set${cap}Status] = useState<'idle'|'loading'|'success'|'error'>('idle')
+const [${varBase}Data, set${cap}Data] = useState(null)
+const [${varBase}Error, set${cap}Error] = useState('')
+
+async function trigger${cap}(payload) {
+  set${cap}Status('loading')
+  try {
+    const res = await fetch(${JSON.stringify(url)}, {
+      method: ${JSON.stringify(method)},
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    const json = await res.json()
+    set${cap}Data(json)
+    set${cap}Status('success')
+  } catch (err) {
+    set${cap}Error(String(err))
+    set${cap}Status('error')
+  }
+}`;
+}
+
 /**
  * Wires are documented as `useState` hooks for each source output plus a
  * comment describing what it feeds into. Wiring does not (yet) rewrite the
  * target component's JSX props automatically — that mapping is left as a
  * clear comment for the developer to wire up.
+ *
+ * apiCall nodes are special-cased: they always get a dedicated status/data/
+ * error hook trio plus a `trigger...()` function (see buildApiCallHook), and
+ * any button wired into their `trigger` input gets a real onClick that calls
+ * it — tracked via `triggerOverrides` and consumed by generateNodeCode.
  */
 function buildWiringBlock(
   edges: CanvasEdge[],
   nodes: CanvasNode[],
-): { declarations: string; hasState: boolean } {
-  if (edges.length === 0) return { declarations: "", hasState: false };
-
+): {
+  declarations: string;
+  hasState: boolean;
+  triggerOverrides: Map<string, string>;
+} {
   const names = new Map(nodes.map((n) => [n.id, n.data.name ?? ""]));
   const sourceOccurrence = new Map<string, number>();
   const stateLines: string[] = [];
   const wiringComments: string[] = [];
+  const triggerOverrides = new Map<string, string>();
+
+  const apiCallHooks = nodes
+    .filter((n) => n.data.componentType === "apiCall")
+    .map((n) => buildApiCallHook(n));
 
   for (const edge of edges) {
     const sourceId = edge.source;
@@ -129,6 +175,27 @@ function buildWiringBlock(
     const sourceType = sourceNode?.data.componentType ?? "node";
     const targetType = targetNode?.data.componentType ?? "node";
     const transform = String(edge.data?.transform ?? "passthrough");
+
+    // A button (or any node) wired into an apiCall's trigger input calls the
+    // generated trigger function directly instead of toggling raw state.
+    if (targetType === "apiCall" && edge.targetHandle === "trigger") {
+      const cap = capitalize(apiVarBase(targetId));
+      triggerOverrides.set(sourceId, `trigger${cap}(formValues)`);
+      wiringComments.push(
+        `  // ${sourceType}.${edge.sourceHandle ?? "output"} --[trigger]--> ${targetType}.trigger (calls trigger${cap})`,
+      );
+      continue;
+    }
+
+    // apiCall's own outputs already have dedicated hooks from
+    // buildApiCallHook — just document where they're wired instead of
+    // emitting a duplicate generic boolean hook.
+    if (sourceType === "apiCall") {
+      wiringComments.push(
+        `  // ${sourceType}.${edge.sourceHandle ?? "output"} --[${transform}]--> ${targetType}.${edge.targetHandle ?? "prop"}`,
+      );
+      continue;
+    }
 
     const occurrence = (sourceOccurrence.get(sourceId) ?? 0) + 1;
     sourceOccurrence.set(sourceId, occurrence);
@@ -146,13 +213,16 @@ function buildWiringBlock(
     );
   }
 
-  const sections = [stateLines.join("\n"), wiringComments.join("\n")].filter(
-    Boolean,
-  );
+  const sections = [
+    apiCallHooks.join("\n\n"),
+    stateLines.join("\n"),
+    wiringComments.join("\n"),
+  ].filter(Boolean);
 
   return {
     declarations: sections.join("\n\n"),
-    hasState: stateLines.length > 0,
+    hasState: stateLines.length > 0 || apiCallHooks.length > 0,
+    triggerOverrides,
   };
 }
 
@@ -169,7 +239,10 @@ ${css}
 */\n`;
 }
 
-export function generateNodeCode(node: CanvasNode): string {
+export function generateNodeCode(
+  node: CanvasNode,
+  triggerOverrides?: Map<string, string>,
+): string {
   const { componentType, props } = node.data;
   const ui = UI_COMPONENTS[componentType];
 
@@ -180,8 +253,11 @@ export function generateNodeCode(node: CanvasNode): string {
   const propsString = buildPropsString(props as Record<string, unknown>);
 
   switch (componentType) {
-    case "button":
-      return `<Button${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Button")}</Button>`;
+    case "button": {
+      const override = triggerOverrides?.get(node.id);
+      const onClickAttr = override ? ` onClick={() => ${override}}` : "";
+      return `<Button${propsString ? ` ${propsString}` : ""}${onClickAttr}>${String(props.label ?? "Button")}</Button>`;
+    }
 
     case "label":
       return `<Label${propsString ? ` ${propsString}` : ""}>${String(props.text ?? "Label")}</Label>`;
@@ -385,50 +461,12 @@ ${String(props.keys ?? "Ctrl K")
       return "";
 
     case "apiCall": {
-      const url = String(props.url ?? "");
-      const method = String(props.method ?? "POST");
-      const headers = Array.isArray(props.headers)
-        ? (props.headers as { key: string; value: string }[])
-        : [];
-      const bodyMode = String(props.bodyMode ?? "bound");
-      const staticBody = String(props.staticBody ?? "{}");
-      const timeoutMs = Number(props.timeoutMs ?? 10000);
-      const headerLines = headers
-        .filter((h) => h.key)
-        .map((h) => `    "${h.key}": ${JSON.stringify(h.value)},`)
-        .join("\n");
-      const bodyExpr =
-        method === "GET"
-          ? "undefined"
-          : bodyMode === "bound"
-            ? "JSON.stringify(payload)"
-            : JSON.stringify(staticBody);
-
-      return `{/* API Call: ${method} ${url || "<endpoint>"} */}
-<Button
-  variant="outline"
-  onClick={async () => {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), ${timeoutMs})
-    try {
-      const response = await fetch(${JSON.stringify(url)}, {
-        method: ${JSON.stringify(method)},
-        headers: {
-          "Content-Type": "application/json",
-${headerLines}
-        },
-        body: ${bodyExpr},
-        signal: controller.signal,
-      })
-      const data = await response.text()
-      console.log(data)
-    } finally {
-      clearTimeout(timer)
-    }
-  }}
->
-  Send request
-</Button>`;
+      const varBase = apiVarBase(node.id);
+      return `{/* API call node — see generated hook above */}
+<div className="text-xs text-muted-foreground">
+  {${varBase}Status === "loading" && "Loading..."}
+  {${varBase}Status === "error" && ${varBase}Error}
+</div>`;
     }
 
     default:
@@ -443,11 +481,11 @@ export function generateFullCode(
 ): string {
   const types = [...new Set(nodes.map((n) => n.data.componentType))];
   const imports = buildImports(types);
+  const wiring = buildWiringBlock(edges, nodes);
   const componentsCode = nodes
-    .map((node) => indent(generateNodeCode(node), 6))
+    .map((node) => indent(generateNodeCode(node, wiring.triggerOverrides), 6))
     .join("\n");
 
-  const wiring = buildWiringBlock(edges, nodes);
   const reactImport = wiring.hasState
     ? `import { useState } from "react"\n`
     : "";
@@ -490,6 +528,8 @@ function buildImports(types: string[]): string {
       lines.add(
         `import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"`,
       );
+    } else if (type === "apiCall") {
+      // Renders a plain status <div> — no shadcn component import needed.
     } else {
       lines.add(
         `import { ${ui.exportName} } from "@/components/ui/${ui.importPath}"`,

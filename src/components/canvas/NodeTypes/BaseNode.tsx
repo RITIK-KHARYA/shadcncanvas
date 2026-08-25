@@ -128,7 +128,6 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
             <NodeSkeleton componentType={data.componentType} fill={isCustom} />
           ) : (
             <NodePreview
-              nodeId={id}
               componentType={data.componentType}
               props={data.props}
               state={data.state}

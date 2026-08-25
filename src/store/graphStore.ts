@@ -386,7 +386,7 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
 
     try {
       const headerObj = Object.fromEntries(
-        (headers ?? []).map((h) => [h.key, h.value]),
+        (headers ?? []).filter((h) => h.key).map((h) => [h.key, h.value]),
       );
 
       const body =

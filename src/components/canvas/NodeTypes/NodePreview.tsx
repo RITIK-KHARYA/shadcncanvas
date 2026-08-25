@@ -2,7 +2,6 @@ import type { VariantProps } from "class-variance-authority";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { useGraphStore } from "@/store/graphStore";
 import {
   CalendarDays,
   Inbox,
@@ -135,7 +134,6 @@ type FormField = {
 };
 
 type NodePreviewProps = {
-  nodeId: string;
   componentType: string;
   props: Record<string, unknown>;
   state: NodeState;
@@ -163,7 +161,6 @@ function wiredBoolean(
 }
 
 export function NodePreview({
-  nodeId,
   componentType,
   props,
   state,
@@ -869,54 +866,38 @@ export function NodePreview({
     }
 
     case "apiCall": {
-      const url = String(props.url ?? "");
-      const method = String(props.method ?? "POST");
-      const status = String(state.status ?? "idle");
-
-      // Execution lives in graphStore.triggerApiCall — a single source of
-      // truth so wired triggers (via propagate()) and manual clicks never
-      // race or double-fire the request.
-      const run = () => {
-        void useGraphStore.getState().triggerApiCall(nodeId);
-      };
-
-      const statusVariant =
-        status === "success"
-          ? "default"
-          : status === "error"
-            ? "destructive"
-            : "secondary";
+      const status = (state.status as string) ?? "idle";
+      const statusColor =
+        {
+          idle: "bg-muted text-muted-foreground",
+          loading: "bg-blue-100 text-blue-700",
+          success: "bg-green-100 text-green-700",
+          error: "bg-red-100 text-red-700",
+        }[status] ?? "bg-muted";
 
       return (
-        <div className={cn("w-64 space-y-2 text-xs", isCustom && "w-full")}>
-          <div className="flex items-center justify-between gap-2">
-            <Badge
-              variant="outline"
-              className="font-mono text-[10px] uppercase"
-            >
-              {method}
-            </Badge>
-            <Badge
-              variant={
-                statusVariant as VariantProps<typeof badgeVariants>["variant"]
-              }
-              className="text-[10px] capitalize"
+        <div
+          className={cn(
+            "w-56 space-y-1.5 rounded-lg border bg-card p-3",
+            isCustom && "w-full",
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase">
+              {String(props.method ?? "POST")}
+            </span>
+            <span
+              className={cn(
+                "rounded px-1.5 py-0.5 text-[10px] font-medium",
+                statusColor,
+              )}
             >
               {status}
-            </Badge>
+            </span>
           </div>
-          <p className="truncate font-mono text-[11px] text-muted-foreground">
-            {url || "No endpoint set"}
-          </p>
-          <Button
-            size="sm"
-            variant="outline"
-            className="w-full"
-            disabled={disabled || status === "loading"}
-            onClick={() => void run()}
-          >
-            {status === "loading" ? "Sending…" : "Send request"}
-          </Button>
+          <div className="truncate text-xs text-muted-foreground">
+            {String(props.url ?? "") || "No URL set"}
+          </div>
         </div>
       );
     }
