@@ -85,8 +85,8 @@ export function colorFormatter(value: string, _format: "hsl", precision: string 
     return parseFloat(str)
   }
   const oklchMatch =
-    val.match(/oklch\(\s*([\d\.]+%?)\s+([\d\.]+%?)\s+([\d\.]+(?:deg|rad|turn)?)\s*(?:\/\s*([\d\.]+%?))?\s*\)/i) ||
-    val.match(/oklch\(\s*([\d\.]+%?)\s*,\s*([\d\.]+%?)\s*,\s*([\d\.]+(?:deg|rad|turn)?)\s*(?:,\s*([\d\.]+%?))?\s*\)/i)
+    val.match(/oklch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+(?:deg|rad|turn)?)\s*(?:\/\s*([\d.]+%?))?\s*\)/i) ||
+    val.match(/oklch\(\s*([\d.]+%?)\s*,\s*([\d.]+%?)\s*,\s*([\d.]+(?:deg|rad|turn)?)\s*(?:,\s*([\d.]+%?))?\s*\)/i)
   if (oklchMatch) {
     const lRaw = oklchMatch[1]
     const cRaw = oklchMatch[2]
@@ -126,7 +126,7 @@ export function colorFormatter(value: string, _format: "hsl", precision: string 
     return rgbToHsl(r / 255, g / 255, b / 255, a, p)
   }
   const rgbMatch = val.match(
-    /rgba?\(\s*([\d\.]+%?)\s*[\s,]\s*([\d\.]+%?)\s*[\s,]\s*([\d\.]+%?)\s*(?:[\s,\/]\s*([\d\.]+%?))?\s*\)/i
+    /rgba?\(\s*([\d.]+%?)\s*[\s,]\s*([\d.]+%?)\s*[\s,]\s*([\d.]+%?)\s*(?:[\s,/]\s*([\d.]+%?))?\s*\)/i
   )
   if (rgbMatch) {
     const r = parsePercent(rgbMatch[1], 255) / 255
@@ -138,7 +138,7 @@ export function colorFormatter(value: string, _format: "hsl", precision: string 
     return rgbToHsl(r, g, b, a, p)
   }
   const hslMatch = val.match(
-    /hsla?\(\s*([\d\.]+(?:deg|rad|turn)?)\s*[\s,]\s*([\d\.]+%?)\s*[\s,]\s*([\d\.]+%?)\s*(?:[\s,\/]\s*([\d\.]+%?))?\s*\)/i
+    /hsla?\(\s*([\d.]+(?:deg|rad|turn)?)\s*[\s,]\s*([\d.]+%?)\s*[\s,]\s*([\d.]+%?)\s*(?:[\s,/]\s*([\d.]+%?))?\s*\)/i
   )
   if (hslMatch) {
     let h = parseFloat(hslMatch[1])
@@ -165,7 +165,7 @@ export function adjustHslColor(
   hslString: string,
   adjustments: { hueShift: number; saturationScale: number; lightnessScale: number }
 ): string {
-  const match = hslString.match(/hsl\(\s*([\d\.]+)\s+([\d\.]+)%\s+([\d\.]+)%\s*(?:\/\s*([\d\.]+))?\s*\)/i)
+  const match = hslString.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+))?\s*\)/i)
   if (!match) return hslString
   let h = parseFloat(match[1])
   let s = parseFloat(match[2])

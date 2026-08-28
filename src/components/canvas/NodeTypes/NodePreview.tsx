@@ -191,7 +191,7 @@ export function NodePreview({
           disabled={disabled}
           className={isCustom ? "w-full" : undefined}
           aria-pressed={Boolean(state.pressed)}
-          onClick={() => emit("pressed", !Boolean(state.pressed))}
+          onClick={() => emit("pressed", !state.pressed)}
         >
           {String(props.label ?? "Button")}
         </Button>
