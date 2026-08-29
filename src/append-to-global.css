@@ -1,0 +1,28 @@
+/* ---- Landing page revamp additions (append to end of global.css) ---- */
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee linear infinite;
+}
+
+.hero-glow {
+    background: radial-gradient(
+        60% 50% at 50% 0%,
+        color-mix(in oklch, var(--foreground) 10%, transparent),
+        transparent 70%
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+        animation: none;
+    }
+}

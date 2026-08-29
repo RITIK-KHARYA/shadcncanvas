@@ -120,7 +120,10 @@ export const nodeSchemas: Record<string, z.ZodType> = {
   }),
   toast: z.object({
     message: z.string().min(1, "Message required"),
+    successMessage: z.string().min(1, "Success message required"),
+    errorMessage: z.string().min(1, "Error message required"),
     variant: z.enum(["success", "error"]),
+    statusVariant: z.enum(["auto", "success", "error", "info"]),
   }),
   apiCall: z.object({
     url: z.string().url("Must be a valid URL"),

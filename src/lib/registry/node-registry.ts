@@ -60,6 +60,7 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     outputs: [
       { key: "submitted", label: "Submitted", type: "boolean" },
       { key: "isValid", label: "Is Valid", type: "boolean" },
+      { key: "payload", label: "Payload", type: "string" },
     ],
   },
   input: {
@@ -616,7 +617,10 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     category: "feedback",
     defaultProps: {
       message: "Changes saved",
+      successMessage: "Login successful!",
+      errorMessage: "Login failed. Check credentials.",
       variant: "success",
+      statusVariant: "auto",
     },
     configurableProps: [
       {
@@ -626,14 +630,38 @@ export const nodeRegistry: Record<string, NodeConfig> = {
         default: "Changes saved",
       },
       {
+        key: "successMessage",
+        label: "Success Message",
+        inputType: "text",
+        default: "Login successful!",
+      },
+      {
+        key: "errorMessage",
+        label: "Error Message",
+        inputType: "text",
+        default: "Login failed. Check credentials.",
+      },
+      {
         key: "variant",
-        label: "Variant",
+        label: "Default Variant",
         inputType: "select",
         options: ["success", "error"],
         default: "success",
       },
+      {
+        key: "statusVariant",
+        label: "Color Mode",
+        inputType: "select",
+        options: ["auto", "success", "error", "info"],
+        default: "auto",
+      },
     ],
-    inputs: [{ key: "trigger", label: "Trigger", type: "boolean" }],
+    inputs: [
+      { key: "trigger", label: "Trigger", type: "boolean" },
+      { key: "status", label: "Status", type: "string" },
+      { key: "isSuccess", label: "Success", type: "boolean" },
+      { key: "isError", label: "Error", type: "boolean" },
+    ],
     outputs: [{ key: "fired", label: "Fired", type: "boolean" }],
   },
   apiCall: {
@@ -685,11 +713,15 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       { key: "status", label: "Status", type: "string" },
       { key: "data", label: "Response Data", type: "string" },
       { key: "error", label: "Error Message", type: "string" },
+      { key: "isLoading", label: "Loading", type: "boolean" },
+      { key: "isSuccess", label: "Success", type: "boolean" },
+      { key: "isError", label: "Error", type: "boolean" },
     ],
   },
 }
 
 for (const config of Object.values(nodeRegistry)) {
+  if (config.type === "toast") continue
   if (!config.inputs.some((input) => input.key === "loading")) {
     config.inputs.push({ key: "loading", label: "Loading", type: "boolean" })
   }

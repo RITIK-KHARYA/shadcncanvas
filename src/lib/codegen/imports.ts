@@ -25,6 +25,9 @@ export function buildImports(types: string[]): string {
       )
     } else if (type === "apiCall") {
       // Renders a plain status <div> — no shadcn component import needed.
+    } else if (type === "toast") {
+      lines.add(`import { toast } from "sonner"`);
+      lines.add(`import { useEffect } from "react"`);
     } else {
       lines.add(
         `import { ${ui.exportName} } from "@/components/ui/${ui.importPath}"`,

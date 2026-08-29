@@ -1,55 +1,55 @@
-import type { CanvasEdge, CanvasNode } from "@/types/graph"
-import type { ThemeTokens } from "@/store/theme-store"
-import { themeTokensToStyle } from "@/store/theme-store"
-import { nodeRegistry, UI_COMPONENTS } from "@/lib/registry"
-import type { FormField } from "@/types/registry"
-import { buildPropsString, indent } from "./helpers"
-import { buildWiringBlock } from "./wiring"
-import { buildImports } from "./imports"
+import type { CanvasEdge, CanvasNode } from "@/types/graph";
+import type { ThemeTokens } from "@/store/theme-store";
+import { themeTokensToStyle } from "@/store/theme-store";
+import { nodeRegistry, UI_COMPONENTS } from "@/lib/registry";
+import type { FormField } from "@/types/registry";
+import { buildPropsString, indent } from "./helpers";
+import { buildWiringBlock } from "./wiring";
+import { buildImports } from "./imports";
 
 function buildThemeBlock(theme?: ThemeTokens): string {
-  if (!theme) return ""
-  const vars = themeTokensToStyle(theme)
+  if (!theme) return "";
+  const vars = themeTokensToStyle(theme);
   const css = Object.entries(vars)
     .map(([k, v]) => `  ${k}: ${v};`)
-    .join("\n")
+    .join("\n");
   return `\n/* Canvas theme tokens */\n/*
 :root {
 ${css}
 }
-*/\n`
+*/\n`;
 }
 
 export function generateNodeCode(
   node: CanvasNode,
   triggerOverrides?: Map<string, string>,
 ): string {
-  const { componentType, props } = node.data
-  const ui = UI_COMPONENTS[componentType]
+  const { componentType, props } = node.data;
+  const ui = UI_COMPONENTS[componentType];
 
   if (!ui || !nodeRegistry[componentType]) {
-    return `{/* Unknown node: ${componentType} */}`
+    return `{/* Unknown node: ${componentType} */}`;
   }
 
-  const propsString = buildPropsString(props as Record<string, unknown>)
+  const propsString = buildPropsString(props as Record<string, unknown>);
 
   switch (componentType) {
     case "button": {
-      const override = triggerOverrides?.get(node.id)
-      const onClickAttr = override ? ` onClick={() => ${override}}` : ""
-      return `<Button${propsString ? ` ${propsString}` : ""}${onClickAttr}>${String(props.label ?? "Button")}</Button>`
+      const override = triggerOverrides?.get(node.id);
+      const onClickAttr = override ? ` onClick={() => ${override}}` : "";
+      return `<Button${propsString ? ` ${propsString}` : ""}${onClickAttr}>${String(props.label ?? "Button")}</Button>`;
     }
 
     case "label":
-      return `<Label${propsString ? ` ${propsString}` : ""}>${String(props.text ?? "Label")}</Label>`
+      return `<Label${propsString ? ` ${propsString}` : ""}>${String(props.text ?? "Label")}</Label>`;
 
     case "badge":
-      return `<Badge${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Badge")}</Badge>`
+      return `<Badge${propsString ? ` ${propsString}` : ""}>${String(props.label ?? "Badge")}</Badge>`;
 
     case "select": {
       const options = Array.isArray(props.options)
         ? (props.options as string[])
-        : ["Option 1"]
+        : ["Option 1"];
       return `<Select>
   <SelectTrigger className="w-48">
     <SelectValue placeholder="${String(props.placeholder ?? "Select")}" />
@@ -57,14 +57,16 @@ export function generateNodeCode(
   <SelectContent>
 ${options.map((o) => `    <SelectItem value="${o}">${o}</SelectItem>`).join("\n")}
   </SelectContent>
-</Select>`
+</Select>`;
     }
 
     case "form": {
       const fields = Array.isArray(props.fields)
         ? (props.fields as FormField[])
-        : [{ name: "field1", type: "text", placeholder: "Field 1" }]
-      const active = props.active !== undefined ? Boolean(props.active) : true
+        : [{ name: "field1", type: "text", placeholder: "Field 1" }];
+      const active = props.active !== undefined ? Boolean(props.active) : true;
+      const override = triggerOverrides?.get(node.id);
+      const submitAttr = override ? ` onClick={() => ${override}}` : "";
       return `<Card className="p-4">
   <CardHeader>
     <CardTitle>${String(props.title ?? "Untitled Form")}</CardTitle>
@@ -74,13 +76,13 @@ ${options.map((o) => `    <SelectItem value="${o}">${o}</SelectItem>`).join("\n"
 ${fields
   .map(
     (f) =>
-      `      <Input name="${f.name}" type="${f.type}" placeholder="${f.placeholder ?? f.name}"${f.required ? " required" : ""} />`,
+      `      <Input name="${f.name}" type="${f.type}" placeholder="${f.placeholder ?? f.name}"${f.required ? " required" : ""} value={formValues["${f.name}"] ?? ""} onChange={(e) => setFormValues((prev) => ({ ...prev, ["${f.name}"]: e.target.value }))} />`,
   )
   .join("\n")}
-      <Button type="submit">Submit</Button>
+      <Button type="button"${submitAttr}>Submit</Button>
     </fieldset>
   </CardContent>
-</Card>`
+</Card>`;
     }
 
     case "card":
@@ -89,7 +91,7 @@ ${fields
     <CardTitle>${String(props.title ?? "Card Title")}</CardTitle>
     <CardDescription>${String(props.description ?? "")}</CardDescription>
   </CardHeader>
-</Card>`
+</Card>`;
 
     case "tabs":
       return `<Tabs defaultValue="tab-1" className="w-56">
@@ -99,18 +101,18 @@ ${fields
   </TabsList>
   <TabsContent value="tab-1">Tab one content</TabsContent>
   <TabsContent value="tab-2">Tab two content</TabsContent>
-</Tabs>`
+</Tabs>`;
 
     case "separator":
-      return `<Separator className="my-2" />`
+      return `<Separator className="my-2" />`;
 
     case "skeleton":
-      return `<Skeleton className="h-10 w-48" />`
+      return `<Skeleton className="h-10 w-48" />`;
 
     case "bubble":
       return `<Bubble variant="${String(props.variant ?? "received")}">
   ${String(props.text ?? "")}
-</Bubble>`
+</Bubble>`;
 
     case "message":
       return `<Message>
@@ -118,12 +120,12 @@ ${fields
   <MessageContent variant="${String(props.variant ?? "received")}">
     <MessageBody variant="${String(props.variant ?? "received")}">${String(props.text ?? "")}</MessageBody>
   </MessageContent>
-</Message>`
+</Message>`;
 
     case "message-scroller":
       return `<MessageScroller>
   {/* Message components */}
-</MessageScroller>`
+</MessageScroller>`;
 
     case "empty":
       return `<Empty>
@@ -132,7 +134,19 @@ ${fields
     <EmptyTitle>${String(props.title ?? "No results")}</EmptyTitle>
     <EmptyDescription>${String(props.description ?? "")}</EmptyDescription>
   </EmptyHeader>
-</Empty>`
+</Empty>`;
+
+    case "input":
+      return `<Input placeholder="${String(props.placeholder ?? "Enter text")}" type="${String(props.inputType ?? "text")}" />`;
+
+    case "textarea":
+      return `<Textarea placeholder="${String(props.placeholder ?? "Enter message")}" />`;
+
+    case "checkbox":
+      return `<div className="flex items-center gap-2"><Checkbox /><span className="text-sm">${String(props.label ?? "Checkbox")}</span></div>`;
+
+    case "switch":
+      return `<div className="flex items-center gap-2"><Switch /><span className="text-sm">${String(props.label ?? "Switch")}</span></div>`;
 
     case "kbd":
       return `<KbdGroup>
@@ -140,16 +154,16 @@ ${String(props.keys ?? "Ctrl K")
   .split(/\s+/)
   .map((key) => `  <Kbd>${key}</Kbd>`)
   .join("\n")}
-</KbdGroup>`
+</KbdGroup>`;
 
     case "marker": {
-      const text = String(props.text ?? "")
-      const highlight = String(props.highlight ?? "")
+      const text = String(props.text ?? "");
+      const highlight = String(props.highlight ?? "");
       const index = highlight
         ? text.toLowerCase().indexOf(highlight.toLowerCase())
-        : -1
-      if (index === -1) return text
-      return `${text.slice(0, index)}<Marker>${text.slice(index, index + highlight.length)}</Marker>${text.slice(index + highlight.length)}`
+        : -1;
+      if (index === -1) return text;
+      return `${text.slice(0, index)}<Marker>${text.slice(index, index + highlight.length)}</Marker>${text.slice(index + highlight.length)}`;
     }
 
     case "field":
@@ -157,12 +171,12 @@ ${String(props.keys ?? "Ctrl K")
   <FieldLabel>${String(props.label ?? "Label")}</FieldLabel>
   <Input placeholder="..." />
   ${props.error ? `<FieldError>${String(props.error)}</FieldError>` : `<FieldDescription>${String(props.description ?? "")}</FieldDescription>`}
-</Field>`
+</Field>`;
 
     case "native-select":
       return `<NativeSelect defaultValue="">
   <option value="" disabled>${String(props.placeholder ?? "Select…")}</option>
-</NativeSelect>`
+</NativeSelect>`;
 
     case "carousel":
       return `<Carousel className="w-full max-w-xs">
@@ -172,7 +186,7 @@ ${String(props.keys ?? "Ctrl K")
   </CarouselContent>
   <CarouselPrevious />
   <CarouselNext />
-</Carousel>`
+</Carousel>`;
 
     case "item":
       return `<Item variant="outline">
@@ -182,7 +196,7 @@ ${String(props.keys ?? "Ctrl K")
     <ItemDescription>${String(props.description ?? "")}</ItemDescription>
   </ItemContent>
   <ItemActions>{/* controls */}</ItemActions>
-</Item>`
+</Item>`;
 
     case "dialog":
       return `<Dialog>
@@ -196,7 +210,7 @@ ${String(props.keys ?? "Ctrl K")
     </DialogHeader>
     <DialogFooter>{/* actions */}</DialogFooter>
   </DialogContent>
-</Dialog>`
+</Dialog>`;
 
     case "drawer":
       return `<Drawer>
@@ -209,13 +223,13 @@ ${String(props.keys ?? "Ctrl K")
       <DrawerDescription>${String(props.description ?? "")}</DrawerDescription>
     </DrawerHeader>
   </DrawerContent>
-</Drawer>`
+</Drawer>`;
 
     case "hover-card":
       return `<HoverCard>
   <HoverCardTrigger href="#">${String(props.trigger ?? "@trigger")}</HoverCardTrigger>
   <HoverCardContent>${String(props.heading ?? "")} — ${String(props.bio ?? "")}</HoverCardContent>
-</HoverCard>`
+</HoverCard>`;
 
     case "command":
       return `<Command className="rounded-lg border shadow-none">
@@ -226,7 +240,7 @@ ${String(props.keys ?? "Ctrl K")
       <CommandItem>Calendar</CommandItem>
     </CommandGroup>
   </CommandList>
-</Command>`
+</Command>`;
 
     case "chart":
       return `<ChartContainer config={chartConfig} className="aspect-video">
@@ -236,22 +250,29 @@ ${String(props.keys ?? "Ctrl K")
     <ChartTooltip content={<ChartTooltipContent />} />
     <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
   </BarChart>
-</ChartContainer>`
+</ChartContainer>`;
 
-    case "toast":
-      return ""
+    case "toast": {
+      // Toast is handled via wiring effects (apiCall -> toast). Render placeholder so node is visible in export.
+      const msg = String(props.message ?? "Done");
+      const successMsg = String(props.successMessage ?? msg);
+      const errorMsg = String(props.errorMessage ?? msg);
+      const variant = String(props.variant ?? "success");
+      const color = String(props.statusVariant ?? "auto");
+      return `{/* Toast (${variant}/${color}): success="${successMsg}" error="${errorMsg}" - via wiring effect */}`;
+    }
 
     case "apiCall": {
-      const varBase = `api${node.id.slice(0, 4)}`
+      const varBase = `api${node.id.slice(0, 4)}`;
       return `{/* API call node — see generated hook above */}
 <div className="text-xs text-muted-foreground">
   {${varBase}Status === "loading" && "Loading..."}
   {${varBase}Status === "error" && ${varBase}Error}
-</div>`
+</div>`;
     }
 
     default:
-      return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`
+      return `<${ui.exportName}${propsString ? ` ${propsString}` : ""} />`;
   }
 }
 
@@ -260,19 +281,19 @@ export function generateFullCode(
   edges: CanvasEdge[],
   theme?: ThemeTokens,
 ): string {
-  const types = [...new Set(nodes.map((n) => n.data.componentType))]
-  const imports = buildImports(types)
-  const wiring = buildWiringBlock(edges, nodes)
+  const types = [...new Set(nodes.map((n) => n.data.componentType))];
+  const imports = buildImports(types);
+  const wiring = buildWiringBlock(edges, nodes);
   const componentsCode = nodes
     .map((node) => indent(generateNodeCode(node, wiring.triggerOverrides), 6))
-    .join("\n")
+    .join("\n");
 
   const reactImport = wiring.hasState
     ? `import { useState } from "react"\n`
-    : ""
+    : "";
   const wiringBlock = wiring.declarations
     ? `${indent(wiring.declarations, 0)}\n\n`
-    : ""
+    : "";
 
   return `${reactImport}${imports}
 ${buildThemeBlock(theme)}
@@ -283,5 +304,5 @@ ${componentsCode}
     </div>
   )
 }
-`
+`;
 }

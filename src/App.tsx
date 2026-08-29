@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom"
-
 import { BuilderPage } from "@/pages/builder-page"
-import { LandingPage } from "@/pages/landing-page"
+import { LandingPage } from "./components/landing-page"
 
 export default function App() {
   return (

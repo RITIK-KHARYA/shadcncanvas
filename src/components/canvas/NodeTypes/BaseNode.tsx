@@ -80,7 +80,8 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
   const outputCount = config.outputs.length;
   const handleCount = Math.max(inputCount, outputCount, 1);
   const isCustom = layout.sizeMode === "custom";
-  const isLoading = Boolean(data.props.loading ?? data.state.loading);
+  // Toast must never be hidden by loading skeleton - it needs to fire even while apiCall is loading
+  const isLoading = data.componentType !== "toast" && Boolean(data.props.loading ?? data.state.loading);
 
   return (
     <>

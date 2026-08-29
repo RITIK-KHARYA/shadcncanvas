@@ -1,5 +1,5 @@
 import type { VariantProps } from "class-variance-authority";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
@@ -125,26 +125,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { NodeSizeMode, NodeState } from "@/types/graph";
+import type { FormField, NodePreviewProps } from "./types";
 
-type FormField = {
-  name: string;
-  type: string;
-  required?: boolean;
-  placeholder?: string;
-};
 
-type NodePreviewProps = {
-  componentType: string;
-  props: Record<string, unknown>;
-  state: NodeState;
-  sizeMode?: NodeSizeMode;
-  onOutputChange?: (
-    outputKey: string,
-    value: boolean | string | number,
-  ) => void;
-  onOutputsChange?: (outputs: NodeState) => void;
-};
-
+  
 function fieldClass(sizeMode: NodeSizeMode | undefined, extra?: string) {
   return cn(sizeMode === "custom" ? "w-full" : "w-auto max-w-full", extra);
 }
@@ -171,6 +155,7 @@ export function NodePreview({
   const disabled = wiredBoolean(props, state, "disabled");
   const active = wiredBoolean(props, state, "active", true);
   const isCustom = sizeMode === "custom";
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
 
   const emit = (key: string, value: boolean | string | number) => {
     onOutputChange?.(key, value);
@@ -332,6 +317,13 @@ export function NodePreview({
                   placeholder={field.placeholder ?? field.name}
                   required={field.required}
                   className="w-full"
+                  value={formValues[field.name] ?? ""}
+                  onChange={(e) =>
+                    setFormValues((prev) => ({
+                      ...prev,
+                      [field.name]: e.target.value,
+                    }))
+                  }
                 />
               ))}
               <Button
@@ -340,9 +332,12 @@ export function NodePreview({
                 disabled={!active}
                 onClick={() => {
                   const isValid = fields.every(
-                    (field) => !field.required || Boolean(field.name),
+                    (field) =>
+                      !field.required ||
+                      Boolean(formValues[field.name]?.trim()),
                   );
-                  emitMany({ submitted: true, isValid });
+                  const payload = JSON.stringify(formValues);
+                  emitMany({ submitted: true, isValid, payload });
                 }}
               >
                 Submit
@@ -830,38 +825,77 @@ export function NodePreview({
       );
 
     case "toast": {
-      const message = String(props.message ?? "");
-      const isError = props.variant === "error";
+      const baseMessage = String(props.message ?? "");
+      const successMessage = String(props.successMessage ?? baseMessage ?? "Success!");
+      const errorMessage = String(props.errorMessage ?? baseMessage ?? "Something went wrong");
+      const defaultIsError = props.variant === "error";
+      const statusVariant = String(props.statusVariant ?? "auto");
       const trigger = Boolean(props.trigger ?? state.trigger);
-      const fire = () => {
-        if (isError) toast.error(message || "Something went wrong");
-        else toast.success(message || "Changes saved");
+      const statusStr = String(props.status ?? state.status ?? "");
+      const isSuccessWired = Boolean(props.isSuccess ?? state.isSuccess);
+      const isErrorWired = Boolean(props.isError ?? state.isError);
+
+      const resolveVariant = (isSuccess: boolean, isError: boolean, status: string): { isError: boolean; message: string } => {
+        if (statusVariant === "success") return { isError: false, message: successMessage || baseMessage };
+        if (statusVariant === "error") return { isError: true, message: errorMessage || baseMessage };
+        if (statusVariant === "info") return { isError: false, message: baseMessage };
+        // auto: prioritise explicit error/success signals
+        if (isError || status === "error") return { isError: true, message: errorMessage || baseMessage };
+        if (isSuccess || status === "success") return { isError: false, message: successMessage || baseMessage };
+        return { isError: defaultIsError, message: baseMessage };
+      };
+
+      const fireWith = (isSuccess: boolean, isError: boolean, status: string) => {
+        const { isError: err, message } = resolveVariant(isSuccess, isError, status);
+        if (err) toast.error(message || "Something went wrong");
+        else toast.success(message || "Done");
         emit("fired", true);
       };
 
-      // Fire on the rising edge of a wired trigger signal.
+      // Manual trigger (generic wiring)
       const prevTrigger = useRef(trigger);
       useEffect(() => {
         if (trigger && !prevTrigger.current) {
-          fire();
+          fireWith(isSuccessWired, isErrorWired, statusStr);
         }
         prevTrigger.current = trigger;
         // eslint-disable-next-line react-hooks/exhaustive-deps -- fire is stable per render inputs
       }, [trigger]);
 
+      // Status-driven auto firing (when Form → apiCall → Toast status/isSuccess/isError wired)
+      const prevSuccess = useRef(isSuccessWired);
+      const prevError = useRef(isErrorWired);
+      const prevStatus = useRef(statusStr);
+      useEffect(() => {
+        if (isSuccessWired && !prevSuccess.current) fireWith(true, false, statusStr);
+        if (isErrorWired && !prevError.current) fireWith(false, true, statusStr);
+        if (statusStr !== prevStatus.current) {
+          if (statusStr === "success" && !isSuccessWired) fireWith(true, false, statusStr);
+          if (statusStr === "error" && !isErrorWired) fireWith(false, true, statusStr);
+        }
+        prevSuccess.current = isSuccessWired;
+        prevError.current = isErrorWired;
+        prevStatus.current = statusStr;
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- fireWith is stable
+      }, [isSuccessWired, isErrorWired, statusStr]);
+
+      // Display variant with color combination: respect statusVariant and live status
+      const display = resolveVariant(isSuccessWired, isErrorWired, statusStr);
+      const displayIsError = display.isError;
+      const displayLabel = statusStr === "success" ? successMessage : statusStr === "error" ? errorMessage : displayIsError ? "Fire error" : "Fire toast";
+      const buttonVariant: VariantProps<typeof buttonVariants>["variant"] = displayIsError ? "destructive" : statusVariant === "info" ? "secondary" : "outline";
+
       return (
-        <Button
-          size="sm"
-          variant={isError ? "destructive" : "outline"}
-          disabled={disabled}
-          onClick={fire}
-        >
-          {trigger && !isError
-            ? "Firing…"
-            : isError
-              ? "Fire error"
-              : "Fire toast"}
-        </Button>
+        <div className={cn("space-y-1", isCustom && "w-full")}>
+          <Button size="sm" variant={buttonVariant} disabled={disabled} onClick={() => fireWith(isSuccessWired, isErrorWired, statusStr)}>
+            {trigger && !displayIsError ? "Firing…" : displayLabel}
+          </Button>
+          {(statusStr === "success" || statusStr === "error") && (
+            <div className={cn("text-[10px] font-medium", statusStr === "success" ? "text-green-600" : "text-red-600")}>
+              {statusStr === "success" ? successMessage : errorMessage}
+            </div>
+          )}
+        </div>
       );
     }
 

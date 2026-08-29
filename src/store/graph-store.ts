@@ -24,6 +24,8 @@ type Snapshot = {
 
 const MAX_HISTORY = 40
 
+const activeApiControllers = new Map<string, AbortController>()
+
 type GraphStore = {
   nodes: CanvasNode[]
   edges: CanvasEdge[]
@@ -378,54 +380,108 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
       timeoutMs?: number
     }
 
-    get().updateNodeState(nodeId, { status: "loading" })
-    get().propagate(nodeId, "status", "loading")
+    if (!url || typeof url !== "string" || url.trim() === "") {
+      const errMsg = "Invalid URL: empty endpoint"
+      get().updateNodeState(nodeId, { status: "error", isLoading: false, isSuccess: false, isError: true, error: errMsg })
+      get().propagate(nodeId, "status", "error")
+      get().propagate(nodeId, "isLoading", false)
+      get().propagate(nodeId, "isSuccess", false)
+      get().propagate(nodeId, "isError", true)
+      get().propagate(nodeId, "error", errMsg)
+      return
+    }
+    try {
+      const parsed = new URL(url)
+      if (!["http:", "https:"].includes(parsed.protocol)) throw new Error()
+    } catch {
+      const errMsg = `Invalid URL: ${url}`
+      get().updateNodeState(nodeId, { status: "error", isLoading: false, isSuccess: false, isError: true, error: errMsg })
+      get().propagate(nodeId, "status", "error")
+      get().propagate(nodeId, "isLoading", false)
+      get().propagate(nodeId, "isSuccess", false)
+      get().propagate(nodeId, "isError", true)
+      get().propagate(nodeId, "error", errMsg)
+      return
+    }
 
+    activeApiControllers.get(nodeId)?.abort()
     const controller = new AbortController()
+    activeApiControllers.set(nodeId, controller)
+
     const timeout = setTimeout(() => controller.abort(), timeoutMs ?? 10000)
+
+    get().updateNodeState(nodeId, { status: "loading", isLoading: true, isSuccess: false, isError: false, error: "", data: "" })
+    get().propagate(nodeId, "status", "loading")
+    get().propagate(nodeId, "isLoading", true)
+    get().propagate(nodeId, "isSuccess", false)
+    get().propagate(nodeId, "isError", false)
 
     try {
       const headerObj = Object.fromEntries(
         (headers ?? []).filter((h) => h.key).map((h) => [h.key, h.value]),
       )
 
-      const body =
+      const rawBody =
         bodyMode === "bound"
           ? (get().nodes.find((n) => n.id === nodeId)?.data.state.payload as
               string | undefined)
           : staticBody
 
-      const res = await fetch(url ?? "", {
+      let body: string | undefined
+      if (method !== "GET") {
+        if (rawBody == null || rawBody === "") {
+          body = undefined
+        } else if (typeof rawBody === "string") {
+          body = rawBody
+        } else {
+          body = JSON.stringify(rawBody)
+        }
+      }
+
+      const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json", ...headerObj },
-        body: method === "GET" ? undefined : body,
+        headers: body ? { "Content-Type": "application/json", ...headerObj } : { ...headerObj },
+        body,
         signal: controller.signal,
       })
 
-      clearTimeout(timeout)
       const json = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        const errMsg = `HTTP ${res.status}: ${res.statusText}`
-        get().updateNodeState(nodeId, { status: "error", error: errMsg })
+        const errMsg = json && typeof json === "object" && "message" in json
+          ? `HTTP ${res.status}: ${String((json as Record<string, unknown>).message)}`
+          : `HTTP ${res.status}: ${res.statusText}`
+        get().updateNodeState(nodeId, { status: "error", isLoading: false, isSuccess: false, isError: true, error: errMsg })
         get().propagate(nodeId, "status", "error")
+        get().propagate(nodeId, "isLoading", false)
+        get().propagate(nodeId, "isSuccess", false)
+        get().propagate(nodeId, "isError", true)
         get().propagate(nodeId, "error", errMsg)
         return
       }
 
       const dataStr = JSON.stringify(json)
-      get().updateNodeState(nodeId, { status: "success", data: dataStr })
+      get().updateNodeState(nodeId, { status: "success", isLoading: false, isSuccess: true, isError: false, data: dataStr })
       get().propagate(nodeId, "status", "success")
+      get().propagate(nodeId, "isLoading", false)
+      get().propagate(nodeId, "isSuccess", true)
+      get().propagate(nodeId, "isError", false)
       get().propagate(nodeId, "data", dataStr)
     } catch (err) {
-      clearTimeout(timeout)
+      if (controller.signal.aborted && activeApiControllers.get(nodeId) !== controller) return
       const errMsg =
         err instanceof Error && err.name === "AbortError"
           ? "Request timed out"
           : String(err)
-      get().updateNodeState(nodeId, { status: "error", error: errMsg })
+      get().updateNodeState(nodeId, { status: "error", isLoading: false, isSuccess: false, isError: true, error: errMsg })
       get().propagate(nodeId, "status", "error")
+      get().propagate(nodeId, "isLoading", false)
+      get().propagate(nodeId, "isSuccess", false)
+      get().propagate(nodeId, "isError", true)
       get().propagate(nodeId, "error", errMsg)
+    } finally {
+      clearTimeout(timeout)
+      if (activeApiControllers.get(nodeId) === controller) activeApiControllers.delete(nodeId)
     }
   },
 
