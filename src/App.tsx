@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom"
 import { BuilderPage } from "@/pages/builder-page"
-import { LandingPage } from "./components/landing-page"
+import { LandingV2 } from "./components/landing-v2/landing"
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingV2 />} />
       <Route path="/app" element={<BuilderPage />} />
     </Routes>
   )

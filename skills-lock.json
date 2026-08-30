@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "landing-page-design": {
+      "source": "skills-101/superpowers",
+      "sourceType": "github",
+      "skillPath": "guides/design/landing-page-design/SKILL.md",
+      "computedHash": "00c0bb9b3bf40a9865f51471c26724e140de40b8850a213378ab04d8e89679c9"
+    },
     "svg-animations": {
       "source": "supermemoryai/skills",
       "sourceType": "github",

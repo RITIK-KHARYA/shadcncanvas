@@ -263,131 +263,174 @@ body {
         border-color 0.2s ease;
 }
 
-/* Landing page: node wiring illustration */
-.nf-illustration {
-    color: var(--color-foreground);
+/* ============================================================
+   Landing v2 — brutalist / glassmorphic / dot-matrix ("Nothing OS")
+   Self-contained design tokens so it never fights the app theme.
+   ============================================================ */
+.lp-root {
+    --lp-bg: #050505;
+    --lp-fg: #fafafa;
+    --lp-muted: rgba(250, 250, 250, 0.55);
+    --lp-faint: rgba(250, 250, 250, 0.32);
+    --lp-line: rgba(250, 250, 250, 0.1);
+    --lp-line-strong: rgba(250, 250, 250, 0.18);
+    --lp-glass: rgba(250, 250, 250, 0.025);
+    --lp-glass-hover: rgba(250, 250, 250, 0.05);
+
+    color-scheme: dark;
+    background: var(--lp-bg);
+    color: var(--lp-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: clip;
 }
 
-.nf-illustration .nf-grid-line {
-    stroke: var(--color-border);
+/* Subtle dot-grid backdrop */
+.lp-root::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(250, 250, 250, 0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
 }
 
-.nf-illustration .nf-node rect {
-    fill: var(--color-card);
-    stroke: var(--color-border);
+.lp-root * {
+    border-color: var(--lp-line);
+}
+
+.lp-glass {
+    background: var(--lp-glass);
+    border: 1px solid var(--lp-line);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    transition: background 0.4s ease, border-color 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lp-glass:hover {
+    background: var(--lp-glass-hover);
+    border-color: var(--lp-line-strong);
+}
+
+/* Dot-matrix typography: text filled with a dot grid */
+.lp-dotmatrix {
+    font-family: var(--font-mono);
+    background-image: radial-gradient(currentColor 1px, transparent 1.5px);
+    background-size: 5px 5px;
+    background-position: 0 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+}
+
+.lp-mono-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--lp-faint);
+}
+
+.lp-tracking-tight {
+    letter-spacing: -0.03em;
+}
+
+/* ============================================================
+   Node-flow SVG (hero illustration) — monochrome, dot-matrix.
+   ============================================================ */
+.nf-dot {
+    fill: rgba(250, 250, 250, 0.1);
+}
+
+.nf-node rect {
+    fill: var(--lp-glass);
+    stroke: var(--lp-line-strong);
     stroke-width: 1;
 }
 
-.nf-illustration .nf-node text {
-    fill: var(--color-foreground);
+.nf-node text {
+    fill: var(--lp-fg);
     font-size: 13px;
     font-family: var(--font-sans);
 }
 
-.nf-illustration .nf-node-export rect {
-    fill: var(--color-foreground);
+.nf-node-export rect {
+    fill: var(--lp-fg);
     stroke: none;
 }
 
-.nf-illustration .nf-node-export .nf-export-text {
-    fill: var(--color-background);
+.nf-node-export .nf-export-text {
+    fill: var(--lp-bg);
     font-family: var(--font-mono);
-    font-size: 20px;
+    font-size: 22px;
 }
 
-.nf-illustration .nf-handle {
-    fill: var(--color-foreground);
+.nf-handle {
+    fill: var(--lp-fg);
 }
 
-.nf-illustration .nf-path {
+.nf-line {
     fill: none;
-    stroke: var(--color-foreground);
-    stroke-opacity: 0.22;
+    stroke: var(--lp-fg);
+    stroke-opacity: 0.28;
     stroke-width: 1.5;
-    stroke-dasharray: 5 6;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    animation: nf-draw 1.1s ease forwards;
 }
 
-.nf-illustration .nf-packet {
-    fill: var(--color-foreground);
+.nf-line-2 { animation-delay: 0.15s; }
+.nf-line-3 { animation-delay: 0.3s; }
+
+@keyframes nf-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+.nf-packet {
+    fill: var(--lp-fg);
     offset-rotate: 0deg;
     animation: nf-travel 2.6s linear infinite;
 }
 
-.nf-illustration .nf-packet-1 {
-    offset-path: path("M140 76 C 220 76, 220 150, 300 150");
+.nf-packet-1 { offset-path: path("M150 66 C 220 66, 220 130, 290 130"); }
+.nf-packet-2 {
+    offset-path: path("M150 150 C 220 150, 220 150, 290 148");
+    animation-delay: 0.7s;
 }
-
-.nf-illustration .nf-packet-2 {
-    offset-path: path("M140 180 C 220 180, 220 180, 300 176");
-    animation-delay: 0.6s;
-}
-
-.nf-illustration .nf-packet-3 {
-    offset-path: path("M140 284 C 220 284, 220 210, 300 202");
-    animation-delay: 1.2s;
+.nf-packet-3 {
+    offset-path: path("M150 234 C 220 234, 220 166, 290 162");
+    animation-delay: 1.4s;
 }
 
 @keyframes nf-travel {
-    from {
-        offset-distance: 0%;
-        opacity: 0;
-    }
-
-    8% {
-        opacity: 1;
-    }
-
-    92% {
-        opacity: 1;
-    }
-
-    to {
-        offset-distance: 100%;
-        opacity: 0;
-    }
+    from { offset-distance: 0%; opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    to { offset-distance: 100%; opacity: 0; }
 }
 
-.nf-illustration .nf-node {
+.nf-node {
     animation: nf-fade-up 0.6s ease both;
 }
-
-.nf-illustration .nf-node-1 {
-    animation-delay: 0.05s;
-}
-
-.nf-illustration .nf-node-2 {
-    animation-delay: 0.15s;
-}
-
-.nf-illustration .nf-node-3 {
-    animation-delay: 0.25s;
-}
-
-.nf-illustration .nf-node-export {
-    animation-delay: 0.4s;
-}
+.nf-node-1 { animation-delay: 0.05s; }
+.nf-node-2 { animation-delay: 0.15s; }
+.nf-node-3 { animation-delay: 0.25s; }
 
 @keyframes nf-fade-up {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .nf-illustration .nf-packet {
-        animation: none;
-        opacity: 0.6;
-    }
-
-    .nf-illustration .nf-node {
-        animation: none;
-        opacity: 1;
-        transform: none;
-    }
+    .nf-packet { animation: none; opacity: 0.6; }
+    .nf-line { animation: none; stroke-dashoffset: 0; }
+    .nf-node { animation: none; opacity: 1; transform: none; }
+    .lp-root::before { background-size: 26px 26px; }
 }
