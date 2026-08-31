@@ -2,6 +2,8 @@ import { CollapsibleSection } from "@/components/inspector/CollapsibleSection";
 import {
   FormFieldsEditor,
   SelectOptionsEditor,
+  TabsEditor,
+  type TabItem,
 } from "@/components/inspector/FormFieldsEditor";
 import { useGraphStore } from "@/store/graph-store";
 import type { CanvasNode } from "@/types/graph";
@@ -45,6 +47,29 @@ export function ContentSection({ node }: { node: CanvasNode }) {
         />
       </CollapsibleSection>
     );
+  }
+
+  if (node.data.componentType === "tabs") {
+    return (
+      <CollapsibleSection id="content" title="Tabs">
+        <TabsEditor
+          tabs={
+            Array.isArray(node.data.props.tabs)
+              ? (node.data.props.tabs as TabItem[])
+              : [
+                  { id: "tab-1", label: "Tab 1" },
+                  { id: "tab-2", label: "Tab 2" },
+                ]
+          }
+          onChange={(tabs) => {
+            setProp("tabs", tabs)
+            // keep defaultValue in sync with first tab if it was stale
+            const cur = String(node.data.props.defaultValue ?? "")
+            if (!tabs.some((t) => t.id === cur) && tabs[0]) setProp("defaultValue", tabs[0].id)
+          }}
+        />
+      </CollapsibleSection>
+    )
   }
 
   return null;

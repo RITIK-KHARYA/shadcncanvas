@@ -1,10 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { nodeStyleToCss } from "@/theme/style-utils";
+import type { NodeStyleOverride } from "@/types/graph";
 
 type NodeSkeletonProps = {
   componentType: string;
   /** Fill the full node body width (custom-size nodes). */
   fill?: boolean;
+  style?: NodeStyleOverride;
 };
 
 function Lines({ count, className }: { count?: number; className?: string }) {
@@ -24,47 +27,60 @@ function Lines({ count, className }: { count?: number; className?: string }) {
  * Renders the skeleton (loading) form of any registered component type.
  * Shown by BaseNode while a `loading` signal is wired into the node.
  */
-export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
+export function NodeSkeleton({ componentType, fill, style }: NodeSkeletonProps) {
   const wide = fill || undefined;
+  const styleOverride = nodeStyleToCss(style);
+  const wrap = (el: React.ReactNode) => {
+    if (!style || Object.keys(styleOverride).length === 0) return el;
+    return <div style={styleOverride}>{el}</div>;
+  };
 
+  let content: React.ReactNode = null;
   switch (componentType) {
     case "button":
     case "badge":
-      return <Skeleton className={cn("h-8 w-24 rounded-md", wide)} />;
+      content = <Skeleton className={cn("h-8 w-24 rounded-md", wide)} />;
+      break;
 
     case "input":
     case "select":
     case "native-select":
-      return <Skeleton className={cn("h-9 w-48 rounded-md", wide)} />;
+      content = <Skeleton className={cn("h-9 w-48 rounded-md", wide)} />;
+      break;
 
     case "textarea":
-      return <Skeleton className={cn("h-20 w-48 rounded-md", wide)} />;
+      content = <Skeleton className={cn("h-20 w-48 rounded-md", wide)} />;
+      break;
 
     case "checkbox":
     case "switch":
     case "field":
-      return (
+      content = (
         <div className="flex items-center gap-2">
           <Skeleton className="size-4 rounded-sm" />
           <Skeleton className="h-3 w-28" />
         </div>
       );
+      break;
 
     case "label":
     case "kbd":
     case "marker":
-      return <Skeleton className="h-4 w-32" />;
+      content = <Skeleton className="h-4 w-32" />;
+      break;
 
     case "separator":
-      return <Skeleton className="h-px w-48" />;
+      content = <Skeleton className="h-px w-48" />;
+      break;
 
     case "skeleton":
-      return <Skeleton className="h-10 w-full" />;
+      content = <Skeleton className="h-10 w-full" />;
+      break;
 
     case "card":
     case "form":
     case "empty":
-      return (
+      content = (
         <div
           className={cn("w-56 space-y-3 rounded-lg border bg-card p-4", wide)}
         >
@@ -90,9 +106,10 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           )}
         </div>
       );
+      break;
 
     case "tabs":
-      return (
+      content = (
         <div className={cn("w-56 space-y-2", wide)}>
           <div className="flex gap-1">
             <Skeleton className="h-8 w-16 rounded-md" />
@@ -101,9 +118,10 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           <Skeleton className="h-12 w-full rounded-md" />
         </div>
       );
+      break;
 
     case "button-group":
-      return (
+      content = (
         <div className="flex overflow-hidden rounded-md">
           {[0, 1, 2].map((i) => (
             <Skeleton
@@ -113,9 +131,10 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           ))}
         </div>
       );
+      break;
 
     case "calendar":
-      return (
+      content = (
         <div
           className={cn(
             "w-64 space-y-2 rounded-lg border bg-background p-3",
@@ -134,18 +153,20 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           </div>
         </div>
       );
+      break;
 
     case "carousel":
-      return (
+      content = (
         <div className={cn("flex w-60 items-center gap-2", wide)}>
           <Skeleton className="size-8 shrink-0 rounded-full" />
           <Skeleton className="aspect-video flex-1 rounded-lg" />
           <Skeleton className="size-8 shrink-0 rounded-full" />
         </div>
       );
+      break;
 
     case "chart":
-      return (
+      content = (
         <div
           className={cn(
             "flex aspect-video h-32 w-64 items-end gap-2 border-b border-l p-2",
@@ -161,22 +182,25 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           ))}
         </div>
       );
+      break;
 
     case "command":
-      return (
+      content = (
         <div className={cn("w-64 space-y-2 rounded-lg border p-2", wide)}>
           <Skeleton className="h-9 w-full rounded-sm" />
           <Lines count={4} className="px-1" />
         </div>
       );
+      break;
 
     case "dialog":
     case "drawer":
     case "hover-card":
-      return <Skeleton className="h-8 w-28 rounded-md" />;
+      content = <Skeleton className="h-8 w-28 rounded-md" />;
+      break;
 
     case "item":
-      return (
+      content = (
         <div className={cn("w-56 space-y-2", wide)}>
           {[0, 1].map((i) => (
             <div
@@ -193,13 +217,15 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           ))}
         </div>
       );
+      break;
 
     case "bubble":
-      return <Skeleton className="h-10 w-44 rounded-2xl" />;
+      content = <Skeleton className="h-10 w-44 rounded-2xl" />;
+      break;
 
     case "message":
     case "message-scroller":
-      return (
+      content = (
         <div className={cn("w-56 space-y-3", wide)}>
           <div className="flex items-end gap-2">
             <Skeleton className="size-7 shrink-0 rounded-full" />
@@ -217,36 +243,42 @@ export function NodeSkeleton({ componentType, fill }: NodeSkeletonProps) {
           )}
         </div>
       );
+      break;
 
     case "direction":
-      return (
+      content = (
         <div className="flex items-center gap-2">
           <Skeleton className="size-8 rounded-md" />
           <Skeleton className="h-8 w-24 rounded-md" />
         </div>
       );
+      break;
 
     case "toast":
-      return (
+      content = (
         <div className="flex items-center gap-2.5 rounded-md border bg-card px-3 py-2.5">
           <Skeleton className="size-4 shrink-0 rounded-full" />
           <Skeleton className="h-3 w-28" />
         </div>
       );
+      break;
 
     case "apiCall":
-      return (
+      content = (
         <div className={cn("w-56 space-y-2 rounded-lg border p-3", wide)}>
           <Skeleton className="h-3 w-16" />
           <Skeleton className="h-3 w-full" />
         </div>
       );
+      break;
 
     default:
-      return (
+      content = (
         <div className={cn("w-48", wide)}>
           <Lines />
         </div>
       );
+      break;
   }
+  return wrap(content as React.ReactNode);
 }

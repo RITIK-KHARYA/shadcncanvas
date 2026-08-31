@@ -216,8 +216,16 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     type: "tabs",
     label: "Tabs",
     category: "layout",
-    defaultProps: { defaultValue: "tab-1" },
-    configurableProps: [],
+    defaultProps: {
+      defaultValue: "tab-1",
+      tabs: [
+        { id: "tab-1", label: "Tab 1" },
+        { id: "tab-2", label: "Tab 2" },
+      ],
+    },
+    configurableProps: [
+      { key: "defaultValue", label: "Default Value", inputType: "text", default: "tab-1" },
+    ],
     inputs: [],
     outputs: [],
   },
@@ -378,8 +386,11 @@ export const nodeRegistry: Record<string, NodeConfig> = {
           "This action cannot be undone. The project will be permanently deleted.",
       },
     ],
-    inputs: [],
-    outputs: [{ key: "confirmed", label: "Confirmed", type: "boolean" }],
+    inputs: [{ key: "open", label: "Open", type: "boolean" }],
+    outputs: [
+      { key: "confirmed", label: "Confirmed", type: "boolean" },
+      { key: "open", label: "Open", type: "boolean" },
+    ],
   },
   drawer: {
     type: "drawer",
@@ -410,8 +421,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
         default: "Drag the handle or press Esc to close.",
       },
     ],
-    inputs: [],
-    outputs: [],
+    inputs: [{ key: "open", label: "Open", type: "boolean" }],
+    outputs: [{ key: "open", label: "Open", type: "boolean" }],
   },
   "hover-card": {
     type: "hover-card",
@@ -531,6 +542,7 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     defaultProps: {
       title: "No results found",
       description: "Try adjusting your filters or a different query.",
+      visible: true,
     },
     configurableProps: [
       {
@@ -546,16 +558,52 @@ export const nodeRegistry: Record<string, NodeConfig> = {
         default: "Try adjusting your filters or a different query.",
       },
     ],
-    inputs: [],
+    inputs: [{ key: "visible", label: "Visible", type: "boolean" }],
     outputs: [],
   },
   chart: {
     type: "chart",
     label: "Bar Chart",
     category: "display",
-    defaultProps: {},
-    configurableProps: [],
-    inputs: [],
+    defaultProps: {
+      chartType: "bar",
+      dataMode: "static",
+      staticData: JSON.stringify(
+        [
+          { month: "Jan", desktop: 186, mobile: 80 },
+          { month: "Feb", desktop: 305, mobile: 200 },
+          { month: "Mar", desktop: 237, mobile: 120 },
+          { month: "Apr", desktop: 173, mobile: 190 },
+          { month: "May", desktop: 209, mobile: 130 },
+        ],
+        null,
+        2,
+      ),
+    },
+    configurableProps: [
+      {
+        key: "chartType",
+        label: "Chart Type",
+        inputType: "select",
+        options: ["bar", "line", "pie"],
+        default: "bar",
+      },
+      {
+        key: "dataMode",
+        label: "Data Source",
+        inputType: "select",
+        options: ["static", "bound"],
+        default: "static",
+      },
+      {
+        key: "staticData",
+        label: "Static Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"month":"Jan","desktop":186},{"month":"Feb","desktop":305}]',
+      },
+    ],
+    inputs: [{ key: "data", label: "Data", type: "string" }],
     outputs: [],
   },
   kbd: {

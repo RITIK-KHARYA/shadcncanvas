@@ -15,6 +15,7 @@ import type {
   CanvasNode,
   NodeLayout,
   NodeState,
+  NodeStyleOverride,
 } from "@/types/graph"
 
 type Snapshot = {
@@ -58,6 +59,8 @@ type GraphStore = {
   duplicateNode: (nodeId: string) => void
   deleteNode: (nodeId: string) => void
   updateNodeState: (nodeId: string, newState: NodeState) => void
+  updateNodeStyle: (nodeId: string, patch: Partial<NodeStyleOverride>) => void
+  resetNodeStyle: (nodeId: string, key?: keyof NodeStyleOverride) => void
   updateEdgeTransform: (edgeId: string, transform: string) => void
   propagate: (
     nodeId: string,
@@ -332,11 +335,38 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
               ...node,
               data: {
                 ...node.data,
+                props: { ...node.data.props, ...newState },
                 state: { ...node.data.state, ...newState },
               },
             }
           : node,
       ),
+    }),
+
+  updateNodeStyle: (nodeId, patch) =>
+    set({
+      nodes: get().nodes.map((node) =>
+        node.id === nodeId
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                style: { ...node.data.style, ...patch },
+              },
+            }
+          : node,
+      ),
+    }),
+
+  resetNodeStyle: (nodeId, key) =>
+    set({
+      nodes: get().nodes.map((node) => {
+        if (node.id !== nodeId) return node
+        if (!key) return { ...node, data: { ...node.data, style: {} } }
+        const next = { ...node.data.style }
+        delete next[key]
+        return { ...node, data: { ...node.data, style: next } }
+      }),
     }),
 
   updateEdgeTransform: (edgeId, transform) => {

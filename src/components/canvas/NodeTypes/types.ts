@@ -1,4 +1,4 @@
-import type { NodeState, NodeSizeMode } from "@/types/graph";
+import type { NodeState, NodeSizeMode, NodeStyleOverride } from "@/types/graph";
 
 export type FormField = {
   name: string;
@@ -12,6 +12,7 @@ export type NodePreviewProps = {
   props: Record<string, unknown>; 
   state: NodeState;
   sizeMode?: NodeSizeMode;
+  style?: NodeStyleOverride;
   onOutputChange?: (
     outputKey: string,
     value: boolean | string | number,

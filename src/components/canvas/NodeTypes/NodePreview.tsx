@@ -1,7 +1,17 @@
 import type { VariantProps } from "class-variance-authority";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  Cell,
+} from "recharts";
 import {
   CalendarDays,
   Inbox,
@@ -126,6 +136,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { NodeSizeMode, NodeState } from "@/types/graph";
 import type { FormField, NodePreviewProps } from "./types";
+import { nodeStyleToCss } from "@/theme/style-utils";
 
 
   
@@ -149,6 +160,7 @@ export function NodePreview({
   props,
   state,
   sizeMode = "default",
+  style,
   onOutputChange,
   onOutputsChange,
 }: NodePreviewProps) {
@@ -156,6 +168,7 @@ export function NodePreview({
   const active = wiredBoolean(props, state, "active", true);
   const isCustom = sizeMode === "custom";
   const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const styleOverride = nodeStyleToCss(style);
 
   const emit = (key: string, value: boolean | string | number) => {
     onOutputChange?.(key, value);
@@ -165,9 +178,15 @@ export function NodePreview({
     onOutputsChange?.(outputs);
   };
 
+  const wrap = (el: React.ReactNode) => {
+    if (!style || Object.keys(styleOverride).length === 0) return el;
+    return <div style={styleOverride}>{el}</div>;
+  };
+
+  let content: React.ReactNode = null;
   switch (componentType) {
     case "button":
-      return (
+      content = (
         <Button
           variant={
             props.variant as VariantProps<typeof buttonVariants>["variant"]
@@ -181,9 +200,10 @@ export function NodePreview({
           {String(props.label ?? "Button")}
         </Button>
       );
+      break;
 
     case "input":
-      return (
+      content = (
         <Input
           type={String(props.inputType ?? "text")}
           placeholder={String(props.placeholder ?? "")}
@@ -193,9 +213,10 @@ export function NodePreview({
           onChange={(e) => emit("value", e.target.value)}
         />
       );
+      break;
 
     case "textarea":
-      return (
+      content = (
         <Textarea
           placeholder={String(props.placeholder ?? "")}
           disabled={disabled}
@@ -204,9 +225,10 @@ export function NodePreview({
           onChange={(e) => emit("value", e.target.value)}
         />
       );
+      break;
 
     case "checkbox":
-      return (
+      content = (
         <div className="flex items-center gap-2">
           <Checkbox
             disabled={disabled}
@@ -216,9 +238,10 @@ export function NodePreview({
           <span className="text-sm">{String(props.label ?? "Checkbox")}</span>
         </div>
       );
+      break;
 
     case "switch":
-      return (
+      content = (
         <div className="flex items-center gap-2">
           <Switch
             disabled={disabled}
@@ -228,12 +251,13 @@ export function NodePreview({
           <span className="text-sm">{String(props.label ?? "Switch")}</span>
         </div>
       );
+      break;
 
     case "select": {
       const options = Array.isArray(props.options)
         ? (props.options as string[])
         : ["Option 1", "Option 2"];
-      return (
+      content = (
         <Select
           disabled={disabled}
           value={String(state.value ?? "")}
@@ -253,10 +277,11 @@ export function NodePreview({
           </SelectContent>
         </Select>
       );
+      break;
     }
 
     case "card":
-      return (
+      content = (
         <Card className={cn("py-4", isCustom ? "w-full" : "w-56")}>
           <CardHeader className="px-4 pb-2">
             <CardTitle className="text-base">
@@ -271,9 +296,10 @@ export function NodePreview({
           </CardContent>
         </Card>
       );
+      break;
 
     case "badge":
-      return (
+      content = (
         <Badge
           variant={
             props.variant as VariantProps<typeof badgeVariants>["variant"]
@@ -282,16 +308,18 @@ export function NodePreview({
           {String(props.label ?? "Badge")}
         </Badge>
       );
+      break;
 
     case "label":
-      return <Label>{String(props.text ?? "Label")}</Label>;
+      content = <Label>{String(props.text ?? "Label")}</Label>;
+      break;
 
     case "form": {
       const fields = Array.isArray(props.fields)
         ? (props.fields as FormField[])
         : [{ name: "email", type: "email", placeholder: "Email" }];
 
-      return (
+      content = (
         <Card
           className={cn(
             "py-4",
@@ -346,29 +374,42 @@ export function NodePreview({
           </CardContent>
         </Card>
       );
+      break;
     }
 
-    case "tabs":
-      return (
-        <Tabs defaultValue="tab-1" className={isCustom ? "w-full" : "w-56"}>
+    case "tabs": {
+      const tabs = Array.isArray(props.tabs)
+        ? (props.tabs as { id: string; label: string }[])
+        : [
+            { id: "tab-1", label: "Tab 1" },
+            { id: "tab-2", label: "Tab 2" },
+          ];
+      const defaultValue = String(props.defaultValue ?? tabs[0]?.id ?? "tab-1");
+      content = (
+        <Tabs defaultValue={defaultValue} className={isCustom ? "w-full" : "w-56"}>
           <TabsList>
-            <TabsTrigger value="tab-1">Tab 1</TabsTrigger>
-            <TabsTrigger value="tab-2">Tab 2</TabsTrigger>
+            {tabs.map((t) => (
+              <TabsTrigger key={t.id} value={t.id}>
+                {t.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
-          <TabsContent value="tab-1" className="text-xs text-muted-foreground">
-            Tab one content
-          </TabsContent>
-          <TabsContent value="tab-2" className="text-xs text-muted-foreground">
-            Tab two content
-          </TabsContent>
+          {tabs.map((t) => (
+            <TabsContent key={t.id} value={t.id} className="text-xs text-muted-foreground">
+              {t.label} content
+            </TabsContent>
+          ))}
         </Tabs>
       );
+      break;
+    }
 
     case "separator":
-      return <Separator className={isCustom ? "w-full" : "w-48"} />;
+      content = <Separator className={isCustom ? "w-full" : "w-48"} />;
+      break;
 
     case "skeleton":
-      return (
+      content = (
         <Skeleton
           style={{
             width: String(props.width ?? "12rem"),
@@ -376,9 +417,10 @@ export function NodePreview({
           }}
         />
       );
+      break;
 
     case "button-group":
-      return (
+      content = (
         <ButtonGroup>
           <Button variant="outline">Copy</Button>
           <Button variant="outline">Paste</Button>
@@ -389,9 +431,10 @@ export function NodePreview({
           </ButtonGroupText>
         </ButtonGroup>
       );
+      break;
 
     case "calendar":
-      return (
+      content = (
         <Calendar
           disabled={disabled}
           className={cn(
@@ -405,10 +448,11 @@ export function NodePreview({
           onSelect={(date) => emit("value", date?.toISOString() ?? "")}
         />
       );
+      break;
 
     case "field": {
       const error = String(props.error ?? "");
-      return (
+      content = (
         <div className={cn("w-56", isCustom && "w-full")}>
           <Field data-invalid={error ? true : undefined}>
             <FieldLabel htmlFor="preview-field-input">
@@ -432,13 +476,14 @@ export function NodePreview({
           </Field>
         </div>
       );
+      break;
     }
 
     case "native-select": {
       const options = Array.isArray(props.options)
         ? (props.options as string[])
         : ["Apple", "Banana", "Cherry"];
-      return (
+      content = (
         <NativeSelect
           disabled={disabled}
           className={fieldClass(sizeMode, isCustom ? undefined : "w-48")}
@@ -460,6 +505,7 @@ export function NodePreview({
           ))}
         </NativeSelect>
       );
+      break;
     }
 
     case "carousel": {
@@ -467,7 +513,7 @@ export function NodePreview({
         2,
         Math.min(10, Number(props.slides ?? 4) || 4),
       );
-      return (
+      content = (
         <Carousel
           className={cn("w-full max-w-[240px]", isCustom && "max-w-none")}
         >
@@ -484,10 +530,11 @@ export function NodePreview({
           <CarouselNext />
         </Carousel>
       );
+      break;
     }
 
     case "item":
-      return (
+      content = (
         <ItemGroup className={cn(isCustom ? "w-full" : "w-60")}>
           <Item variant="outline">
             <ItemMedia variant="icon">
@@ -521,16 +568,30 @@ export function NodePreview({
           </Item>
         </ItemGroup>
       );
+      break;
 
-    case "dialog":
-      return (
-        <Dialog>
+    case "dialog": {
+      const openWired =
+        props.open !== undefined || state.open !== undefined;
+      const openVal = wiredBoolean(props, state, "open", false);
+      // controlled when wired, uncontrolled otherwise
+      const dialogOpenProps = openWired
+        ? {
+            open: openVal,
+            onOpenChange: (v: boolean) => {
+              emit("open", v);
+              emit("confirmed", v);
+            },
+          }
+        : {};
+      content = (
+        <Dialog {...dialogOpenProps}>
           <DialogTrigger asChild>
             <Button variant="outline">
               {String(props.triggerLabel ?? "Open Dialog")}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent style={Object.keys(styleOverride).length ? styleOverride : undefined}>
             <DialogHeader>
               <DialogTitle>{String(props.title ?? "Dialog")}</DialogTitle>
               <DialogDescription>
@@ -553,16 +614,27 @@ export function NodePreview({
           </DialogContent>
         </Dialog>
       );
+      break;
+    }
 
-    case "drawer":
-      return (
-        <Drawer>
+    case "drawer": {
+      const openWired =
+        props.open !== undefined || state.open !== undefined;
+      const openVal = wiredBoolean(props, state, "open", false);
+      const drawerOpenProps = openWired
+        ? {
+            open: openVal,
+            onOpenChange: (v: boolean) => emit("open", v),
+          }
+        : {};
+      content = (
+        <Drawer {...drawerOpenProps}>
           <DrawerTrigger asChild>
             <Button variant="outline">
               {String(props.triggerLabel ?? "Open Drawer")}
             </Button>
           </DrawerTrigger>
-          <DrawerContent>
+          <DrawerContent style={Object.keys(styleOverride).length ? styleOverride : undefined}>
             <DrawerHeader>
               <DrawerTitle>{String(props.title ?? "Drawer")}</DrawerTitle>
               <DrawerDescription>
@@ -577,9 +649,11 @@ export function NodePreview({
           </DrawerContent>
         </Drawer>
       );
+      break;
+    }
 
     case "hover-card":
-      return (
+      content = (
         <HoverCard>
           <HoverCardTrigger
             href="#"
@@ -605,9 +679,10 @@ export function NodePreview({
           </HoverCardContent>
         </HoverCard>
       );
+      break;
 
     case "command":
-      return (
+      content = (
         <Command
           className={cn(
             "w-64 rounded-lg border shadow-none",
@@ -635,10 +710,11 @@ export function NodePreview({
           </CommandList>
         </Command>
       );
+      break;
 
     case "bubble": {
       const bubbleVariant = props.variant === "sent" ? "sent" : "received";
-      return (
+      content = (
         <Bubble
           variant={bubbleVariant}
           className={cn(isCustom && "max-w-full")}
@@ -646,11 +722,12 @@ export function NodePreview({
           {String(props.text ?? "")}
         </Bubble>
       );
+      break;
     }
 
     case "message": {
       const messageVariant = props.variant === "sent" ? "sent" : "received";
-      return (
+      content = (
         <Message
           className={cn(
             messageVariant === "sent" && "flex-row-reverse",
@@ -671,10 +748,11 @@ export function NodePreview({
           </MessageContent>
         </Message>
       );
+      break;
     }
 
     case "message-scroller":
-      return (
+      content = (
         <div
           className={cn(
             "rounded-lg border bg-background",
@@ -711,9 +789,12 @@ export function NodePreview({
           </BubbleHeader>
         </div>
       );
+      break;
 
-    case "empty":
-      return (
+    case "empty": {
+      const visible = wiredBoolean(props, state, "visible", true);
+      if (!visible) return null;
+      content = (
         <Empty className={cn(isCustom ? "w-full" : "w-56")}>
           <EmptyHeader>
             <EmptyMedia>
@@ -731,42 +812,85 @@ export function NodePreview({
           </EmptyContent>
         </Empty>
       );
+      break;
+    }
 
     case "chart": {
-      const chartData = [
+      const chartType = String(props.chartType ?? "bar") as "bar" | "line" | "pie";
+      const dataMode = String(props.dataMode ?? "static");
+      const staticRaw = String(props.staticData ?? "");
+      let staticData: Record<string, unknown>[] = [
         { month: "Jan", desktop: 186, mobile: 80 },
         { month: "Feb", desktop: 305, mobile: 200 },
         { month: "Mar", desktop: 237, mobile: 120 },
         { month: "Apr", desktop: 173, mobile: 190 },
         { month: "May", desktop: 209, mobile: 130 },
       ];
+      if (staticRaw) {
+        try {
+          const parsed = JSON.parse(staticRaw);
+          if (Array.isArray(parsed) && parsed.length) staticData = parsed;
+        } catch {}
+      }
+      const wiredRaw = (props.data ?? state.data) as unknown;
+      let chartData = staticData;
+      if (dataMode === "bound" && wiredRaw != null && String(wiredRaw).trim() !== "") {
+        try {
+          const parsed = JSON.parse(String(wiredRaw));
+          if (Array.isArray(parsed)) chartData = parsed;
+          else if (parsed && typeof parsed === "object" && Array.isArray((parsed as Record<string, unknown>).data)) {
+            chartData = (parsed as Record<string, unknown>).data as Record<string, unknown>[];
+          } else if (parsed && typeof parsed === "object") {
+            // single object wrapped
+            chartData = [parsed as Record<string, unknown>];
+          }
+        } catch {
+          // keep static if parse fails
+        }
+      }
       const chartConfig = {
         desktop: { label: "Desktop", color: "var(--chart-1)" },
         mobile: { label: "Mobile", color: "var(--chart-2)" },
       };
-      return (
+      const pieColors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+      content = (
         <ChartContainer
           config={chartConfig}
           className={cn("aspect-video w-64", isCustom && "w-full")}
         >
-          <BarChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={8}
-              axisLine={false}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-          </BarChart>
+          {chartType === "line" ? (
+            <LineChart accessibilityLayer data={chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="month" tickLine={false} tickMargin={8} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line type="monotone" dataKey="desktop" stroke="var(--color-desktop)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="mobile" stroke="var(--color-mobile)" strokeWidth={2} dot={false} />
+            </LineChart>
+          ) : chartType === "pie" ? (
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Pie data={chartData} dataKey="desktop" nameKey="month" cx="50%" cy="50%" outerRadius={60} label>
+                {chartData.map((_, i) => (
+                  <Cell key={i} fill={pieColors[i % pieColors.length]} />
+                ))}
+              </Pie>
+            </PieChart>
+          ) : (
+            <BarChart accessibilityLayer data={chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="month" tickLine={false} tickMargin={8} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            </BarChart>
+          )}
         </ChartContainer>
       );
+      break;
     }
 
     case "kbd":
-      return (
+      content = (
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           Press
           <KbdGroup>
@@ -779,16 +903,18 @@ export function NodePreview({
           to open
         </div>
       );
+      break;
 
     case "marker": {
       const text = String(props.text ?? "");
       const highlight = String(props.highlight ?? "").toLowerCase();
       if (!highlight || !text.toLowerCase().includes(highlight)) {
-        return <p className="max-w-56 text-sm leading-relaxed">{text}</p>;
+        content = <p className="max-w-56 text-sm leading-relaxed">{text}</p>;
+      break;
       }
       const startIndex = text.toLowerCase().indexOf(highlight);
       const endIndex = startIndex + highlight.length;
-      return (
+      content = (
         <p
           className={cn(
             "max-w-56 text-sm leading-relaxed",
@@ -800,10 +926,11 @@ export function NodePreview({
           {text.slice(endIndex)}
         </p>
       );
+      break;
     }
 
     case "direction":
-      return (
+      content = (
         <DirectionProvider dir={props.dir === "rtl" ? "rtl" : "ltr"}>
           <div
             dir={props.dir === "rtl" ? "rtl" : "ltr"}
@@ -823,6 +950,7 @@ export function NodePreview({
           </div>
         </DirectionProvider>
       );
+      break;
 
     case "toast": {
       const baseMessage = String(props.message ?? "");
@@ -885,7 +1013,7 @@ export function NodePreview({
       const displayLabel = statusStr === "success" ? successMessage : statusStr === "error" ? errorMessage : displayIsError ? "Fire error" : "Fire toast";
       const buttonVariant: VariantProps<typeof buttonVariants>["variant"] = displayIsError ? "destructive" : statusVariant === "info" ? "secondary" : "outline";
 
-      return (
+      content = (
         <div className={cn("space-y-1", isCustom && "w-full")}>
           <Button size="sm" variant={buttonVariant} disabled={disabled} onClick={() => fireWith(isSuccessWired, isErrorWired, statusStr)}>
             {trigger && !displayIsError ? "Firing…" : displayLabel}
@@ -897,6 +1025,7 @@ export function NodePreview({
           )}
         </div>
       );
+      break;
     }
 
     case "apiCall": {
@@ -909,7 +1038,7 @@ export function NodePreview({
           error: "bg-red-100 text-red-700",
         }[status] ?? "bg-muted";
 
-      return (
+      content = (
         <div
           className={cn(
             "w-56 space-y-1.5 rounded-lg border bg-card p-3",
@@ -934,13 +1063,16 @@ export function NodePreview({
           </div>
         </div>
       );
+      break;
     }
 
     default:
-      return (
+      content = (
         <div className="text-xs text-muted-foreground">
           Unknown: {componentType}
         </div>
       );
+      break;
   }
+  return wrap(content as React.ReactNode);
 }

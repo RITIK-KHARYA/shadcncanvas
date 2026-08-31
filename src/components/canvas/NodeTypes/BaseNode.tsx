@@ -82,6 +82,9 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
   const isCustom = layout.sizeMode === "custom";
   // Toast must never be hidden by loading skeleton - it needs to fire even while apiCall is loading
   const isLoading = data.componentType !== "toast" && Boolean(data.props.loading ?? data.state.loading);
+  const isEmptyHidden =
+    data.componentType === "empty" &&
+    (data.props.visible ?? data.state.visible) === false;
 
   return (
     <>
@@ -125,14 +128,15 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
         ))}
 
         <div className="nodrag nopan nowheel">
-          {isLoading ? (
-            <NodeSkeleton componentType={data.componentType} fill={isCustom} />
+          {isEmptyHidden ? null : isLoading ? (
+            <NodeSkeleton componentType={data.componentType} fill={isCustom} style={data.style} />
           ) : (
             <NodePreview
               componentType={data.componentType}
               props={data.props}
               state={data.state}
               sizeMode={layout.sizeMode}
+              style={data.style}
               onOutputChange={emitOutput}
               onOutputsChange={emitOutputs}
             />

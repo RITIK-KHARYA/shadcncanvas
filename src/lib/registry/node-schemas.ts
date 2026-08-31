@@ -51,7 +51,12 @@ export const nodeSchemas: Record<string, z.ZodType> = {
   label: z.object({
     text: z.string().min(1, "Text required"),
   }),
-  tabs: z.object({}),
+  tabs: z.object({
+    defaultValue: z.string().min(1, "Default value required"),
+    tabs: z
+      .array(z.object({ id: z.string().min(1), label: z.string().min(1) }))
+      .min(1, "At least one tab required"),
+  }),
   separator: z.object({}),
   skeleton: z.object({
     width: z.string().optional(),
@@ -106,8 +111,20 @@ export const nodeSchemas: Record<string, z.ZodType> = {
   empty: z.object({
     title: z.string().min(1, "Title required"),
     description: z.string(),
+    visible: z.boolean().optional(),
   }),
-  chart: z.object({}),
+  chart: z.object({
+    chartType: z.enum(["bar", "line", "pie"]),
+    dataMode: z.enum(["static", "bound"]),
+    staticData: z.string().refine((v) => {
+      try {
+        JSON.parse(v)
+        return true
+      } catch {
+        return false
+      }
+    }, "Must be valid JSON"),
+  }),
   kbd: z.object({
     keys: z.string().min(1, "Keys required"),
   }),

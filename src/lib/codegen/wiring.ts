@@ -59,12 +59,14 @@ export function buildWiringBlock(
   declarations: string
   hasState: boolean
   triggerOverrides: Map<string, string>
+  propOverrides: Map<string, Map<string, string>>
 } {
   const names = new Map(nodes.map((n) => [n.id, n.data.name ?? ""]))
   const sourceOccurrence = new Map<string, number>()
   const stateLines: string[] = []
   const wiringComments: string[] = []
   const triggerOverrides = new Map<string, string>()
+  const propOverrides = new Map<string, Map<string, string>>()
 
   const apiCallHooks = nodes
     .filter((n) => n.data.componentType === "apiCall")
@@ -199,6 +201,25 @@ export function buildWiringBlock(
     }
 
     if (sourceType === "apiCall") {
+      const varBase = apiVarBase(sourceId)
+      const sh = String(edge.sourceHandle ?? "")
+      let expr = `${varBase}Data`
+      if (sh === "data") expr = `${varBase}Data`
+      else if (sh === "status") expr = `${varBase}Status`
+      else if (sh === "error") expr = `${varBase}Error`
+      else if (sh === "isLoading") expr = `${varBase}IsLoading`
+      else if (sh === "isSuccess") expr = `${varBase}IsSuccess`
+      else if (sh === "isError") expr = `${varBase}IsError`
+      else if (sh === "payload") expr = `${varBase}Data`
+      if (edge.targetHandle) {
+        let finalExpr = expr
+        if (transform === "invert") finalExpr = `!${expr}`
+        else if (transform === "isSuccess" && sh === "status") finalExpr = `${varBase}Status === "success"`
+        else if (transform === "isError" && sh === "status") finalExpr = `${varBase}Status === "error"`
+        else if (transform === "isLoading" && sh === "status") finalExpr = `${varBase}Status === "loading"`
+        if (!propOverrides.has(targetId)) propOverrides.set(targetId, new Map())
+        propOverrides.get(targetId)!.set(edge.targetHandle, finalExpr)
+      }
       wiringComments.push(
         `  // ${sourceType}.${edge.sourceHandle ?? "output"} --[${transform}]--> ${targetType}.${edge.targetHandle ?? "prop"}`,
       )
@@ -214,6 +235,24 @@ export function buildWiringBlock(
       stateLines.push(
         `  const [${stateName}, set${capitalize(stateName)}] = useState(false)`,
       )
+    }
+
+    if (edge.targetHandle) {
+      const expr =
+        transform === "invert"
+          ? `!${stateName}`
+          : transform === "isLoading"
+            ? `${stateName} === "loading"`
+            : transform === "isError"
+              ? `${stateName} === "error"`
+              : transform === "isSuccess"
+                ? `${stateName} === "success"`
+                : stateName
+      if (!propOverrides.has(targetId)) propOverrides.set(targetId, new Map())
+      propOverrides.get(targetId)!.set(edge.targetHandle, expr)
+      if (!triggerOverrides.has(sourceId)) {
+        triggerOverrides.set(sourceId, `set${capitalize(stateName)}(!${stateName})`)
+      }
     }
 
     wiringComments.push(
@@ -232,5 +271,6 @@ export function buildWiringBlock(
     declarations: sections.join("\n\n"),
     hasState: stateLines.length > 0 || apiCallHooks.length > 0,
     triggerOverrides,
+    propOverrides,
   }
 }

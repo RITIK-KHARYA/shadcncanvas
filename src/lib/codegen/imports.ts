@@ -23,6 +23,9 @@ export function buildImports(types: string[]): string {
       lines.add(
         `import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"`,
       )
+    } else if (type === "chart") {
+      lines.add(`import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"`)
+      lines.add(`import { Bar, BarChart, CartesianGrid, XAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts"`)
     } else if (type === "apiCall") {
       // Renders a plain status <div> — no shadcn component import needed.
     } else if (type === "toast") {

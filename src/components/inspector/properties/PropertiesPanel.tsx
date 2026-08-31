@@ -3,6 +3,7 @@ import { MousePointerClick } from "lucide-react";
 import { ApiInspector } from "@/components/inspector/ApiInspector";
 import { AppearanceSection } from "@/components/inspector/properties/AppearanceSection";
 import { ContentSection } from "@/components/inspector/properties/ContentSection";
+import { DesignSection } from "@/components/inspector/properties/DesignSection";
 import { EffectsSection } from "@/components/inspector/properties/EffectsSection";
 import { PositionSection } from "@/components/inspector/properties/PositionSection";
 import { nodeRegistry } from "@/lib/registry";
@@ -42,10 +43,14 @@ export function PropertiesPanel({ node }: { node: CanvasNode | null }) {
     <div>
       <PositionSection node={node} />
       {isApiCall ? (
-        <ApiInspector node={node} />
+        <>
+          <ApiInspector node={node} />
+          <DesignSection node={node} config={config} />
+        </>
       ) : (
         <>
           <AppearanceSection node={node} config={config} />
+          <DesignSection node={node} config={config} />
           <ContentSection node={node} />
         </>
       )}
