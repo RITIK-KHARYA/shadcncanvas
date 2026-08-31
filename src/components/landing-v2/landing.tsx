@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Github } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 import { ScrambleText } from "@/components/landing/scramble-text";
 import { Button } from "@/components/ui/button";
@@ -137,13 +138,38 @@ function Footer() {
 
 export function LandingV2() {
   return (
-    <main className="lp-root">
-      <Header />
-      <Hero />
-      <Tooling />
-      <Features />
-      <FinalCta />
-      <Footer />
-    </main>
+    <>
+      <Helmet>
+        <title>Shadcn Canvas — Visual Builder for shadcn/ui Components</title>
+        <meta
+          name="description"
+          content="Drag, wire, and export real shadcn/ui code visually. Build forms, connect logic between components, and download production-ready React."
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Shadcn Canvas",
+            applicationCategory: "DeveloperApplication",
+            operatingSystem: "Web",
+            description:
+              "Visual builder for shadcn/ui components with logic wiring and code export.",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+          })}
+        </script>
+      </Helmet>
+      <main className="lp-root">
+        <Header />
+        <Hero />
+        <Tooling />
+        <Features />
+        <FinalCta />
+        <Footer />
+      </main>
+    </>
   );
 }

@@ -8,6 +8,7 @@ type NodeSkeletonProps = {
   /** Fill the full node body width (custom-size nodes). */
   fill?: boolean;
   style?: NodeStyleOverride;
+  props?: Record<string, unknown>;
 };
 
 function Lines({ count, className }: { count?: number; className?: string }) {
@@ -27,7 +28,7 @@ function Lines({ count, className }: { count?: number; className?: string }) {
  * Renders the skeleton (loading) form of any registered component type.
  * Shown by BaseNode while a `loading` signal is wired into the node.
  */
-export function NodeSkeleton({ componentType, fill, style }: NodeSkeletonProps) {
+export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeletonProps) {
   const wide = fill || undefined;
   const styleOverride = nodeStyleToCss(style);
   const wrap = (el: React.ReactNode) => {
@@ -155,15 +156,21 @@ export function NodeSkeleton({ componentType, fill, style }: NodeSkeletonProps) 
       );
       break;
 
-    case "carousel":
+    case "carousel": {
+      const slideCount = Math.max(1, Number((props as Record<string, unknown>)?.slides ?? 4) || 4);
       content = (
         <div className={cn("flex w-60 items-center gap-2", wide)}>
           <Skeleton className="size-8 shrink-0 rounded-full" />
-          <Skeleton className="aspect-video flex-1 rounded-lg" />
+          <div className="flex flex-1 items-center gap-1">
+            {Array.from({ length: Math.min(slideCount, 4) }).map((_, i) => (
+              <Skeleton key={i} className="aspect-video flex-1 rounded-lg" />
+            ))}
+          </div>
           <Skeleton className="size-8 shrink-0 rounded-full" />
         </div>
       );
       break;
+    }
 
     case "chart":
       content = (
@@ -184,14 +191,17 @@ export function NodeSkeleton({ componentType, fill, style }: NodeSkeletonProps) 
       );
       break;
 
-    case "command":
+    case "command": {
+      const cmdItems = Array.isArray(props?.items) ? (props?.items as unknown[]) : [];
+      const count = Math.max(1, cmdItems.length || 4);
       content = (
         <div className={cn("w-64 space-y-2 rounded-lg border p-2", wide)}>
           <Skeleton className="h-9 w-full rounded-sm" />
-          <Lines count={4} className="px-1" />
+          <Lines count={count} className="px-1" />
         </div>
       );
       break;
+    }
 
     case "dialog":
     case "drawer":

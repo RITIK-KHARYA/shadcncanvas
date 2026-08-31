@@ -97,6 +97,14 @@ export const nodeSchemas: Record<string, z.ZodType> = {
   }),
   command: z.object({
     placeholder: z.string().min(1, "Placeholder required"),
+    items: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          label: z.string().min(1),
+        }),
+      )
+      .min(1, "Add at least one command item"),
   }),
   bubble: z.object({
     text: z.string().min(1, "Text required"),

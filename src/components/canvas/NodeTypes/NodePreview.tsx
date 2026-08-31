@@ -47,7 +47,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
 } from "@/components/ui/command";
 import {
   Dialog,
@@ -509,10 +508,7 @@ export function NodePreview({
     }
 
     case "carousel": {
-      const slideCount = Math.max(
-        2,
-        Math.min(10, Number(props.slides ?? 4) || 4),
-      );
+      const slideCount = Math.max(1, Number(props.slides) || 4);
       content = (
         <Carousel
           className={cn("w-full max-w-[240px]", isCustom && "max-w-none")}
@@ -681,7 +677,14 @@ export function NodePreview({
       );
       break;
 
-    case "command":
+    case "command": {
+      const items = Array.isArray(props.items)
+        ? (props.items as { id: string; label: string }[])
+        : [
+            { id: "calendar", label: "Calendar" },
+            { id: "search", label: "Search Emoji" },
+            { id: "settings", label: "Settings" },
+          ];
       content = (
         <Command
           className={cn(
@@ -693,24 +696,18 @@ export function NodePreview({
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Suggestions">
-              {["Calendar", "Search Emoji", "Calculator"].map((item) => (
-                <CommandItem key={item} onSelect={() => emit("selected", item)}>
+              {items.map((item) => (
+                <CommandItem key={item.id} onSelect={() => emit("selected", item.label)}>
                   <CalendarDays aria-hidden="true" />
-                  {item}
+                  {item.label}
                 </CommandItem>
               ))}
-            </CommandGroup>
-            <CommandGroup heading="Settings">
-              <CommandItem onSelect={() => emit("selected", "Profile")}>
-                <Users aria-hidden="true" />
-                Profile
-                <CommandShortcut>⌘P</CommandShortcut>
-              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
       );
       break;
+    }
 
     case "bubble": {
       const bubbleVariant = props.variant === "sent" ? "sent" : "received";

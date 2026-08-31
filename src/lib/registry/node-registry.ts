@@ -327,8 +327,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     configurableProps: [
       { key: "slides", label: "Slides", inputType: "number", default: 4 },
     ],
-    inputs: [],
-    outputs: [],
+    inputs: [{ key: "goToSlide", label: "Go To Slide", type: "number" }],
+    outputs: [{ key: "currentSlide", label: "Current Slide", type: "number" }],
   },
   item: {
     type: "item",
@@ -460,7 +460,14 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     type: "command",
     label: "Command Menu",
     category: "navigation",
-    defaultProps: { placeholder: "Type a command or search..." },
+    defaultProps: {
+      placeholder: "Type a command or search...",
+      items: [
+        { id: "calendar", label: "Calendar" },
+        { id: "search", label: "Search Emoji" },
+        { id: "settings", label: "Settings" },
+      ],
+    },
     configurableProps: [
       {
         key: "placeholder",

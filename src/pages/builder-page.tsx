@@ -1,6 +1,7 @@
 import { Box, Copy, Download, Redo2, Trash2, Undo2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Helmet } from "react-helmet-async";
 
 import { Canvas } from "@/components/canvas/Canvas";
 import { EditorSidebar } from "@/components/inspector/EditorSidebar";
@@ -151,7 +152,12 @@ export function BuilderPage() {
   }, [edges, nodes, projectName, tokens]);
 
   return (
-    <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
+    <>
+      <Helmet>
+        <title>Builder — Shadcn Canvas</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
       <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-card/60 px-4">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <Box
@@ -230,5 +236,6 @@ export function BuilderPage() {
         </aside>
       </div>
     </main>
+    </>
   );
 }

@@ -227,15 +227,17 @@ ${String(props.keys ?? "Ctrl K")
   <option value="" disabled>${String(props.placeholder ?? "Select…")}</option>
 </NativeSelect>`;
 
-    case "carousel":
+    case "carousel": {
+      const slideCount = Math.max(1, Number(props.slides) || 4);
+      const slideLines = Array.from({ length: slideCount }, (_, i) => `    <CarouselItem>Slide ${i + 1}</CarouselItem>`).join("\n");
       return `<Carousel className="w-full max-w-xs"${styleAttr}>
   <CarouselContent>
-    <CarouselItem>Slide 1</CarouselItem>
-    <CarouselItem>Slide 2</CarouselItem>
+${slideLines}
   </CarouselContent>
   <CarouselPrevious />
   <CarouselNext />
 </Carousel>`;
+    }
 
     case "item":
       return `<Item variant="outline"${styleAttr}>
@@ -298,16 +300,21 @@ ${String(props.keys ?? "Ctrl K")
   <HoverCardContent>${String(props.heading ?? "")} — ${String(props.bio ?? "")}</HoverCardContent>
 </HoverCard>`;
 
-    case "command":
+    case "command": {
+      const items = Array.isArray(props.items) ? (props.items as { id: string; label: string }[]) : [];
+      const itemLines = items
+        .map((item) => `      <CommandItem>${String(item.label).replace(/</g, "&lt;")}</CommandItem>`)
+        .join("\n");
       return `<Command className="rounded-lg border shadow-none"${styleAttr}>
   <CommandInput placeholder="${String(props.placeholder ?? "Type a command...")}" />
   <CommandList>
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandGroup heading="Suggestions">
-      <CommandItem>Calendar</CommandItem>
+${itemLines}
     </CommandGroup>
   </CommandList>
 </Command>`;
+    }
 
     case "chart": {
       const chartType = String(props.chartType ?? "bar");

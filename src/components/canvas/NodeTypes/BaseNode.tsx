@@ -129,7 +129,7 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
 
         <div className="nodrag nopan nowheel">
           {isEmptyHidden ? null : isLoading ? (
-            <NodeSkeleton componentType={data.componentType} fill={isCustom} style={data.style} />
+            <NodeSkeleton componentType={data.componentType} fill={isCustom} style={data.style} props={data.props} />
           ) : (
             <NodePreview
               componentType={data.componentType}

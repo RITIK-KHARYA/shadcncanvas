@@ -5,6 +5,10 @@ import {
   TabsEditor,
   type TabItem,
 } from "@/components/inspector/FormFieldsEditor";
+import {
+  CommandItemsEditor,
+  type CommandItem,
+} from "@/components/inspector/properties/CommandItemsEditor";
 import { useGraphStore } from "@/store/graph-store";
 import type { CanvasNode } from "@/types/graph";
 
@@ -67,6 +71,25 @@ export function ContentSection({ node }: { node: CanvasNode }) {
             const cur = String(node.data.props.defaultValue ?? "")
             if (!tabs.some((t) => t.id === cur) && tabs[0]) setProp("defaultValue", tabs[0].id)
           }}
+        />
+      </CollapsibleSection>
+    )
+  }
+
+  if (node.data.componentType === "command") {
+    return (
+      <CollapsibleSection id="content" title="Command items">
+        <CommandItemsEditor
+          items={
+            Array.isArray(node.data.props.items)
+              ? (node.data.props.items as CommandItem[])
+              : [
+                  { id: "calendar", label: "Calendar" },
+                  { id: "search", label: "Search Emoji" },
+                  { id: "settings", label: "Settings" },
+                ]
+          }
+          onChange={(items) => setProp("items", items)}
         />
       </CollapsibleSection>
     )
