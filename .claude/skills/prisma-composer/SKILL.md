@@ -2,7 +2,7 @@
 name: prisma-composer
 metadata:
   library: "@prisma/composer"
-  library_version: "0.16.0"
+  library_version: "0.14.0"
 description: >-
   How to write, test, and deploy an app with Prisma Composer
   (`@prisma/composer`): declare services with `compute()` and typed
@@ -27,7 +27,7 @@ description: >-
 # Writing apps with Prisma Composer
 
 A **Prisma App** is a tree of **Modules** composed in TypeScript. The leaves
-are **services** (`compute()`) and **resources** (`rawPostgres()`); the root
+are **services** (`compute()`) and **resources** (`postgres()`); the root
 module wires them together by their typed ports. Your code receives everything
 from exactly one place — the service node:
 
@@ -56,7 +56,7 @@ Two packages, and only two, appear in your `package.json`:
 | Package | Provides |
 | --- | --- |
 | `@prisma/composer` | Core authoring: `module`, `secret`, `isSecretString`, `/arktype` (the `secretString()` schema leaf), `/rpc`, `/node`, `/nextjs`, `/config`, `/testing`, the `prisma-composer` CLI |
-| `@prisma/composer-prisma-cloud` | The Prisma Cloud target: `compute`, `postgres`, `envSecret`, `envParam`, `/control`, `/testing`, and the shared `/cron`, `/storage`, `/streams`, `/orm` modules |
+| `@prisma/composer-prisma-cloud` | The Prisma Cloud target: `compute`, `postgres`, `envSecret`, `envParam`, `/control`, `/testing`, and the shared `/cron`, `/storage`, `/streams`, `/prisma-next` modules |
 
 ## tsconfig and import specifiers
 
@@ -112,7 +112,7 @@ import { authContract } from './contract.ts';
 
 export default compute({
   name: 'auth',
-  deps: { db: rawPostgres() },
+  deps: { db: postgres() },
   build: node({ module: import.meta.url, entry: '../dist/server.mjs' }),
   expose: { rpc: authContract },
 });
@@ -308,56 +308,37 @@ when the app contains a Next.js service.
 
 Two kinds of Postgres dependency:
 
-**`rawPostgres()`** — the binding is `{ url }` and the app owns its client.
+**`postgres()`** — the binding is `{ url }` and the app owns its client.
 Construct it in your server entry, as in the auth example above.
 
-**`postgres(...)`** — a Prisma-ORM-typed database: `load()`
+**`pnPostgres(...)`** — a Prisma Next-typed database: `load()`
 returns the typed client the framework constructs from your data contract, so
 queries like `db.orm.public.Product.all()` are compile-time checked. The
-contract is emitted from `contract.prisma` by `prisma contract emit` and
+contract is emitted from `contract.prisma` by `prisma-next contract emit` and
 wrapped once, referenced by both ends:
 
 ```ts
 // src/data.ts — the ONE value both ends reference
-import { dataContract } from '@prisma/composer-prisma-cloud/orm';
+import { pnContract } from '@prisma/composer-prisma-cloud/prisma-next';
 import type { Contract } from '../contract.d.ts';
 import contractJson from '../contract.json' with { type: 'json' };
 
-export const catalogData = dataContract<Contract>(contractJson);
+export const catalogData = pnContract<Contract>(contractJson);
 ```
 
-The dependency end is `deps: { db: postgres(catalogData) }`. The resource
+The dependency end is `deps: { db: pnPostgres(catalogData) }`. The resource
 end (inside the module that owns the database) also names the
-`prisma.config.ts` path, which the deploy's migration step loads to find
-`migrations/` — committed migrations are replayed at deploy, before the
-service starts:
+`prisma-next.config.ts` path, which the deploy's migration step loads to find
+`migrations/` — migrations are applied at deploy, before the service starts:
 
 ```ts
 const db = provision(
-  postgres({ name: 'database', contract: catalogData, config: './prisma.config.ts' }),
+  pnPostgres({ name: 'database', contract: catalogData, config: './prisma-next.config.ts' }),
 );
 ```
 
-(`postgres` is both ends: the contract alone is the dependency end; the
+(`pnPostgres` is both ends: the contract alone is the dependency end; the
 options object is the resource end.)
-
-The deploy is replay-only: it applies the migrations committed under
-`migrations/` and never creates schema itself. Every schema change (including
-the very first schema of a new database) follows the same loop:
-
-1. Edit `contract.prisma`.
-2. `prisma contract emit` — regenerates `contract.json` + `contract.d.ts`.
-3. `prisma migration plan --name <slug>` — authors the migration into
-   `migrations/` (on an empty graph this authors the baseline,
-   empty → your schema).
-4. Commit `migrations/` with the change, then deploy. A fresh database
-   replays the whole path from empty.
-
-If no authored path reaches the target contract, the deploy (and
-`prisma-composer dev` against a stale local database) refuses with
-`MIGRATION_PATH_NOT_FOUND` and names the exits: author the missing migration
-as above, or — when iterating against a local database only — bring it along
-directly with `prisma db update`. Never skip step 3 before a deploy.
 
 See `examples/store/modules/catalog` in the prisma/composer repo for the
 complete pattern.
@@ -399,7 +380,7 @@ export default module(
   'auth',
   { secrets: { signingKey: secret() }, expose: { rpc: authContract } },
   ({ secrets, provision }) => {
-    const db = provision(rawPostgres({ name: 'database' }));
+    const db = provision(postgres({ name: 'database' }));
     const service = provision(authService, {
       id: 'service',
       deps: { db },
@@ -463,7 +444,7 @@ Choosing the channel is most of the decision:
 
 | The value is… | Declare | Provide | Read |
 | --- | --- | --- | --- |
-| produced by another node | `deps: { db: rawPostgres() }` | wire at `provision()` | `load()` |
+| produced by another node | `deps: { db: postgres() }` | wire at `provision()` | `load()` |
 | anything else — config or credential | one field of the `input` schema | bind at `provision()`: literal, `envParam()`, or `envSecret()` | `input()` |
 
 The service declares its whole incoming configuration — plain values and

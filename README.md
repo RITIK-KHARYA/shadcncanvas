@@ -111,23 +111,25 @@ src/
 ```bash
 git clone https://github.com/RITIK-KHARYA/shadcncanvas.git
 cd shadcncanvas
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Runs at `http://localhost:5173`
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Dev server with HMR |
-| `npm run build` | Type-check + production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Oxlint |
+| `bun run dev` | Dev server with HMR |
+| `bun run build` | Type-check + production build |
+| `bun run preview` | Preview production build |
+| `bun run lint` | Oxlint |
+
+Alternatively, use the Makefile: `make dev`, `make build`, `make lint`, etc.
 
 Add new components:
 
 ```bash
-npx shadcn@latest add <component-name>
+bunx shadcn@latest add <component-name>
 ```
 
 ---

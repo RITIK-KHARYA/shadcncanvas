@@ -1,19 +1,19 @@
 .PHONY: install dev build lint typecheck clean
 
 install:
-	npm install
+	bun install
 
 dev:
-	npm run dev
+	bun run dev
 
 build:
-	npm run build
+	bun run build
 
 lint:
-	npm run lint
+	bun run lint
 
 typecheck:
-	npx tsc --noEmit
+	bunx tsc --noEmit
 
 clean:
 	rm -rf dist node_modules
