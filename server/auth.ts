@@ -18,7 +18,7 @@ export const auth = betterAuth({
     type: "postgres",
   },
   secret: process.env.BETTER_AUTH_SECRET!,
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:5173",
+  baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:5173"),
   advanced: {
     defaultCookieAttributes: {
       sameSite: "lax",

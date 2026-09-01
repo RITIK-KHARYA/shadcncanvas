@@ -15,5 +15,5 @@
     "noUncheckedSideEffectImports": true,
     "skipLibCheck": true
   },
-  "include": ["vite.config.ts", "vite-plugin-auth.ts", "server"]
+  "include": ["vite.config.ts", "vite-plugin-auth.ts", "server", "api"]
 }
