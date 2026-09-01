@@ -14,7 +14,7 @@ export const product = {
   description:
     "Drag real shadcn/ui components onto an infinite canvas, wire their behavior, validate with Zod, and export production-ready React code. Fully client-side — nothing to deploy.",
   github: "https://github.com/RITIK-KHARYA/shadcncanvas",
-  builder: "/app",
+  builder: "/auth",
 };
 
 export interface Feature {
