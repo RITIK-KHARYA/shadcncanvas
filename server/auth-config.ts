@@ -31,6 +31,7 @@ export function createAuthOptions(
         secure: process.env.NODE_ENV === "production",
       },
     },
+    trustedOrigins: ["http://localhost:5173", "https://shadcncanvas.vercel.app"],
     emailAndPassword: {
       enabled: true,
     },
