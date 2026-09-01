@@ -7,6 +7,7 @@ let cached: Auth | null = null;
 
 function getAuth(): Auth {
   if (!cached) {
+    // 
     cached = betterAuth(createAuthOptions(createDatabase()));
   }
   return cached;
