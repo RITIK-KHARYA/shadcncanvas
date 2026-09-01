@@ -1,8 +1,15 @@
-import { Box, Copy, Download, Redo2, Trash2, Undo2 } from "lucide-react";
+import {
+  Box,
+  Copy,
+  Download,
+  Redo2,
+  Trash2,
+  Undo2,
+  LogOut,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
-
 import { Canvas } from "@/components/canvas/Canvas";
 import { EditorSidebar } from "@/components/inspector/EditorSidebar";
 import { ComponentLibrary } from "@/components/sidebar/ComponentLibrary";
@@ -13,12 +20,24 @@ import { exportProjectZip } from "@/lib/exportZip";
 import { loadProject, saveProject } from "@/lib/persistence";
 import { useGraphStore } from "@/store/graph-store";
 import { useEditorStore } from "@/store/editor-store";
+import { signOut } from "@/lib/auth-client";
 import { applyThemeToElement } from "@/theme/apply";
 
 export function BuilderPage() {
   const themeState = useEditorStore((s) => s.themeState);
   const activeMode = themeState.currentMode;
+
   const activeStyles = themeState.styles[activeMode];
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ callbackURL: "/auth" });
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to log out");
+    }
+  };
 
   const tokens = useMemo(
     () => ({
@@ -158,84 +177,88 @@ export function BuilderPage() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-card/60 px-4">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <Box
-            className="size-5 shrink-0 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <Input
-            aria-label="Project name"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            className="h-8 max-w-72 border-transparent bg-background/70 font-medium"
-          />
-          <span className="hidden text-xs text-muted-foreground sm:inline">
-            {lastSaved
-              ? `Saved ${new Date(lastSaved).toLocaleTimeString()}`
-              : "Saving…"}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Undo"
-            disabled={!canUndo}
-            onClick={undo}
-          >
-            <Undo2 aria-hidden="true" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Redo"
-            disabled={!canRedo}
-            onClick={redo}
-          >
-            <Redo2 aria-hidden="true" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Remove all components from canvas"
-            title="Remove all components from canvas"
-            className="text-destructive hover:text-destructive"
-            disabled={!hasCanvasContent}
-            onClick={handleClearCanvas}
-          >
-            <Trash2 aria-hidden="true" />
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleCopyCode}>
-            <Copy aria-hidden="true" />
-            Copy Code
-          </Button>
-          <Button size="sm" onClick={handleExportZip}>
-            <Download aria-hidden="true" />
-            Export ZIP
-          </Button>
-        </div>
-      </header>
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-card/60 px-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <Box
+              className="size-5 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              aria-label="Project name"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              className="h-8 max-w-72 border-transparent bg-background/70 font-medium"
+            />
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              {lastSaved
+                ? `Saved ${new Date(lastSaved).toLocaleTimeString()}`
+                : "Saving…"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Undo"
+              disabled={!canUndo}
+              onClick={undo}
+            >
+              <Undo2 aria-hidden="true" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Redo"
+              disabled={!canRedo}
+              onClick={redo}
+            >
+              <Redo2 aria-hidden="true" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Remove all components from canvas"
+              title="Remove all components from canvas"
+              className="text-destructive hover:text-destructive"
+              disabled={!hasCanvasContent}
+              onClick={handleClearCanvas}
+            >
+              <Trash2 aria-hidden="true" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleCopyCode}>
+              <Copy aria-hidden="true" />
+              Copy Code
+            </Button>
+            <Button size="sm" onClick={handleExportZip}>
+              <Download aria-hidden="true" />
+              Export ZIP
+            </Button>
+            <Button size="sm" onClick={handleLogout}>
+              <LogOut aria-hidden="true" />
+              Log Out
+            </Button>
+          </div>
+        </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-[250px_minmax(540px,1fr)_300px]">
-        <aside className="flex min-h-0 flex-col border-r bg-sidebar text-sidebar-foreground">
-          <ComponentLibrary />
-        </aside>
+        <div className="grid min-h-0 flex-1 grid-cols-[250px_minmax(540px,1fr)_300px]">
+          <aside className="flex min-h-0 flex-col border-r bg-sidebar text-sidebar-foreground">
+            <ComponentLibrary />
+          </aside>
 
-        <section
-          ref={containerRef}
-          className="canvas-theme relative h-full min-h-0 overflow-hidden bg-background text-foreground"
-        >
-          <Canvas />
-        </section>
+          <section
+            ref={containerRef}
+            className="canvas-theme relative h-full min-h-0 overflow-hidden bg-background text-foreground"
+          >
+            <Canvas />
+          </section>
 
-        <aside className="flex min-h-0 flex-col border-l bg-sidebar text-sidebar-foreground">
-          <EditorSidebar />
-        </aside>
-      </div>
-    </main>
+          <aside className="flex min-h-0 flex-col border-l bg-sidebar text-sidebar-foreground">
+            <EditorSidebar />
+          </aside>
+        </div>
+      </main>
     </>
   );
 }
