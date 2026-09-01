@@ -1,13 +1,15 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "../../server/auth";
+
+const handler = toNodeHandler(auth);
 
 export default async function authHandler(
   req: IncomingMessage,
   res: ServerResponse,
 ): Promise<void> {
   try {
-    const { toNodeHandler } = await import("better-auth/node");
-    const { auth } = await import("../../server/auth");
-    await toNodeHandler(auth)(req, res);
+    await handler(req, res);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("[auth function]", error);
