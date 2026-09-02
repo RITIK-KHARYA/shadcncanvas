@@ -1,7 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "dist",
+  "installCommand": "bun install",
   "buildCommand": "bun run build",
+  "functions": {
+    "api/auth/[...all].ts": {
+      "includeFiles": ["server/**"]
+    }
+  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
