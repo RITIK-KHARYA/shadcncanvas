@@ -3,6 +3,7 @@
   "outputDirectory": "dist",
   "installCommand": "bun install",
   "buildCommand": "bun run build",
+  "framework": null,
   "functions": {
     "api/auth/[...all].ts": {
       "includeFiles": "server/**"
