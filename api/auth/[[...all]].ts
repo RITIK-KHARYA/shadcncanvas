@@ -1,7 +1,7 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
 
 export default function handler(
-  req: IncomingMessage,
+  // req: IncomingMessage,
   res: ServerResponse,
 ) {
   res.statusCode = 200;
