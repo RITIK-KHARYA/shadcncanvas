@@ -6,10 +6,10 @@ export default function handler(
 ) {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
-  res.end(
-    JSON.stringify({
-      ok: true,
-      message: "Vercel auth function is alive",
-    }),
-  );
+
+  res.end(JSON.stringify({
+    ok: true,
+    databaseUrlExists: !!process.env.DATABASE_URL,
+    secretExists: !!process.env.BETTER_AUTH_SECRET,
+  }));
 }
