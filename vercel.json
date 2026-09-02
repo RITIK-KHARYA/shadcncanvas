@@ -5,7 +5,7 @@
   "buildCommand": "bun run build",
   "functions": {
     "api/auth/[...all].ts": {
-      "includeFiles": ["server/**"]
+      "includeFiles": "server/**"
     }
   },
   "rewrites": [
