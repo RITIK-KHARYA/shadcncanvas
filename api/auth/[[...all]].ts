@@ -3,6 +3,8 @@ import { betterAuth, type Auth } from "better-auth";
 import { toNodeHandler } from "better-auth/node";
 import { createAuthOptions, createDatabase } from "../../server/auth-config";
 
+export const config = { maxDuration: 30 };
+
 let cached: Auth | null = null;
 
 function getAuth(): Auth {

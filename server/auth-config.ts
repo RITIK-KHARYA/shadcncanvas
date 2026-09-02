@@ -5,7 +5,7 @@ import { Kysely, PostgresDialect } from "kysely";
 export function createDatabase() {
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 10,
+    max: 2,
   });
 
   return new Kysely<Record<string, unknown>>({
@@ -16,6 +16,29 @@ export function createDatabase() {
 export function createAuthOptions(
   db: Kysely<Record<string, unknown>>,
 ): BetterAuthOptions {
+  const socialProviders: BetterAuthOptions["socialProviders"] = {};
+
+  if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
+    socialProviders.discord = {
+      clientId: process.env.DISCORD_CLIENT_ID,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    };
+  }
+
+  if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    socialProviders.github = {
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    };
+  }
+
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    socialProviders.google = {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    };
+  }
+
   return {
     database: {
       db,
@@ -35,19 +58,6 @@ export function createAuthOptions(
     emailAndPassword: {
       enabled: true,
     },
-    socialProviders: {
-      discord: {
-        clientId: process.env.DISCORD_CLIENT_ID!,
-        clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-      },
-      github: {
-        clientId: process.env.GITHUB_CLIENT_ID!,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      },
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      },
-    },
+    socialProviders,
   };
 }
