@@ -1,7 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { betterAuth, type Auth } from "better-auth";
 import { toNodeHandler } from "better-auth/node";
-import { createAuthOptions, createDatabase } from "../../server/auth-config";
+import {
+  createAuthOptions,
+  createDatabase,
+} from "../../server/auth-config.js";
 
 let cached: Auth | null = null;
 
