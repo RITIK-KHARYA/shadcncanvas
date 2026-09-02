@@ -2,7 +2,6 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Github, Loader2 } from "lucide-react";
-
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,21 +23,28 @@ export function AuthPage() {
   async function handleSocial(provider: "github" | "discord" | "google") {
     setLoading({ providers: true });
     setError(null);
-    const { error } = await authClient.signIn.social({ provider, callbackURL: REDIRECT });
+    const { error } = await authClient.signIn.social({
+      provider,
+      callbackURL: REDIRECT,
+    });
     if (error) {
       setLoading({});
       setError(error.message ?? "Something went wrong.");
     }
   }
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading({ submit: true });
     setError(null);
 
     const { error } =
       mode === "sign-in"
-        ? await authClient.signIn.email({ email, password, callbackURL: REDIRECT })
+        ? await authClient.signIn.email({
+            email,
+            password,
+            callbackURL: REDIRECT,
+          })
         : await authClient.signUp.email({
             email,
             password,
@@ -69,7 +75,9 @@ export function AuthPage() {
               Shadcn Canvas
             </Link>
             <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
-              {mode === "sign-in" ? "Sign in to your account" : "Create your account"}
+              {mode === "sign-in"
+                ? "Sign in to your account"
+                : "Create your account"}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
               {mode === "sign-in"
@@ -147,18 +155,26 @@ export function AuthPage() {
               </p>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading.submit || loading.providers}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading.submit || loading.providers}
+            >
               {loading.submit && <Loader2 className="animate-spin" />}
               {mode === "sign-in" ? "Sign in" : "Sign up"}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "sign-in" ? "Don't have an account?" : "Already have an account?"}{" "}
+            {mode === "sign-in"
+              ? "Don't have an account?"
+              : "Already have an account?"}{" "}
             <button
               type="button"
               className="font-medium text-foreground underline-offset-4 hover:underline"
-              onClick={() => setMode(mode === "sign-in" ? "sign-up" : "sign-in")}
+              onClick={() =>
+                setMode(mode === "sign-in" ? "sign-up" : "sign-in")
+              }
             >
               {mode === "sign-in" ? "Create one" : "Sign in"}
             </button>
