@@ -6,7 +6,7 @@ Visual builder for [shadcn/ui](https://ui.shadcn.com/) components. Drag componen
 
 ---
 
-## ✨ Features
+## Features
 
 - **Infinite Canvas** - Pan/zoom canvas powered by React Flow
 - **54+ Components** - Full shadcn/ui library: Layout, Form, Feedback, Navigation, Data, and more
@@ -24,7 +24,7 @@ Visual builder for [shadcn/ui](https://ui.shadcn.com/) components. Drag componen
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 graph TB
@@ -46,23 +46,23 @@ graph TB
     end
 ```
 
-## 🎯 Builder Workflow
+## Builder Workflow
 
 ```mermaid
 flowchart LR
     Search --> Drag --> Wire --> Configure --> Validate --> Export
 ```
 
-1. **Search** – Find components in the palette using keywords
-2. **Drag** – Place components onto canvas as React Flow nodes
-3. **Wire** – Connect nodes via typed edges to define logic flow
-4. **Configure** – Edit component props in the inspector panel
-5. **Validate** – Run Zod schemas for data validation
-6. **Export** – Copy JSX or download complete ZIP package
+1. **Search** - Find components in the palette using keywords
+2. **Drag** - Place components onto canvas as React Flow nodes
+3. **Wire** - Connect nodes via typed edges to define logic flow
+4. **Configure** - Edit component props in the inspector panel
+5. **Validate** - Run Zod schemas for data validation
+6. **Export** - Copy JSX or download complete ZIP package
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -81,7 +81,7 @@ flowchart LR
 
 ---
 
-## 📦 Code Generation
+## Code Generation
 
 Export production-ready React JSX directly from your canvas. The codegen engine:
 
@@ -98,7 +98,7 @@ Export production-ready React JSX directly from your canvas. The codegen engine:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -118,7 +118,7 @@ src/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+ or Bun
@@ -165,9 +165,9 @@ Components follow shadcn/ui conventions with Tailwind CSS styling.
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### ✅ Completed
+### Completed
 - [x] Live component rendering on canvas
 - [x] Typed edge wiring
 - [x] Drag-and-drop palette to canvas
@@ -178,7 +178,7 @@ Components follow shadcn/ui conventions with Tailwind CSS styling.
 - [x] Undo/redo state machine
 - [x] Canvas persistence
 
-### 🚀 In Progress / Planned
+### In Progress / Planned
 - [ ] Collaborative editing (real-time sync)
 - [ ] AI component suggestions
 - [ ] Component marketplace
@@ -190,7 +190,7 @@ Components follow shadcn/ui conventions with Tailwind CSS styling.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how to get started:
 
@@ -209,26 +209,26 @@ Contributions are welcome! Here's how to get started:
 
 ---
 
-## 📄 License
+## License
 
-MIT License – see [LICENSE](./LICENSE) file for details.
+MIT License - see [LICENSE](./LICENSE) file for details.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 Built and maintained by **[Ritik Kharya](https://github.com/RITIK-KHARYA)**
 
 **Connect:**
 - GitHub: [@RITIK-KHARYA](https://github.com/RITIK-KHARYA)
-- Website: [shadcncanvas.dev](https://shadcncanvas.dev)
+- Website: [shadcncanvas.vercel.app](https://shadcncanvas.vercel.app)
 
 ---
 
-## 📝 Changelog
+## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for detailed version history and updates.
 
 ---
 
-**Star ⭐ this repo if you find it helpful!**
+**Star this repo if you find it helpful!**
