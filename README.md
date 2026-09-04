@@ -1,27 +1,30 @@
 # Shadcn Canvas
 
-Visual builder for [shadcn/ui](https://ui.shadcn.com/) components. Drag components onto an infinite canvas, wire behavior, validate with Zod, export production-ready React code. Fully client-side.
+Visual builder for [shadcn/ui](https://ui.shadcn.com/) components. Drag components onto an infinite canvas, wire behavior, validate with Zod, and export production-ready React code. Fully client-side.
 
-[Repository](https://github.com/RITIK-KHARYA/shadcncanvas) | Live Demo (coming soon)
-
----
-
-## Features
-
-- Infinite pan/zoom canvas via React Flow
-- 54+ shadcn/ui components (Layout, Form, Feedback, Navigation, and more)
-- Node wiring for state flow and event routing via typed edges
-- Zod schema validation with react-hook-form
-- JSX code generation and ZIP export
-- Live props inspector with theme token editing
-- Dark mode with OKLCH color tokens
-- Undo/redo history
-- Drag-and-drop palette to canvas
-- Local project persistence (localStorage)
+**Live Demo**: [shadcncanvas.vercel.app](https://shadcncanvas.vercel.app) | **Repository**: [RITIK-KHARYA/shadcncanvas](https://github.com/RITIK-KHARYA/shadcncanvas)
 
 ---
 
-## Architecture
+## ✨ Features
+
+- **Infinite Canvas** - Pan/zoom canvas powered by React Flow
+- **54+ Components** - Full shadcn/ui library: Layout, Form, Feedback, Navigation, Data, and more
+- **Live Component Rendering** - Real-time preview of components on canvas
+- **Node Wiring** - Connect components via typed edges for state flow and event routing
+- **Prop Inspector** - Edit component props in real-time with live updates
+- **Validation** - Zod schema integration with react-hook-form
+- **Code Generation** - Export production-ready JSX directly from canvas
+- **ZIP Export** - Download complete project scaffolding with all components and theme data
+- **Theme Customization** - Dark mode with OKLCH color tokens, live theme editor
+- **History Management** - Undo/redo functionality for all canvas operations
+- **Drag & Drop** - Intuitive palette-to-canvas component placement
+- **Persistence** - Auto-save projects to browser localStorage
+- **Collaborative Ready** - Architecture supports real-time collaboration
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 graph TB
@@ -43,124 +46,189 @@ graph TB
     end
 ```
 
-## Builder Flow
+## 🎯 Builder Workflow
 
 ```mermaid
 flowchart LR
     Search --> Drag --> Wire --> Configure --> Validate --> Export
 ```
 
-1. **Search** -- find components in the palette
-2. **Drag** -- place onto canvas as React Flow nodes
-3. **Wire** -- connect nodes via typed edges
-4. **Configure** -- edit props in the inspector
-5. **Validate** -- run Zod schemas
-6. **Export** -- copy JSX or download ZIP
+1. **Search** – Find components in the palette using keywords
+2. **Drag** – Place components onto canvas as React Flow nodes
+3. **Wire** – Connect nodes via typed edges to define logic flow
+4. **Configure** – Edit component props in the inspector panel
+5. **Validate** – Run Zod schemas for data validation
+6. **Export** – Copy JSX or download complete ZIP package
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | React 19, TypeScript, Vite |
-| Canvas | @xyflow/react |
-| Components | shadcn/ui, Radix UI |
-| Styling | Tailwind CSS 4, OKLCH tokens |
-| State | Zustand |
-| Forms | React Hook Form, Zod |
-| Export | JSZip, FileSaver, codegen |
-| Routing | React Router DOM |
-| DnD | React Flow built-in |
+| **Framework** | React 19, TypeScript, Vite |
+| **Canvas Engine** | @xyflow/react (React Flow) |
+| **UI Components** | shadcn/ui, Radix UI, Base UI |
+| **Styling** | Tailwind CSS 4, OKLCH tokens |
+| **State Management** | Zustand |
+| **Forms** | React Hook Form, Zod |
+| **Export/Build** | JSZip, FileSaver, Codegen |
+| **Routing** | React Router DOM v7 |
+| **Drag & Drop** | React Flow built-in |
+| **Icons** | Lucide React |
+| **Animations** | Framer Motion |
+| **Analytics** | Vercel Analytics |
 
 ---
 
-## Code Generation
+## 📦 Code Generation
 
-Generate production-ready React JSX from your canvas layout. The code generator:
+Export production-ready React JSX directly from your canvas. The codegen engine:
 
-- Maps 30+ shadcn/ui component types to JSX
-- Handles props, states, and wired event connections
-- Outputs formatted code with proper imports
-- Supports ZIP export with graph and theme data
+- Maps 50+ shadcn/ui component types to JSX
+- Preserves component props, states, and wired event connections
+- Generates properly formatted, importable code
+- Exports project as ZIP with component graph, theme tokens, and scaffolding
 
-See the [Export](/docs/export) section for usage details.
+**Export formats:**
+- Single JSX file (copy to clipboard)
+- Complete project ZIP with multiple files
+- TypeScript support
+- Theme configuration included
 
 ---
 
-## Structure
+## 📁 Project Structure
 
 ```
 src/
-  components/ui/   -- 54+ shadcn/ui components
-  hooks/           -- useIsMobile
-  lib/             -- cn() utility
-  pages/
+  components/ui/         # 54+ shadcn/ui components (Radix UI based)
+  pages/                 # Landing and builder pages
     landing-page.tsx
     builder-page.tsx
-  App.tsx          -- Routes
-  main.tsx         -- Entry
-  global.css       -- Theme tokens
-  loaders.css      -- Canvas background
+  hooks/                 # Utility hooks (useIsMobile, etc.)
+  lib/                   # Utilities (cn, classname merge, etc.)
+  store/                 # Zustand state management
+  utils/                 # Codegen, validation, helpers
+  App.tsx                # React Router setup
+  main.tsx               # Entry point
+  global.css             # Global styles + OKLCH tokens
+  loaders.css            # Canvas background patterns
 ```
 
 ---
 
-## Setup
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ or Bun
+- Git
+
+### Installation
 
 ```bash
 git clone https://github.com/RITIK-KHARYA/shadcncanvas.git
 cd shadcncanvas
-bun install
-bun run dev
+bun install  # or npm install / yarn install
+bun run dev  # or npm run dev
 ```
 
 Runs at `http://localhost:5173`
 
-| Command | What it does |
+### Available Commands
+
+| Command | Purpose |
 |---|---|
-| `bun run dev` | Dev server with HMR |
+| `bun run dev` | Start dev server with HMR |
 | `bun run build` | Type-check + production build |
-| `bun run preview` | Preview production build |
-| `bun run lint` | Oxlint |
+| `bun run preview` | Preview production build locally |
+| `bun run lint` | Run Oxlint |
+| `bun run typecheck` | TypeScript type checking |
 
-Alternatively, use the Makefile: `make dev`, `make build`, `make lint`, etc.
-
-Add new components:
-
+**Using Makefile:**
 ```bash
-bunx shadcn@latest add <component-name>
+make dev       # Start dev server
+make build     # Production build
+make lint      # Run linter
+make typecheck # Type check
 ```
 
+### Adding New Components
+
+Use the shadcn CLI to add new components:
+
+```bash
+bunx shadcn-ui@latest add <component-name>
+```
+
+Components follow shadcn/ui conventions with Tailwind CSS styling.
+
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
-- [ ] Live component rendering on canvas
-- [ ] Typed edge wiring
-- [ ] Drag-and-drop palette to canvas
-- [ ] Inspector prop binding
-- [ ] Theme customizer
-- [ ] JSX code generation
-- [ ] ZIP export with scaffolding
-- [ ] Undo/redo state machine
-- [ ] Canvas persistence
-- [ ] Collaborative editing
+### ✅ Completed
+- [x] Live component rendering on canvas
+- [x] Typed edge wiring
+- [x] Drag-and-drop palette to canvas
+- [x] Inspector prop binding
+- [x] Theme customizer
+- [x] JSX code generation
+- [x] ZIP export with scaffolding
+- [x] Undo/redo state machine
+- [x] Canvas persistence
+
+### 🚀 In Progress / Planned
+- [ ] Collaborative editing (real-time sync)
 - [ ] AI component suggestions
+- [ ] Component marketplace
+- [ ] Mobile builder preview
+- [ ] Component versioning
+- [ ] Team workspaces
+- [ ] Template library
+- [ ] Performance optimizations
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork the repo
-2. `git checkout -b feature/your-feature`
-3. Commit and push
-4. Open a PR
+Contributions are welcome! Here's how to get started:
 
-Use TypeScript. Use shadcn CLI for components. Follow OKLCH token conventions.
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/your-feature`
+3. **Commit** your changes: `git commit -m "Add your feature"`
+4. **Push** to your fork: `git push origin feature/your-feature`
+5. **Open** a Pull Request
+
+### Guidelines
+- Use **TypeScript** for all code
+- Use **shadcn CLI** for adding new components
+- Follow **OKLCH token conventions** for colors
+- Ensure code passes `bun run lint`
+- Add tests for new features when applicable
 
 ---
 
-License: MIT
+## 📄 License
 
-Built by [Ritik Kharya](https://github.com/RITIK-KHARYA)
+MIT License – see [LICENSE](./LICENSE) file for details.
+
+---
+
+## 👨‍💻 Author
+
+Built and maintained by **[Ritik Kharya](https://github.com/RITIK-KHARYA)**
+
+**Connect:**
+- GitHub: [@RITIK-KHARYA](https://github.com/RITIK-KHARYA)
+- Website: [shadcncanvas.dev](https://shadcncanvas.dev)
+
+---
+
+## 📝 Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for detailed version history and updates.
+
+---
+
+**Star ⭐ this repo if you find it helpful!**
