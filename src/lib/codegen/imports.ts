@@ -31,6 +31,10 @@ export function buildImports(types: string[]): string {
     } else if (type === "toast") {
       lines.add(`import { toast } from "sonner"`);
       lines.add(`import { useEffect } from "react"`);
+    } else if (ui.importPath.startsWith("evilcharts/")) {
+      lines.add(
+        `import { ${ui.exportName} } from "@/components/${ui.importPath}"`,
+      )
     } else {
       lines.add(
         `import { ${ui.exportName} } from "@/components/ui/${ui.importPath}"`,

@@ -1,4 +1,4 @@
-import type { NodeConfig } from "@/types/registry"
+import type { NodeConfig } from "@/types/registry";
 
 export const nodeRegistry: Record<string, NodeConfig> = {
   button: {
@@ -224,7 +224,12 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       ],
     },
     configurableProps: [
-      { key: "defaultValue", label: "Default Value", inputType: "text", default: "tab-1" },
+      {
+        key: "defaultValue",
+        label: "Default Value",
+        inputType: "text",
+        default: "tab-1",
+      },
     ],
     inputs: [],
     outputs: [],
@@ -773,12 +778,273 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       { key: "isError", label: "Error", type: "boolean" },
     ],
   },
-}
+  "grid-bar": {
+    type: "grid-bar",
+    label: "ECharts Grid Bar",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"hour":"08:00","sessions":98},{"hour":"12:00","sessions":158}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "monospace-bar": {
+    type: "monospace-bar",
+    label: "ECharts Monospace Bar",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"month":"Jan \'25","sales":388},{"month":"Feb \'25","sales":912}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "shipments-line": {
+    type: "shipments-line",
+    label: "ECharts Shipments Line",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"slot":"Mon 1","current":14,"previous":34},{"slot":"Mon 2","current":9,"previous":41}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "payouts-line": {
+    type: "payouts-line",
+    label: "ECharts Payouts Line",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"month":"Jan","payouts":312,"pending":548},{"month":"Feb","payouts":388,"pending":502}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "latency-area": {
+    type: "latency-area",
+    label: "ECharts Latency Area",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"time":"Today 13:06","p99":188,"p95":92,"p75":44,"p50":20},{"time":"Today 13:07","p99":196,"p95":95,"p75":46,"p50":21}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "benchmark-area": {
+    type: "benchmark-area",
+    label: "ECharts Benchmark Area",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"date":"Jan 1","actual":240,"target":125},{"date":"Jan 8","actual":240,"target":125}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "audience-area": {
+    type: "audience-area",
+    label: "ECharts Audience Area",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"month":"Jan","listeners":2980},{"month":"Feb","listeners":3120}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "portfolio-area": {
+    type: "portfolio-area",
+    label: "ECharts Portfolio Area",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"date":"Dec 22","robinhood":53916,"coinbase":53670},{"date":"Dec 23","robinhood":54380,"coinbase":53080}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "revenue-mix-pie": {
+    type: "revenue-mix-pie",
+    label: "ECharts Revenue Mix Pie",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"channel":"direct","value":52400},{"channel":"marketplace","value":38900}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "reliability-pie": {
+    type: "reliability-pie",
+    label: "ECharts Reliability Pie",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"band":"atrisk","value":450},{"band":"fair","value":200},{"band":"good","value":170}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "progress-rings-pie": {
+    type: "progress-rings-pie",
+    label: "ECharts Progress Rings",
+    category: "charts",
+    defaultProps: { value: 48, caption: "Additional support requests from users." },
+    configurableProps: [
+      { key: "value", label: "Progress (%)", inputType: "number", default: 48 },
+      {
+        key: "caption",
+        label: "Caption",
+        inputType: "text",
+        default: "Additional support requests from users.",
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "market-share-pie": {
+    type: "market-share-pie",
+    label: "ECharts Market Share Pie",
+    category: "charts",
+    defaultProps: {
+      chartData: "",
+    },
+    configurableProps: [
+      {
+        key: "chartData",
+        label: "Chart Data (JSON)",
+        inputType: "text",
+        default:
+          '[{"product":"skyline","value":27},{"product":"datawell","value":21}]',
+      },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "cache-tiers-radial": {
+    type: "cache-tiers-radial",
+    label: "ECharts Cache Tiers",
+    category: "charts",
+    defaultProps: { total: 1000, hits: 610 },
+    configurableProps: [
+      { key: "total", label: "Total Requests", inputType: "number", default: 1000 },
+      { key: "hits", label: "L1 Hits", inputType: "number", default: 610 },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "ride-radial": {
+    type: "ride-radial",
+    label: "ECharts Ride Radial",
+    category: "charts",
+    defaultProps: { distance: 18.4, goal: 25 },
+    configurableProps: [
+      { key: "distance", label: "Distance", inputType: "number", default: 18.4 },
+      { key: "goal", label: "Goal", inputType: "number", default: 25 },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+  "allocation-sankey": {
+    type: "allocation-sankey",
+    label: "ECharts Allocation Sankey",
+    category: "charts",
+    defaultProps: { title: "Where the fund flows" },
+    configurableProps: [
+      { key: "title", label: "Title", inputType: "text", default: "Where the fund flows" },
+    ],
+    inputs: [],
+    outputs: [],
+  },
+};
 
 for (const config of Object.values(nodeRegistry)) {
-  if (config.type === "toast") continue
+  if (config.type === "toast") continue;
   if (!config.inputs.some((input) => input.key === "loading")) {
-    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" })
+    config.inputs.push({ key: "loading", label: "Loading", type: "boolean" });
   }
 }
 
@@ -790,16 +1056,17 @@ export const categoryLabels: Record<NodeConfig["category"], string> = {
   overlay: "Overlay",
   display: "Display",
   data: "Data",
-}
+  charts: "Charts",
+};
 
 export function getNodesByCategory() {
-  const groups = new Map<NodeConfig["category"], NodeConfig[]>()
+  const groups = new Map<NodeConfig["category"], NodeConfig[]>();
 
   for (const config of Object.values(nodeRegistry)) {
-    const list = groups.get(config.category) ?? []
-    list.push(config)
-    groups.set(config.category, list)
+    const list = groups.get(config.category) ?? [];
+    list.push(config);
+    groups.set(config.category, list);
   }
 
-  return groups
+  return groups;
 }

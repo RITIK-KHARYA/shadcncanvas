@@ -191,6 +191,45 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
       );
       break;
 
+    case "grid-bar":
+    case "monospace-bar":
+    case "shipments-line":
+    case "payouts-line":
+    case "latency-area":
+    case "benchmark-area":
+    case "audience-area":
+    case "portfolio-area":
+    case "revenue-mix-pie":
+    case "reliability-pie":
+    case "progress-rings-pie":
+    case "market-share-pie":
+    case "cache-tiers-radial":
+    case "ride-radial":
+    case "allocation-sankey":
+      content = (
+        <div className={cn("w-full space-y-2", wide)}>
+          <div className="flex items-end gap-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-6 w-16" />
+          </div>
+          <div
+            className={cn(
+              "flex aspect-[16/9] h-28 w-64 items-end gap-2 border-b border-l p-2",
+              wide,
+            )}
+          >
+            {[45, 70, 55, 85, 60, 75].map((height, i) => (
+              <Skeleton
+                key={i}
+                className="flex-1 rounded-t-sm"
+                style={{ height: `${height}%` }}
+              />
+            ))}
+          </div>
+        </div>
+      );
+      break;
+
     case "command": {
       const cmdItems = Array.isArray(props?.items) ? (props?.items as unknown[]) : [];
       const count = Math.max(1, cmdItems.length || 4);

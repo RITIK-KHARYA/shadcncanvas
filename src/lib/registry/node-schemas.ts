@@ -165,6 +165,164 @@ export const nodeSchemas: Record<string, z.ZodType> = {
     }, "Must be valid JSON"),
     timeoutMs: z.number().min(1000).max(60000),
   }),
+  "grid-bar": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "monospace-bar": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "shipments-line": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "payouts-line": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "latency-area": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "benchmark-area": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "audience-area": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "portfolio-area": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "revenue-mix-pie": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "reliability-pie": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "progress-rings-pie": z.object({
+    value: z.number().min(0).max(100),
+    caption: z.string().optional().default(""),
+  }),
+  "market-share-pie": z.object({
+    chartData: z
+      .string()
+      .optional()
+      .refine((v) => (v === undefined || v === "" ? true : (() => {
+        try {
+          const p = JSON.parse(v)
+          return Array.isArray(p)
+        } catch {
+          return false
+        }
+      })()), "Must be a valid JSON array"),
+  }),
+  "cache-tiers-radial": z.object({
+    total: z.number().min(1),
+    hits: z.number().min(0),
+  }),
+  "ride-radial": z.object({
+    distance: z.number().min(0),
+    goal: z.number().min(1),
+  }),
+  "allocation-sankey": z.object({
+    title: z.string().min(1, "Title required"),
+  }),
 }
 
 export function validateNode(componentType: string, props: unknown) {

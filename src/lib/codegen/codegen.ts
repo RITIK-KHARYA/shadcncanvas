@@ -385,6 +385,42 @@ ${itemLines}
 </div>`;
     }
 
+    case "grid-bar":
+    case "monospace-bar":
+    case "shipments-line":
+    case "payouts-line":
+    case "latency-area":
+    case "benchmark-area":
+    case "audience-area":
+    case "portfolio-area":
+    case "revenue-mix-pie":
+    case "reliability-pie":
+    case "market-share-pie": {
+      const raw = String(props.chartData ?? "");
+      let dataArr = "[]";
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) dataArr = JSON.stringify(parsed);
+      } catch {
+        /* fall back to default data in the component */
+      }
+      const dataProp =
+        dataArr !== "[]" ? ` data={${dataArr} as never}` : "";
+      return `<${ui.exportName}${dataProp}${styleAttr} />`;
+    }
+
+    case "progress-rings-pie":
+      return `<${ui.exportName} value={${Number(props.value ?? 48)}} caption="${String(props.caption ?? "")}"${styleAttr} />`;
+
+    case "cache-tiers-radial":
+      return `<${ui.exportName} total={${Number(props.total ?? 1000)}} hits={${Number(props.hits ?? 610)}}${styleAttr} />`;
+
+    case "ride-radial":
+      return `<${ui.exportName} distance={${Number(props.distance ?? 18.4)}} goal={${Number(props.goal ?? 25)}}${styleAttr} />`;
+
+    case "allocation-sankey":
+      return `<${ui.exportName} title="${String(props.title ?? "Where the fund flows")}"${styleAttr} />`;
+
     default:
       return `<${ui.exportName}${propsString ? ` ${propsString}` : ""}${dynamicProps}${styleAttr} />`;
   }

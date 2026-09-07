@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Github, Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -11,6 +11,7 @@ const REDIRECT = "/app";
 
 export function AuthPage() {
   const navigate = useNavigate();
+  const { data, isPending } = authClient.useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
@@ -19,6 +20,10 @@ export function AuthPage() {
     submit?: boolean;
     providers?: boolean;
   }>({});
+
+  if (!isPending && data?.session) {
+    return <Navigate to={REDIRECT} replace />;
+  }
 
   async function handleSocial(provider: "github" | "discord" | "google") {
     setLoading({ providers: true });

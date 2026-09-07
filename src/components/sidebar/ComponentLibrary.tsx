@@ -1,40 +1,42 @@
-import { Component, Search } from "lucide-react"
-import { useMemo, useState } from "react"
+import { Component, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
-import { Input } from "@/components/ui/input"
-import { setComponentDragData } from "@/lib/dnd"
+import { Input } from "@/components/ui/input";
+import { setComponentDragData } from "@/lib/dnd";
 import {
   categoryLabels,
   getNodesByCategory,
   type NodeConfig,
-} from "@/lib/registry"
-
+} from "@/lib/registry";
 function DraggableComponentItem({ config }: { config: NodeConfig }) {
   const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    setComponentDragData(event.dataTransfer, config.type)
-  }
+    setComponentDragData(event.dataTransfer, config.type);
+  };
 
   return (
     <div
       role="listitem"
       draggable
       onDragStart={onDragStart}
-      className="flex h-9 cursor-grab items-center gap-2 rounded-md border bg-background/60 px-2.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground active:cursor-grabbing"
+      className="flex h-9 cursor-grab items-center gap-2 rounded-sm border px-2.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground active:cursor-grabbing"
     >
-      <Component className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <Component
+        className="size-4 shrink-0 text-muted-foreground"
+        aria-hidden="true"
+      />
       {config.label}
     </div>
-  )
+  );
 }
 
 export function ComponentLibrary() {
-  const [query, setQuery] = useState("")
-  const groups = useMemo(() => getNodesByCategory(), [])
+  const [query, setQuery] = useState("");
+  const groups = useMemo(() => getNodesByCategory(), []);
 
-  const normalizedQuery = query.trim().toLowerCase()
+  const normalizedQuery = query.trim().toLowerCase();
 
   return (
-    <>
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-neutral-950/70">
       <div className="border-b p-4">
         <h1 className="text-sm font-semibold">Components</h1>
         <div className="relative mt-3">
@@ -52,16 +54,16 @@ export function ComponentLibrary() {
         </div>
       </div>
 
-      <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto p-3" role="list">
+      <div className="min-h-0 flex-1 overflow-y-auto p-2">
         {Array.from(groups.entries()).map(([category, items]) => {
           const filtered = items.filter(
             (item) =>
               !normalizedQuery ||
               item.label.toLowerCase().includes(normalizedQuery) ||
               item.type.toLowerCase().includes(normalizedQuery),
-          )
+          );
 
-          if (filtered.length === 0) return null
+          if (filtered.length === 0) return null;
 
           return (
             <section key={category} className="mb-5">
@@ -74,9 +76,9 @@ export function ComponentLibrary() {
                 ))}
               </div>
             </section>
-          )
+          );
         })}
       </div>
-    </>
-  )
+    </div>
+  );
 }

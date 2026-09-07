@@ -23,6 +23,7 @@ export type NodeConfig = {
     | "overlay"
     | "display"
     | "data"
+    | "charts"
   defaultProps: Record<string, unknown>
   configurableProps: ConfigurableProp[]
   inputs: PortDef[]

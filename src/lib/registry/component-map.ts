@@ -40,4 +40,64 @@ export const UI_COMPONENTS: Record<string, UiComponentDef> = {
   direction: { exportName: "DirectionProvider", importPath: "direction" },
   toast: { exportName: "toast", importPath: "sonner" },
   apiCall: { exportName: "Button", importPath: "button" },
+  "grid-bar": {
+    exportName: "EChartsGridBarChart",
+    importPath: "evilcharts/blocks/grid-echarts-bar-chart",
+  },
+  "monospace-bar": {
+    exportName: "EChartsMonospaceBarChart",
+    importPath: "evilcharts/blocks/monospace-echarts-bar-chart",
+  },
+  "shipments-line": {
+    exportName: "EChartsShipmentsLineChart",
+    importPath: "evilcharts/blocks/shipments-echarts-line-chart",
+  },
+  "payouts-line": {
+    exportName: "EChartsPayoutsLineChart",
+    importPath: "evilcharts/blocks/payouts-echarts-line-chart",
+  },
+  "latency-area": {
+    exportName: "EChartsLatencyAreaChart",
+    importPath: "evilcharts/blocks/latency-echarts-area-chart",
+  },
+  "benchmark-area": {
+    exportName: "EChartsBenchmarkAreaChart",
+    importPath: "evilcharts/blocks/benchmark-echarts-area-chart",
+  },
+  "audience-area": {
+    exportName: "EChartsAudienceAreaChart",
+    importPath: "evilcharts/blocks/audience-echarts-area-chart",
+  },
+  "portfolio-area": {
+    exportName: "EChartsPortfolioAreaChart",
+    importPath: "evilcharts/blocks/portfolio-echarts-area-chart",
+  },
+  "revenue-mix-pie": {
+    exportName: "EChartsRevenueMixPieChart",
+    importPath: "evilcharts/blocks/revenue-mix-echarts-pie-chart",
+  },
+  "reliability-pie": {
+    exportName: "EChartsReliabilityScorePieChart",
+    importPath: "evilcharts/blocks/reliability-score-echarts-pie-chart",
+  },
+  "progress-rings-pie": {
+    exportName: "EChartsProgressRingsPieChart",
+    importPath: "evilcharts/blocks/progress-rings-echarts-pie-chart",
+  },
+  "market-share-pie": {
+    exportName: "EChartsMarketSharePieChart",
+    importPath: "evilcharts/blocks/market-share-echarts-pie-chart",
+  },
+  "cache-tiers-radial": {
+    exportName: "EChartsCacheTiersRadialChart",
+    importPath: "evilcharts/blocks/cache-tiers-echarts-radial-chart",
+  },
+  "ride-radial": {
+    exportName: "EChartsRideRadialChart",
+    importPath: "evilcharts/blocks/ride-echarts-radial-chart",
+  },
+  "allocation-sankey": {
+    exportName: "EChartsAllocationSankeyChart",
+    importPath: "evilcharts/blocks/allocation-echarts-sankey-chart",
+  },
 }

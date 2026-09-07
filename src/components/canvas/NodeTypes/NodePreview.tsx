@@ -137,6 +137,22 @@ import type { NodeSizeMode, NodeState } from "@/types/graph";
 import type { FormField, NodePreviewProps } from "./types";
 import { nodeStyleToCss } from "@/theme/style-utils";
 
+import { EChartsGridBarChart } from "@/components/evilcharts/blocks/grid-echarts-bar-chart";
+import { EChartsMonospaceBarChart } from "@/components/evilcharts/blocks/monospace-echarts-bar-chart";
+import { EChartsShipmentsLineChart } from "@/components/evilcharts/blocks/shipments-echarts-line-chart";
+import { EChartsPayoutsLineChart } from "@/components/evilcharts/blocks/payouts-echarts-line-chart";
+import { EChartsLatencyAreaChart } from "@/components/evilcharts/blocks/latency-echarts-area-chart";
+import { EChartsBenchmarkAreaChart } from "@/components/evilcharts/blocks/benchmark-echarts-area-chart";
+import { EChartsAudienceAreaChart } from "@/components/evilcharts/blocks/audience-echarts-area-chart";
+import { EChartsPortfolioAreaChart } from "@/components/evilcharts/blocks/portfolio-echarts-area-chart";
+import { EChartsRevenueMixPieChart } from "@/components/evilcharts/blocks/revenue-mix-echarts-pie-chart";
+import { EChartsReliabilityScorePieChart } from "@/components/evilcharts/blocks/reliability-score-echarts-pie-chart";
+import { EChartsProgressRingsPieChart } from "@/components/evilcharts/blocks/progress-rings-echarts-pie-chart";
+import { EChartsMarketSharePieChart } from "@/components/evilcharts/blocks/market-share-echarts-pie-chart";
+import { EChartsCacheTiersRadialChart } from "@/components/evilcharts/blocks/cache-tiers-echarts-radial-chart";
+import { EChartsRideRadialChart } from "@/components/evilcharts/blocks/ride-echarts-radial-chart";
+import { EChartsAllocationSankeyChart } from "@/components/evilcharts/blocks/allocation-echarts-sankey-chart";
+
 
   
 function fieldClass(sizeMode: NodeSizeMode | undefined, extra?: string) {
@@ -152,6 +168,17 @@ function wiredBoolean(
   if (props[key] !== undefined) return Boolean(props[key]);
   if (state[key] !== undefined) return Boolean(state[key]);
   return fallback;
+}
+
+function parseChartData(raw: unknown): Record<string, unknown>[] | undefined {
+  if (raw == null || String(raw).trim() === "") return undefined;
+  try {
+    const parsed = JSON.parse(String(raw));
+    if (Array.isArray(parsed) && parsed.length) return parsed as Record<string, unknown>[];
+  } catch {
+    /* ignore malformed JSON - fall back to default */
+  }
+  return undefined;
 }
 
 export function NodePreview({
@@ -1062,6 +1089,105 @@ export function NodePreview({
       );
       break;
     }
+
+    case "grid-bar":
+      content = (
+        <EChartsGridBarChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "monospace-bar":
+      content = (
+        <EChartsMonospaceBarChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "shipments-line":
+      content = (
+        <EChartsShipmentsLineChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "payouts-line":
+      content = (
+        <EChartsPayoutsLineChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "latency-area":
+      content = (
+        <EChartsLatencyAreaChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "benchmark-area":
+      content = (
+        <EChartsBenchmarkAreaChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "audience-area":
+      content = (
+        <EChartsAudienceAreaChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "portfolio-area":
+      content = (
+        <EChartsPortfolioAreaChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "revenue-mix-pie":
+      content = (
+        <EChartsRevenueMixPieChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "reliability-pie":
+      content = (
+        <EChartsReliabilityScorePieChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "market-share-pie":
+      content = (
+        <EChartsMarketSharePieChart data={parseChartData(props.chartData) as never} />
+      );
+      break;
+
+    case "progress-rings-pie":
+      content = (
+        <EChartsProgressRingsPieChart
+          value={Number(props.value ?? 48)}
+          caption={String(props.caption ?? "")}
+        />
+      );
+      break;
+
+    case "cache-tiers-radial":
+      content = (
+        <EChartsCacheTiersRadialChart
+          total={Number(props.total ?? 1000)}
+          hits={Number(props.hits ?? 610)}
+        />
+      );
+      break;
+
+    case "ride-radial":
+      content = (
+        <EChartsRideRadialChart
+          distance={Number(props.distance ?? 18.4)}
+          goal={Number(props.goal ?? 25)}
+        />
+      );
+      break;
+
+    case "allocation-sankey":
+      content = (
+        <EChartsAllocationSankeyChart title={String(props.title ?? "Where the fund flows")} />
+      );
+      break;
 
     default:
       content = (
