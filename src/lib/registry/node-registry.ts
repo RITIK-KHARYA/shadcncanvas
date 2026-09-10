@@ -783,7 +783,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Grid Bar",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"hour":"08:00","sessions":98},{"hour":"12:00","sessions":158},{"hour":"16:00","sessions":152},{"hour":"20:00","sessions":84}]',
     },
     configurableProps: [
       {
@@ -802,7 +803,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Monospace Bar",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"month":"Jan \'25","sales":388},{"month":"Feb \'25","sales":912},{"month":"Mar \'25","sales":564}]',
     },
     configurableProps: [
       {
@@ -821,7 +823,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Shipments Line",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"slot":"Mon 1","current":14,"previous":34},{"slot":"Mon 2","current":9,"previous":41},{"slot":"Mon 3","current":18,"previous":37}]',
     },
     configurableProps: [
       {
@@ -840,7 +843,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Payouts Line",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"month":"Jan","payouts":312,"pending":548},{"month":"Feb","payouts":388,"pending":502},{"month":"Mar","payouts":342,"pending":561}]',
     },
     configurableProps: [
       {
@@ -859,7 +863,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Latency Area",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"time":"Today 13:06","p99":188,"p95":92,"p75":44,"p50":20},{"time":"Today 13:07","p99":196,"p95":95,"p75":46,"p50":21},{"time":"Today 13:08","p99":181,"p95":89,"p75":43,"p50":20}]',
     },
     configurableProps: [
       {
@@ -878,7 +883,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Benchmark Area",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"date":"Jan 1","actual":240,"target":125},{"date":"Jan 8","actual":240,"target":125},{"date":"Jan 15","actual":175,"target":200}]',
     },
     configurableProps: [
       {
@@ -897,7 +903,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Audience Area",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"month":"Jan","listeners":2980},{"month":"Feb","listeners":3120},{"month":"Mar","listeners":3460}]',
     },
     configurableProps: [
       {
@@ -916,7 +923,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Portfolio Area",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"date":"Dec 22","robinhood":53916,"coinbase":53670},{"date":"Dec 23","robinhood":54380,"coinbase":53080},{"date":"Dec 24","robinhood":54760,"coinbase":52460}]',
     },
     configurableProps: [
       {
@@ -935,7 +943,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Revenue Mix Pie",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"channel":"direct","value":52400},{"channel":"marketplace","value":38900},{"channel":"wholesale","value":24150}]',
     },
     configurableProps: [
       {
@@ -954,7 +963,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Reliability Pie",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"band":"atrisk","value":450},{"band":"fair","value":200},{"band":"good","value":170}]',
     },
     configurableProps: [
       {
@@ -990,7 +1000,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
     label: "ECharts Market Share Pie",
     category: "charts",
     defaultProps: {
-      chartData: "",
+      chartData:
+        '[{"product":"skyline","value":27},{"product":"datawell","value":21},{"product":"cloudpeak","value":13}]',
     },
     configurableProps: [
       {
@@ -1070,3 +1081,4 @@ export function getNodesByCategory() {
 
   return groups;
 }
+

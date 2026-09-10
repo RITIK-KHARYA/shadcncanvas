@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsLineChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-line-chart";
 import { cn } from "@/lib/utils";

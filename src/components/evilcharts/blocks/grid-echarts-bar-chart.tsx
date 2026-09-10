@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsBarChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-bar-chart";
 

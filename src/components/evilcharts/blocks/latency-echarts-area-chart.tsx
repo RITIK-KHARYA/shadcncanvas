@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsAreaChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-area-chart";
 import { cn } from "@/lib/utils";

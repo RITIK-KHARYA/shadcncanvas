@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsRadialChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-radial-chart";
 import { useEffect, useState } from "react";

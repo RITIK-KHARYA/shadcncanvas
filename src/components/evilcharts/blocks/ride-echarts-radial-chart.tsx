@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsRadialChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-radial-chart";
 import { cn } from "@/lib/utils";

@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsSankeyChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-sankey-chart";
 import { cn } from "@/lib/utils";

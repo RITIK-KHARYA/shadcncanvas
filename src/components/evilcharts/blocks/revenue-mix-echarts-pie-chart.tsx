@@ -1,4 +1,4 @@
-"use client";
+
 
 import { EChartsPieChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-pie-chart";
 import { cn } from "@/lib/utils";
