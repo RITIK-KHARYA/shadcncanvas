@@ -112,8 +112,7 @@ src/
   utils/                 # Codegen, validation, helpers
   App.tsx                # React Router setup
   main.tsx               # Entry point
-  global.css             # Global styles + OKLCH tokens
-  loaders.css            # Canvas background patterns
+  global.css             # Global styles + OKLCH tokens + canvas grid
 ```
 
 ---

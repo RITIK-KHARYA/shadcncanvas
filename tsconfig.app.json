@@ -5,6 +5,7 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "allowImportingTsExtensions": true,
+    "allowJs": true,
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "bundler",

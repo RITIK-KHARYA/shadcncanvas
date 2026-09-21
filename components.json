@@ -20,6 +20,7 @@
   "iconLibrary": "lucide",
   "registries": {
     "@supabase": "https://supabase.com/ui/r/{name}.json",
-    "@evilcharts": "https://evilcharts.com/r/{name}.json"
+    "@evilcharts": "https://evilcharts.com/r/{name}.json",
+    "@react-bits": "https://reactbits.dev/r/{name}.json"
   }
 }

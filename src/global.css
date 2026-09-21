@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./loaders.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -151,82 +150,24 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground font-sans antialiased;
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        letter-spacing: var(--letter-spacing);
     }
-}
 
-* {
-    border-color: var(--color-border);
-}
+    .canvas-grid {
+        background-image:
+            linear-gradient(var(--border) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 28px 28px;
+    }
 
-body {
-    margin: 0;
-    min-width: 320px;
-    min-height: 100vh;
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    font-family: var(--font-sans);
-    letter-spacing: var(--letter-spacing);
-    -webkit-font-smoothing: antialiased;
-}
-
-@layer base {
     button:not(:disabled),
     [role="button"]:not(:disabled) {
         cursor: pointer;
     }
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
-}
-
-::view-transition-old(root) {
-    z-index: 0;
-}
-
-::view-transition-new(root) {
-    z-index: 1;
-}
-
-@keyframes reveal {
-    from {
-        clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
-        opacity: 0.7;
-    }
-
-    to {
-        clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
-        opacity: 1;
-    }
-}
-
-::view-transition-new(root) {
-    animation: reveal 0.4s ease-in-out forwards;
-}
-
-.mention {
-    @apply rounded-md bg-primary/10 px-1 font-mono text-sm font-semibold;
-}
-
-.code-inline {
-    @apply bg-muted px-1.5 py-0.5 font-mono text-xs font-medium text-muted-foreground;
-}
-
-@keyframes text {
-    from {
-        background-position: 0% center;
-    }
-
-    to {
-        background-position: -200% center;
-    }
-}
-
-.animate-text {
-    animation: text 3s linear infinite;
 }
 
 @utility scrollbar-thin {
@@ -236,14 +177,6 @@ body {
     &::-webkit-scrollbar {
         width: 8px;
     }
-}
-
-@utility scrollbar-gutter-stable {
-    scrollbar-gutter: stable;
-}
-
-@utility scrollbar-gutter-both {
-    scrollbar-gutter: stable both-edges;
 }
 
 .react-flow__node.dragging > div {
@@ -282,8 +215,10 @@ body {
     color: var(--lp-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
     position: relative;
+    overflow-x: hidden;
     overflow-x: clip;
 }
 
@@ -300,8 +235,10 @@ body {
     -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
 }
 
-.lp-root * {
-    border-color: var(--lp-line);
+@layer base {
+    .lp-root * {
+        border-color: var(--lp-line);
+    }
 }
 
 .lp-glass {
@@ -340,6 +277,13 @@ body {
 
 .lp-tracking-tight {
     letter-spacing: -0.03em;
+}
+
+/* Footer gradient waves — fade into the page so they emerge from the bottom edge */
+.lp-waves {
+    mask-image: linear-gradient(to top, black 45%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 45%, transparent 100%);
+    pointer-events: none;
 }
 
 /* ============================================================
