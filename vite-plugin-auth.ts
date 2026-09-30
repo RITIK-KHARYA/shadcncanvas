@@ -6,7 +6,7 @@ export default function authPlugin(): Plugin {
   return {
     name: "vite-plugin-auth",
     async configureServer(server) {
-      const { auth } = await import("./server/auth");
+      const { auth } = await import("./server/auth.ts");
 
       server.middlewares.use(AUTH_PATH, async (req, res) => {
         const path = `${AUTH_PATH}${req.url ?? "/"}`;

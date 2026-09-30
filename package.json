@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b",
     "preview": "vite preview",
-    "contract:emit": "prisma contract emit && node scripts/contract-types-patch.mjs",
+    "contract:emit": "prisma contract emit && node scripts/contract-types-patch.ts",
     "postinstall": "prisma skills sync || exit 0"
   },
   "dependencies": {
