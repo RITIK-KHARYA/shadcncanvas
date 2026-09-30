@@ -1,1 +1,7 @@
 export { useIsMobile } from "./use-mobile"
+export { useThemeTokens } from "./use-theme-tokens"
+export { useProjectPersistence } from "./use-project-persistence"
+export { useBuilderActions } from "./use-builder-actions"
+export { useCanvasThemeRef } from "./use-canvas-theme"
+export { useAuthForm } from "./use-auth-form"
+export type { SocialProvider, AuthMode } from "./use-auth-form"

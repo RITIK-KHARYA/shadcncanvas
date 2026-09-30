@@ -102,54 +102,43 @@ Export production-ready React JSX directly from your canvas. The codegen engine:
 
 ```
 src/
-  components/ui/         # 54+ shadcn/ui components (Radix UI based)
-  components/landing-v2/ # Landing page components
-    landing.tsx          # Enhanced SEO landing page
-  pages/                 # Application pages
-    auth-page.tsx        # Authentication page
-    builder-page.tsx     # Builder page with SEO
-  hooks/                 # Utility hooks (useIsMobile, etc.)
-  lib/                   # Utilities (cn, classname merge, etc.)
-  store/                 # Zustand state management
+  components/            # UI + feature components
+    ui/                  # 54+ shadcn/ui components (Radix UI based)
+    canvas/              # React Flow canvas
+    inspector/           # Props inspector
+    sidebar/             # Component palette
+    landing-v2/          # Landing page
+    auth/                # Auth guard components
+  pages/                 # Route-level components
+    builder-page.tsx     # Builder (lazy-loaded)
+    auth-page.tsx        # Sign in / sign up
+  hooks/                 # Shared React hooks
+  lib/                   # Utilities (cn, auth client, codegen, export, persistence)
+  store/                 # Zustand stores
+  theme/                 # OKLCH theme tokens + apply logic
+  types/                 # Shared TypeScript types
   utils/                 # Codegen, validation, helpers
+  prisma/                # Generated Prisma client / contract types
   App.tsx                # React Router setup
   main.tsx               # Entry point
   global.css             # Global styles + OKLCH tokens + canvas grid
+
+server/                  # Server-side auth handlers (Vite plugin)
+api/                     # Serverless endpoints
+scripts/                 # Build/maintenance scripts
+public/                  # Static assets copied verbatim into the build
 ```
 
-**SEO Files:**
-- `sitemap.xml` - Search engine sitemap for better crawling
-- `robots.txt` - Search engine crawling instructions
+**SEO Files** (both served from `public/`):
+- `public/sitemap.xml` - Lists indexable routes only
+- `public/robots.txt` - Crawling rules; disallows the `noindex` `/app` and `/auth` routes
 
-**Key SEO Enhancements:**
-- Comprehensive meta tags for all pages
-- Open Graph and Twitter Card support
-- Structured data (JSON-LD) for rich snippets
-- Mobile-friendly viewport meta tags
-- Canonical URLs to prevent duplicate content
-- Performance optimized meta tags
+**Metadata ownership:**
+- `index.html` - Global tags: charset, viewport, keywords, author, theme-color, default Open Graph / Twitter Card
+- `src/components/landing-v2/landing.tsx` - Per-route title, description, robots, canonical, JSON-LD
+- `src/pages/builder-page.tsx`, `src/pages/auth-page.tsx` - `noindex` routes: title, description, robots only
 
 ---
-
-## SEO & Performance
-
-### Search Engine Optimization
-- **Comprehensive Meta Tags**: All pages now include optimized title, description, and keyword tags
-- **Open Graph Support**: Social media sharing optimized with rich previews
-- **Twitter Card Integration**: Twitter-specific meta tags for better sharing
-- **Structured Data**: JSON-LD schema for rich search results
-- **Canonical URLs**: Prevent duplicate content issues
-- **Mobile Optimization**: Responsive viewport meta tags
-
-### Technical SEO
-- **Sitemap**: `sitemap.xml` for better search engine crawling
-- **Robots.txt**: Proper crawling instructions for search engines
-- **Schema.org Markup**: Enhanced rich snippets for software application
-
-### Performance
-- **Vercel Analytics**: Built-in performance monitoring
-- **Optimized Build**: Production-ready with code splitting
-- **Component Optimization**: Lazy loading for better Core Web Vitals
 
 ## Quick Start
 
@@ -196,25 +185,23 @@ bunx shadcn-ui@latest add <component-name>
 
 Components follow shadcn/ui conventions with Tailwind CSS styling.
 
-## SEO & Performance
+## SEO
 
-### Search Engine Optimization
-- **Comprehensive Meta Tags**: All pages now include optimized title, description, and keyword tags
-- **Open Graph Support**: Social media sharing optimized with rich previews
-- **Twitter Card Integration**: Twitter-specific meta tags for better sharing
-- **Structured Data**: JSON-LD schema for rich search results
-- **Canonical URLs**: Prevent duplicate content issues
-- **Mobile Optimization**: Responsive viewport meta tags
+### Metadata
+- **Single source of truth** - global tags live in `index.html`; each route only declares what differs, so no duplicated or conflicting tags
+- **Per-route titles and descriptions** - set via `react-helmet-async` in each page component
+- **Open Graph and Twitter Card** - configured globally in `index.html` for consistent link previews
+- **Structured data** - `SoftwareApplication` JSON-LD on the landing page
+- **Canonical URL** - declared on the landing page only
 
-### Technical SEO
-- **Sitemap**: `sitemap.xml` for better search engine crawling
-- **Robots.txt**: Proper crawling instructions for search engines
-- **Schema.org Markup**: Enhanced rich snippets for software application
+### Crawling
+- **`public/sitemap.xml`** - lists indexable routes; keep in sync when adding public routes in `src/App.tsx`
+- **`public/robots.txt`** - disallows `/app` and `/auth`, which are `noindex`
+- `noindex` routes deliberately omit canonical and JSON-LD, since both would contradict the directive
 
 ### Performance
-- **Vercel Analytics**: Built-in performance monitoring
-- **Optimized Build**: Production-ready with code splitting
-- **Component Optimization**: Lazy loading for better Core Web Vitals
+- **Vercel Analytics** - built-in performance monitoring
+- **Route-level code splitting** - the builder is lazy-loaded, keeping it out of the initial bundle
 
 ---
 

@@ -1,97 +1,44 @@
-import { useState, type FormEvent } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Github, Loader2 } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuthForm } from "@/hooks/use-auth-form";
+import { authClient } from "@/lib/auth-client";
 
 const REDIRECT = "/app";
 
 export function AuthPage() {
-  const navigate = useNavigate();
   const { data, isPending } = authClient.useSession();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<{
-    submit?: boolean;
-    providers?: boolean;
-  }>({});
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    mode,
+    error,
+    pending,
+    signInWith,
+    submit,
+    toggleMode,
+  } = useAuthForm();
 
   if (!isPending && data?.session) {
     return <Navigate to={REDIRECT} replace />;
   }
 
-  async function handleSocial(provider: "github" | "discord" | "google") {
-    setLoading({ providers: true });
-    setError(null);
-    const { error } = await authClient.signIn.social({
-      provider,
-      callbackURL: REDIRECT,
-    });
-    if (error) {
-      setLoading({});
-      setError(error.message ?? "Something went wrong.");
-    }
-  }
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading({ submit: true });
-    setError(null);
-
-    const { error } =
-      mode === "sign-in"
-        ? await authClient.signIn.email({
-            email,
-            password,
-            callbackURL: REDIRECT,
-          })
-        : await authClient.signUp.email({
-            email,
-            password,
-            name: email.split("@")[0] || "User",
-            callbackURL: REDIRECT,
-          });
-
-    if (error) {
-      setLoading({});
-      setError(error.message ?? "Something went wrong.");
-    } else {
-      navigate(REDIRECT);
-    }
-  }
-
   return (
     <>
+      {/* Authentication route: noindex, and not a share target, so it carries
+          only the essentials. Global tags live in index.html. */}
       <Helmet>
         <title>Sign in — Shadcn Canvas</title>
         <meta
           name="description"
-          content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components. Free account required."
+          content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="keywords" content="shadcn canvas sign in, login, account access, component builder" />
-        <meta name="robots" content="noindex" />
-        <meta name="theme-color" content="#0f172a" />
-        <link rel="canonical" href="https://shadcncanvas.vercel.app/auth" />
-        
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://shadcncanvas.vercel.app/auth" />
-        <meta property="og:title" content="Sign in — Shadcn Canvas" />
-        <meta property="og:description" content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components. Free account required." />
-        <meta property="og:image" content="https://shadcncanvas.vercel.app/og-image-auth.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content="https://shadcncanvas.vercel.app/auth" />
-        <meta name="twitter:title" content="Sign in — Shadcn Canvas" />
-        <meta name="twitter:description" content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components. Free account required." />
-        <meta name="twitter:image" content="https://shadcncanvas.vercel.app/og-image-auth.jpg" />
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
         <div className="w-full max-w-sm">
@@ -119,8 +66,8 @@ export function AuthPage() {
               type="button"
               variant="outline"
               className="w-full"
-              disabled={loading.providers}
-              onClick={() => handleSocial("github")}
+              disabled={pending.providers}
+              onClick={() => signInWith("github")}
             >
               <Github />
               Continue with GitHub
@@ -129,8 +76,8 @@ export function AuthPage() {
               type="button"
               variant="outline"
               className="w-full"
-              disabled={loading.providers}
-              onClick={() => handleSocial("discord")}
+              disabled={pending.providers}
+              onClick={() => signInWith("discord")}
             >
               Continue with Discord
             </Button>
@@ -138,8 +85,8 @@ export function AuthPage() {
               type="button"
               variant="outline"
               className="w-full"
-              disabled={loading.providers}
-              onClick={() => handleSocial("google")}
+              disabled={pending.providers}
+              onClick={() => signInWith("google")}
             >
               Continue with Google
             </Button>
@@ -151,7 +98,7 @@ export function AuthPage() {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -186,9 +133,9 @@ export function AuthPage() {
             <Button
               type="submit"
               className="w-full"
-              disabled={loading.submit || loading.providers}
+              disabled={pending.submit || pending.providers}
             >
-              {loading.submit && <Loader2 className="animate-spin" />}
+              {pending.submit && <Loader2 className="animate-spin" />}
               {mode === "sign-in" ? "Sign in" : "Sign up"}
             </Button>
           </form>
@@ -200,9 +147,7 @@ export function AuthPage() {
             <button
               type="button"
               className="font-medium text-foreground underline-offset-4 hover:underline"
-              onClick={() =>
-                setMode(mode === "sign-in" ? "sign-up" : "sign-in")
-              }
+              onClick={toggleMode}
             >
               {mode === "sign-in" ? "Create one" : "Sign in"}
             </button>

@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
+
+# Authenticated / app-only routes are noindex in the page head, so they are
+# also disallowed here. Keep this list in sync with the `robots` meta tags
+# in src/pages/builder-page.tsx and src/pages/auth-page.tsx.
 Disallow: /app
+Disallow: /auth
 
 Sitemap: https://shadcncanvas.vercel.app/sitemap.xml

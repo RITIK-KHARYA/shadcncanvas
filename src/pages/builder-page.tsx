@@ -1,233 +1,54 @@
-import {
-  Box,
-  Copy,
-  Download,
-  Redo2,
-  Trash2,
-  Undo2,
-  LogOut,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import { Box, Copy, Download, LogOut, Redo2, Trash2, Undo2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { Canvas } from "@/components/canvas/Canvas";
 import { EditorSidebar } from "@/components/inspector/EditorSidebar";
 import { ComponentLibrary } from "@/components/sidebar/ComponentLibrary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { generateFullCode, generateNodeCode } from "@/lib/codegen";
-import { exportProjectZip } from "@/lib/exportZip";
-import { loadProject, saveProject } from "@/lib/persistence";
+import { useBuilderActions } from "@/hooks/use-builder-actions";
+import { useCanvasThemeRef } from "@/hooks/use-canvas-theme";
+import { useProjectPersistence } from "@/hooks/use-project-persistence";
 import { useGraphStore } from "@/store/graph-store";
-import { useEditorStore } from "@/store/editor-store";
-import { signOut } from "@/lib/auth-client";
-import { applyThemeToElement } from "@/theme/apply";
 
 export function BuilderPage() {
-  const themeState = useEditorStore((s) => s.themeState);
-  const activeMode = themeState.currentMode;
+  const { projectName, setProjectName, lastSaved, tokens } =
+    useProjectPersistence();
 
-  const activeStyles = themeState.styles[activeMode];
+  const { hasCanvasContent, onClearCanvas, onCopyCode, onExportZip, onLogout } =
+    useBuilderActions({ projectName, tokens });
 
-  const handleLogout = async () => {
-    try {
-      await signOut({ callbackURL: "/auth" });
-      toast.success("Logged out successfully");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to log out");
-    }
-  };
+  const containerRef = useCanvasThemeRef();
 
-  const tokens = useMemo(
-    () => ({
-      primary: activeStyles.primary,
-      secondary: activeStyles.secondary,
-      background: activeStyles.background,
-      radius: activeStyles.radius,
-    }),
-    [activeStyles],
-  );
-
-  const containerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      applyThemeToElement(themeState, containerRef.current);
-    }
-  }, [themeState]);
-
-  const hydrated = useRef(false);
-
-  const [projectName, setProjectName] = useState("Untitled shadcn canvas");
-  const [lastSaved, setLastSaved] = useState<string | null>(null);
-
-  const nodes = useGraphStore((s) => s.nodes);
-  const edges = useGraphStore((s) => s.edges);
-  const selectedNodeId = useGraphStore((s) => s.selectedNodeId);
   const canUndo = useGraphStore((s) => s.canUndo);
   const canRedo = useGraphStore((s) => s.canRedo);
   const undo = useGraphStore((s) => s.undo);
   const redo = useGraphStore((s) => s.redo);
-  const clearCanvas = useGraphStore((s) => s.clearCanvas);
-  const hydrate = useGraphStore((s) => s.hydrate);
-
-  const hasCanvasContent = nodes.length > 0 || edges.length > 0;
-
-  const selectedNode = useMemo(
-    () => nodes.find((node) => node.id === selectedNodeId) ?? null,
-    [nodes, selectedNodeId],
-  );
-
-  useEffect(() => {
-    const saved = loadProject();
-    if (saved) {
-      hydrate(saved.nodes, saved.edges);
-      if (saved.theme) {
-        useEditorStore.setState((prev) => {
-          const nextStyles = { ...prev.themeState.styles };
-          const mode = prev.themeState.currentMode;
-          nextStyles[mode] = {
-            ...nextStyles[mode],
-            primary: saved.theme.primary || nextStyles[mode].primary,
-            secondary: saved.theme.secondary || nextStyles[mode].secondary,
-            background: saved.theme.background || nextStyles[mode].background,
-            radius: saved.theme.radius || nextStyles[mode].radius,
-          };
-          return {
-            ...prev,
-            themeState: {
-              ...prev.themeState,
-              styles: nextStyles,
-            },
-          };
-        });
-      }
-      setProjectName(saved.projectName);
-      setLastSaved(saved.savedAt);
-    }
-    hydrated.current = true;
-  }, [hydrate]);
-
-  useEffect(() => {
-    if (!hydrated.current) return;
-
-    const timer = window.setTimeout(() => {
-      const payload = saveProject({
-        projectName,
-        nodes,
-        edges,
-        theme: tokens,
-      });
-      setLastSaved(payload.savedAt);
-    }, 500);
-
-    return () => window.clearTimeout(timer);
-  }, [nodes, edges, tokens, projectName]);
-
-  const handleClearCanvas = useCallback(() => {
-    if (!hasCanvasContent) return;
-
-    clearCanvas();
-    toast.success("Canvas cleared");
-  }, [clearCanvas, hasCanvasContent]);
-
-  const handleCopyCode = useCallback(async () => {
-    const code = selectedNode
-      ? generateNodeCode(selectedNode)
-      : generateFullCode(nodes, edges, tokens);
-
-    if (!code.trim()) {
-      toast.error("Nothing to copy — add nodes to the canvas first");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(code);
-      toast.success(
-        selectedNode
-          ? "Node code copied to clipboard"
-          : "Full code copied to clipboard",
-      );
-    } catch (err) {
-      console.error("Copy failed:", err);
-      toast.error("Failed to copy — check browser permissions");
-    }
-  }, [edges, nodes, selectedNode, tokens]);
-
-  const handleExportZip = useCallback(async () => {
-    if (nodes.length === 0) {
-      toast.error("Nothing to export — add nodes to the canvas first");
-      return;
-    }
-
-    try {
-      await exportProjectZip({ nodes, edges, theme: tokens, projectName });
-      toast.success("ZIP exported");
-    } catch (err) {
-      console.error("Export failed:", err);
-      toast.error("Export failed");
-    }
-  }, [edges, nodes, projectName, tokens]);
 
   return (
     <>
+      {/* Authenticated, noindex route. A self-referencing canonical and
+          JSON-LD would contradict `noindex`, so only share-preview tags and
+          the robots directive are set here. Global tags live in index.html. */}
       <Helmet>
         <title>Builder — Shadcn Canvas</title>
         <meta
           name="description"
           content="Create and export shadcn/ui components with the visual builder. Drag components onto canvas, wire logic, and generate production-ready React code."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="keywords" content="shadcn canvas builder, component builder, react development, visual programming, code generation" />
         <meta name="robots" content="noindex, nofollow" />
-        <meta name="theme-color" content="#0f172a" />
-        <link rel="canonical" href="https://shadcncanvas.vercel.app/app" />
-        
-        <meta property="og:type" content="website" />
+
         <meta property="og:url" content="https://shadcncanvas.vercel.app/app" />
         <meta property="og:title" content="Builder — Shadcn Canvas" />
-        <meta property="og:description" content="Create and export shadcn/ui components with the visual builder. Drag components onto canvas, wire logic, and generate production-ready React code." />
-        <meta property="og:image" content="https://shadcncanvas.vercel.app/og-image-builder.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content="https://shadcncanvas.vercel.app/app" />
+        <meta
+          property="og:description"
+          content="Drag, wire, and export production-ready shadcn/ui React code."
+        />
+
         <meta name="twitter:title" content="Builder — Shadcn Canvas" />
-        <meta name="twitter:description" content="Create and export shadcn/ui components with the visual builder. Drag components onto canvas, wire logic, and generate production-ready React code." />
-        <meta name="twitter:image" content="https://shadcncanvas.vercel.app/og-image-builder.jpg" />
-        
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: "Shadcn Canvas Builder",
-            applicationCategory: "DeveloperApplication",
-            operatingSystem: "Web",
-            description:
-              "Visual builder for creating shadcn/ui components with logic wiring and code export functionality.",
-            offers: {
-              "@type": "Offer",
-              price: "0",
-              priceCurrency: "USD",
-            },
-            featureList: [
-              "Infinite canvas with pan and zoom",
-              "Drag and drop component placement",
-              "Live component preview",
-              "Node wiring for logic flow",
-              "Real-time prop editing",
-              "Zod validation integration",
-              "Code generation export",
-              "ZIP package download",
-              "Theme customization",
-              "History management (undo/redo)",
-              "LocalStorage persistence",
-            ],
-            url: "https://shadcncanvas.vercel.app/app",
-          })}
-        </script>
+        <meta
+          name="twitter:description"
+          content="Drag, wire, and export production-ready shadcn/ui React code."
+        />
       </Helmet>
       <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
         <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-card/60 px-4">
@@ -274,21 +95,21 @@ export function BuilderPage() {
               title="Remove all components from canvas"
               className="text-destructive hover:text-destructive"
               disabled={!hasCanvasContent}
-              onClick={handleClearCanvas}
+              onClick={onClearCanvas}
             >
               <Trash2 aria-hidden="true" />
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleCopyCode}>
+            <Button variant="outline" size="sm" onClick={onCopyCode}>
               <Copy aria-hidden="true" />
               Copy Code
             </Button>
-            <Button size="sm" onClick={handleExportZip}>
+            <Button size="sm" onClick={onExportZip}>
               <Download aria-hidden="true" />
               Export ZIP
             </Button>
-            <Button size="sm" onClick={handleLogout}>
+            <Button size="sm" onClick={onLogout}>
               <LogOut aria-hidden="true" />
               Log Out
             </Button>

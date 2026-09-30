@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!--
+    Only indexable routes belong here. /app and /auth are noindex + disallowed
+    in robots.txt, so they are intentionally excluded.
+    Add a URL below when a new public, indexable route is added to src/App.tsx.
+  -->
   <url>
     <loc>https://shadcncanvas.vercel.app/</loc>
     <changefreq>weekly</changefreq>

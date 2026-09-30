@@ -1,4 +1,5 @@
 export { applyThemeToElement, applyCommonStyles, applyThemeColors, updateThemeClass } from "./apply"
+export { mergeThemeTokens } from "./merge-tokens"
 export { colorFormatter, adjustHslColor, toHexColor, isColorProperty } from "./colors"
 export { setShadowVariables } from "./shadows"
 export { applyStyleToElement } from "./style-utils"
