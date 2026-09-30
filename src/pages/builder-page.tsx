@@ -174,7 +174,60 @@ export function BuilderPage() {
     <>
       <Helmet>
         <title>Builder — Shadcn Canvas</title>
+        <meta
+          name="description"
+          content="Create and export shadcn/ui components with the visual builder. Drag components onto canvas, wire logic, and generate production-ready React code."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="keywords" content="shadcn canvas builder, component builder, react development, visual programming, code generation" />
         <meta name="robots" content="noindex, nofollow" />
+        <meta name="theme-color" content="#0f172a" />
+        <link rel="canonical" href="https://shadcncanvas.vercel.app/app" />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://shadcncanvas.vercel.app/app" />
+        <meta property="og:title" content="Builder — Shadcn Canvas" />
+        <meta property="og:description" content="Create and export shadcn/ui components with the visual builder. Drag components onto canvas, wire logic, and generate production-ready React code." />
+        <meta property="og:image" content="https://shadcncanvas.vercel.app/og-image-builder.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://shadcncanvas.vercel.app/app" />
+        <meta name="twitter:title" content="Builder — Shadcn Canvas" />
+        <meta name="twitter:description" content="Create and export shadcn/ui components with the visual builder. Drag components onto canvas, wire logic, and generate production-ready React code." />
+        <meta name="twitter:image" content="https://shadcncanvas.vercel.app/og-image-builder.jpg" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "Shadcn Canvas Builder",
+            applicationCategory: "DeveloperApplication",
+            operatingSystem: "Web",
+            description:
+              "Visual builder for creating shadcn/ui components with logic wiring and code export functionality.",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+            featureList: [
+              "Infinite canvas with pan and zoom",
+              "Drag and drop component placement",
+              "Live component preview",
+              "Node wiring for logic flow",
+              "Real-time prop editing",
+              "Zod validation integration",
+              "Code generation export",
+              "ZIP package download",
+              "Theme customization",
+              "History management (undo/redo)",
+              "LocalStorage persistence",
+            ],
+            url: "https://shadcncanvas.vercel.app/app",
+          })}
+        </script>
       </Helmet>
       <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
         <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-card/60 px-4">

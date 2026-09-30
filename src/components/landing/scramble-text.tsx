@@ -36,7 +36,7 @@ export function ScrambleText({
 
     let cancelled = false;
     let lastTick = performance.now();
-    const locked = new Array(text.length).fill(false);
+    const locked = Array(text.length).fill(false);
     let lockCursor = 0;
     let lastLockAt = performance.now();
 

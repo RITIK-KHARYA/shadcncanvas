@@ -103,9 +103,11 @@ Export production-ready React JSX directly from your canvas. The codegen engine:
 ```
 src/
   components/ui/         # 54+ shadcn/ui components (Radix UI based)
-  pages/                 # Landing and builder pages
-    landing-page.tsx
-    builder-page.tsx
+  components/landing-v2/ # Landing page components
+    landing.tsx          # Enhanced SEO landing page
+  pages/                 # Application pages
+    auth-page.tsx        # Authentication page
+    builder-page.tsx     # Builder page with SEO
   hooks/                 # Utility hooks (useIsMobile, etc.)
   lib/                   # Utilities (cn, classname merge, etc.)
   store/                 # Zustand state management
@@ -115,7 +117,39 @@ src/
   global.css             # Global styles + OKLCH tokens + canvas grid
 ```
 
+**SEO Files:**
+- `sitemap.xml` - Search engine sitemap for better crawling
+- `robots.txt` - Search engine crawling instructions
+
+**Key SEO Enhancements:**
+- Comprehensive meta tags for all pages
+- Open Graph and Twitter Card support
+- Structured data (JSON-LD) for rich snippets
+- Mobile-friendly viewport meta tags
+- Canonical URLs to prevent duplicate content
+- Performance optimized meta tags
+
 ---
+
+## SEO & Performance
+
+### Search Engine Optimization
+- **Comprehensive Meta Tags**: All pages now include optimized title, description, and keyword tags
+- **Open Graph Support**: Social media sharing optimized with rich previews
+- **Twitter Card Integration**: Twitter-specific meta tags for better sharing
+- **Structured Data**: JSON-LD schema for rich search results
+- **Canonical URLs**: Prevent duplicate content issues
+- **Mobile Optimization**: Responsive viewport meta tags
+
+### Technical SEO
+- **Sitemap**: `sitemap.xml` for better search engine crawling
+- **Robots.txt**: Proper crawling instructions for search engines
+- **Schema.org Markup**: Enhanced rich snippets for software application
+
+### Performance
+- **Vercel Analytics**: Built-in performance monitoring
+- **Optimized Build**: Production-ready with code splitting
+- **Component Optimization**: Lazy loading for better Core Web Vitals
 
 ## Quick Start
 
@@ -161,6 +195,26 @@ bunx shadcn-ui@latest add <component-name>
 ```
 
 Components follow shadcn/ui conventions with Tailwind CSS styling.
+
+## SEO & Performance
+
+### Search Engine Optimization
+- **Comprehensive Meta Tags**: All pages now include optimized title, description, and keyword tags
+- **Open Graph Support**: Social media sharing optimized with rich previews
+- **Twitter Card Integration**: Twitter-specific meta tags for better sharing
+- **Structured Data**: JSON-LD schema for rich search results
+- **Canonical URLs**: Prevent duplicate content issues
+- **Mobile Optimization**: Responsive viewport meta tags
+
+### Technical SEO
+- **Sitemap**: `sitemap.xml` for better search engine crawling
+- **Robots.txt**: Proper crawling instructions for search engines
+- **Schema.org Markup**: Enhanced rich snippets for software application
+
+### Performance
+- **Vercel Analytics**: Built-in performance monitoring
+- **Optimized Build**: Production-ready with code splitting
+- **Component Optimization**: Lazy loading for better Core Web Vitals
 
 ---
 

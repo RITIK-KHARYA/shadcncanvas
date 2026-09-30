@@ -69,6 +69,29 @@ export function AuthPage() {
     <>
       <Helmet>
         <title>Sign in — Shadcn Canvas</title>
+        <meta
+          name="description"
+          content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components. Free account required."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="keywords" content="shadcn canvas sign in, login, account access, component builder" />
+        <meta name="robots" content="noindex" />
+        <meta name="theme-color" content="#0f172a" />
+        <link rel="canonical" href="https://shadcncanvas.vercel.app/auth" />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://shadcncanvas.vercel.app/auth" />
+        <meta property="og:title" content="Sign in — Shadcn Canvas" />
+        <meta property="og:description" content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components. Free account required." />
+        <meta property="og:image" content="https://shadcncanvas.vercel.app/og-image-auth.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://shadcncanvas.vercel.app/auth" />
+        <meta name="twitter:title" content="Sign in — Shadcn Canvas" />
+        <meta name="twitter:description" content="Sign in to Shadcn Canvas to access your saved projects and continue building shadcn/ui components. Free account required." />
+        <meta name="twitter:image" content="https://shadcncanvas.vercel.app/og-image-auth.jpg" />
       </Helmet>
       <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
         <div className="w-full max-w-sm">

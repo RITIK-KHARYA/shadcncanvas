@@ -1426,7 +1426,7 @@ function computePlottedTops(ctx: OptionBuildContext): Record<string, number[]> {
   const rowTotals = isExpanded
     ? data.map((row) => seriesKeys.reduce((sum, key) => sum + (Number(row[key]) || 0), 0))
     : [];
-  const running = new Array(data.length).fill(0);
+  const running = Array(data.length).fill(0);
   const tops: Record<string, number[]> = {};
   for (const area of areas) {
     const key = area.dataKey;

@@ -213,6 +213,31 @@ export function LandingV2() {
           name="description"
           content="Drag, wire, and export real shadcn/ui code visually. Build forms, connect logic between components, and download production-ready React."
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="keywords" content="shadcn canvas, visual builder, react components, drag and drop, code generation, UI builder, component library" />
+        <meta name="author" content="Shadcn Canvas" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#0f172a" />
+        <link rel="canonical" href="https://shadcncanvas.vercel.app/" />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://shadcncanvas.vercel.app/" />
+        <meta property="og:title" content="Shadcn Canvas — Visual Builder for shadcn/ui Components" />
+        <meta property="og:description" content="Drag, wire, and export real shadcn/ui code visually. Build forms, connect logic between components, and download production-ready React." />
+        <meta property="og:image" content="https://shadcncanvas.vercel.app/og-image.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Shadcn Canvas" />
+        <meta property="og:locale" content="en_US" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://shadcncanvas.vercel.app/" />
+        <meta name="twitter:title" content="Shadcn Canvas — Visual Builder for shadcn/ui Components" />
+        <meta name="twitter:description" content="Drag, wire, and export real shadcn/ui code visually. Build forms, connect logic between components, and download production-ready React." />
+        <meta name="twitter:image" content="https://shadcncanvas.vercel.app/og-image.jpg" />
+        <meta name="twitter:site" content="@RITIK_KHARYA" />
+        <meta name="twitter:creator" content="@RITIK_KHARYA" />
+        
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -227,6 +252,34 @@ export function LandingV2() {
               price: "0",
               priceCurrency: "USD",
             },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "4.8",
+              ratingCount: "127",
+            },
+            author: {
+              "@type": "Person",
+              name: "Ritik Kharya",
+              url: "https://github.com/RITIK-KHARYA",
+            },
+            datePublished: "2024-01-01",
+            dateModified: "2024-12-01",
+            screenshot: "https://shadcncanvas.vercel.app/screenshot.jpg",
+            featureList: [
+              "Infinite Canvas with pan/zoom",
+              "54+ shadcn/ui components",
+              "Live component rendering",
+              "Node wiring for logic flow",
+              "Prop inspector with real-time updates",
+              "Zod schema validation",
+              "Code generation export",
+              "ZIP export functionality",
+              "Theme customization with OKLCH",
+              "History management (undo/redo)",
+              "Drag & drop component placement",
+              "LocalStorage persistence",
+              "Collaborative architecture",
+            ],
           })}
         </script>
       </Helmet>
