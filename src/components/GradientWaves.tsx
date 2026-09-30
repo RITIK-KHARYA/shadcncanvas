@@ -2,13 +2,45 @@ import { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
 import './GradientWaves.css';
 
-const hexToRgb = hex => {
+type DetailLevel = 'low' | 'medium' | 'high';
+
+type GradientWavesProps = {
+  horizonColor?: string;
+  waveColor?: string;
+  crestColor?: string;
+  speed?: number;
+  amplitude?: number;
+  waveScale?: number;
+  waveRatio?: number;
+  swell?: number;
+  turbulence?: number;
+  tilt?: number;
+  zoom?: number;
+  height?: number;
+  fogDepth?: number;
+  detail?: DetailLevel;
+  brightness?: number;
+  opacity?: number;
+  mouseInteraction?: boolean;
+  parallaxStrength?: number;
+  grain?: boolean;
+  grainIntensity?: number;
+  className?: string;
+};
+
+type WavesContext = {
+  renderer: Renderer;
+  program: Program;
+  mesh: Mesh;
+};
+
+const hexToRgb = (hex: string): [number, number, number] => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!result) return [1, 1, 1];
   return [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255];
 };
 
-const detailToSteps = detail => {
+const detailToSteps = (detail: DetailLevel): number => {
   if (detail === 'low') return 40.0;
   if (detail === 'high') return 110.0;
   return 70.0;
@@ -126,7 +158,7 @@ void main() {
 }
 `;
 
-const ctxMap = new WeakMap();
+const ctxMap = new WeakMap<HTMLElement, WavesContext>();
 
 const GradientWaves = ({
   horizonColor = '#5227FF',
@@ -150,8 +182,8 @@ const GradientWaves = ({
   grain = true,
   grainIntensity = 0.05,
   className = ''
-}) => {
-  const containerRef = useRef(null);
+}: GradientWavesProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const enableMouseRef = useRef(mouseInteraction);
 
   useEffect(() => {
@@ -223,10 +255,10 @@ const GradientWaves = ({
     ro.observe(container);
     setSize();
 
-    const currentMouse = [0.5, 0.5];
-    const targetMouse = [0.5, 0.5];
+    const currentMouse = new Float32Array([0.5, 0.5]);
+    const targetMouse = new Float32Array([0.5, 0.5]);
 
-    const onPointerMove = e => {
+    const onPointerMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       targetMouse[0] = (e.clientX - rect.left) / rect.width;
       targetMouse[1] = 1.0 - (e.clientY - rect.top) / rect.height;
@@ -243,7 +275,7 @@ const GradientWaves = ({
     let isPageVisible = !document.hidden;
     const t0 = performance.now();
 
-    const loop = t => {
+    const loop = (t: number) => {
       program.uniforms.iTime.value = (t - t0) * 0.001;
       const tx = enableMouseRef.current ? targetMouse[0] : 0.5;
       const ty = enableMouseRef.current ? targetMouse[1] : 0.5;
@@ -266,7 +298,7 @@ const GradientWaves = ({
     };
 
     const io = new IntersectionObserver(
-      ([entry]) => {
+      ([entry]: IntersectionObserverEntry[]) => {
         isVisible = entry.isIntersecting;
         if (isVisible) {
           tryStart();

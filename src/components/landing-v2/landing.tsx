@@ -4,8 +4,8 @@ import { ArrowRight, Github } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { ScrambleText } from "@/components/landing/scramble-text";
 import { Button } from "@/components/ui/button";
-import { AeroShards } from "@/components/AeroShards.jsx";
-import GradientWaves from "@/components/GradientWaves.jsx";
+import { AeroShards } from "@/components/AeroShards";
+import GradientWaves from "@/components/GradientWaves";
 
 import { product, stack } from "./content";
 
