@@ -3,14 +3,18 @@ import type { ThemeTokens } from "@/store/theme-store";
 import { themeTokensToStyle } from "@/store/theme-store";
 import { nodeRegistry, UI_COMPONENTS, getEffect, effectOrder } from "@/lib/registry";
 import type { EffectConfig, FormField } from "@/types/registry";
-import { buildPropsString, indent } from "./helpers";
+import { buildPropsString, buildPropsStringWithOverrides, indent } from "./helpers";
 import { buildWiringBlock } from "./wiring";
 import { buildImports } from "./imports";
 import { nodeStyleToCss } from "@/theme/style-utils";
 import type { NodeStyleOverride } from "@/types/graph";
 
 /** Nests the node's JSX inside its wrapper effects (registry order, first outermost). */
-function wrapWithEffects(jsx: string, effects?: EffectConfig[]): string {
+function wrapWithEffects(
+  jsx: string,
+  effects?: EffectConfig[],
+  effectOverrides?: Map<string, Map<string, string>>,
+): string {
   if (!effects || effects.length === 0) return jsx;
 
   const ordered = [...effects]
@@ -22,7 +26,11 @@ function wrapWithEffects(jsx: string, effects?: EffectConfig[]): string {
     const effect = ordered[i];
     const def = getEffect(effect.id);
     if (!def) continue;
-    const propsString = buildPropsString(effect.props);
+    const overrides = effectOverrides?.get(effect.id);
+    const propsString =
+      overrides && overrides.size > 0
+        ? buildPropsStringWithOverrides(effect.props, overrides)
+        : buildPropsString(effect.props);
     out = `<${def.exportName}${propsString ? ` ${propsString}` : ""}>\n${indent(out, 2)}\n</${def.exportName}>`;
   }
   return out;
@@ -55,10 +63,12 @@ export function generateNodeCode(
   node: CanvasNode,
   triggerOverrides?: Map<string, string>,
   propOverrides?: Map<string, Map<string, string>>,
+  effectPropOverrides?: Map<string, Map<string, Map<string, string>>>,
 ): string {
   return wrapWithEffects(
     generateNodeElementCode(node, triggerOverrides, propOverrides),
     node.data.effects,
+    effectPropOverrides?.get(node.id),
   );
 }
 
@@ -468,7 +478,17 @@ export function generateFullCode(
   const imports = buildImports(types, effectIds);
   const wiring = buildWiringBlock(edges, nodes);
   const componentsCode = nodes
-    .map((node) => indent(generateNodeCode(node, wiring.triggerOverrides, wiring.propOverrides), 6))
+    .map((node) =>
+      indent(
+        generateNodeCode(
+          node,
+          wiring.triggerOverrides,
+          wiring.propOverrides,
+          wiring.effectPropOverrides,
+        ),
+        6,
+      ),
+    )
     .join("\n");
 
   const reactImport = wiring.hasState

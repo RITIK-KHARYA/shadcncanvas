@@ -20,7 +20,7 @@ function PortHint({ keys, portLabels }: { keys: string[]; portLabels: Record<str
           <code className="font-mono text-foreground">{portLabels[k] ?? k}</code>
         </span>
       ))}{" "}
-      — connect from the Prototype tab.
+      — connect them on the canvas via the accent handles on this node.
     </p>
   );
 }

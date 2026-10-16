@@ -1,4 +1,5 @@
 import type { CanvasEdge, CanvasNode } from "@/types/graph"
+import { parseEffectHandle } from "@/lib/registry/effects-registry"
 import { capitalize, deriveStateName } from "./helpers"
 
 function apiVarBase(nodeId: string): string {
@@ -60,6 +61,8 @@ export function buildWiringBlock(
   hasState: boolean
   triggerOverrides: Map<string, string>
   propOverrides: Map<string, Map<string, string>>
+  /** nodeId -> effectId -> portKey -> expression */
+  effectPropOverrides: Map<string, Map<string, Map<string, string>>>
 } {
   const names = new Map(nodes.map((n) => [n.id, n.data.name ?? ""]))
   const sourceOccurrence = new Map<string, number>()
@@ -67,6 +70,30 @@ export function buildWiringBlock(
   const wiringComments: string[] = []
   const triggerOverrides = new Map<string, string>()
   const propOverrides = new Map<string, Map<string, string>>()
+  const effectPropOverrides = new Map<
+    string,
+    Map<string, Map<string, string>>
+  >()
+
+  const recordPropOverride = (targetId: string, handle: string, expr: string) => {
+    const effectTarget = parseEffectHandle(handle)
+    if (effectTarget) {
+      let byEffect = effectPropOverrides.get(targetId)
+      if (!byEffect) {
+        byEffect = new Map()
+        effectPropOverrides.set(targetId, byEffect)
+      }
+      let byPort = byEffect.get(effectTarget.effectId)
+      if (!byPort) {
+        byPort = new Map()
+        byEffect.set(effectTarget.effectId, byPort)
+      }
+      byPort.set(effectTarget.portKey, expr)
+      return
+    }
+    if (!propOverrides.has(targetId)) propOverrides.set(targetId, new Map())
+    propOverrides.get(targetId)!.set(handle, expr)
+  }
 
   const apiCallHooks = nodes
     .filter((n) => n.data.componentType === "apiCall")
@@ -217,8 +244,7 @@ export function buildWiringBlock(
         else if (transform === "isSuccess" && sh === "status") finalExpr = `${varBase}Status === "success"`
         else if (transform === "isError" && sh === "status") finalExpr = `${varBase}Status === "error"`
         else if (transform === "isLoading" && sh === "status") finalExpr = `${varBase}Status === "loading"`
-        if (!propOverrides.has(targetId)) propOverrides.set(targetId, new Map())
-        propOverrides.get(targetId)!.set(edge.targetHandle, finalExpr)
+        recordPropOverride(targetId, edge.targetHandle, finalExpr)
       }
       wiringComments.push(
         `  // ${sourceType}.${edge.sourceHandle ?? "output"} --[${transform}]--> ${targetType}.${edge.targetHandle ?? "prop"}`,
@@ -248,8 +274,7 @@ export function buildWiringBlock(
               : transform === "isSuccess"
                 ? `${stateName} === "success"`
                 : stateName
-      if (!propOverrides.has(targetId)) propOverrides.set(targetId, new Map())
-      propOverrides.get(targetId)!.set(edge.targetHandle, expr)
+      recordPropOverride(targetId, edge.targetHandle, expr)
       if (!triggerOverrides.has(sourceId)) {
         triggerOverrides.set(sourceId, `set${capitalize(stateName)}(!${stateName})`)
       }
@@ -272,5 +297,6 @@ export function buildWiringBlock(
     hasState: stateLines.length > 0 || apiCallHooks.length > 0,
     triggerOverrides,
     propOverrides,
+    effectPropOverrides,
   }
 }

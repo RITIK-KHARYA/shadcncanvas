@@ -8,6 +8,7 @@ import {
 import { useCallback } from "react";
 
 import { nodeRegistry } from "@/lib/registry";
+import { effectInputPorts } from "@/lib/registry/effects-registry";
 import { useGraphStore, recordNodeDragHistory } from "@/store/graph-store";
 import type { CanvasNode, NodeLayout, NodeState } from "@/types/graph";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,10 @@ import { NodeSkeleton } from "./NodeSkeleton";
 
 const handleClass =
   "!h-2.5 !w-2.5 !border-2 !border-primary !rounded-full !bg-background hover:!bg-primary hover:!scale-110 transition-transform";
+
+// Effect input ports read differently from component ports (accent ring).
+const effectHandleClass =
+  "!h-2.5 !w-2.5 !border-2 !border-accent !rounded-full !bg-background hover:!bg-accent hover:!scale-110 transition-transform";
 
 export const DEFAULT_NODE_WIDTH = 240;
 export const DEFAULT_NODE_HEIGHT = 120;
@@ -78,7 +83,8 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
 
   const inputCount = config.inputs.length;
   const outputCount = config.outputs.length;
-  const handleCount = Math.max(inputCount, outputCount, 1);
+  const effectPorts = effectInputPorts(data.effects);
+  const handleCount = Math.max(inputCount + effectPorts.length, outputCount, 1);
   const isCustom = layout.sizeMode === "custom";
   // Toast must never be hidden by loading skeleton - it needs to fire even while apiCall is loading
   const isLoading = data.componentType !== "toast" && Boolean(data.props.loading ?? data.state.loading);
@@ -124,6 +130,20 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
             title={`${input.label} (${input.type})`}
             className={handleClass}
             style={{ top: `${((i + 1) / (handleCount + 1)) * 100}%` }}
+          />
+        ))}
+
+        {effectPorts.map((port, j) => (
+          <Handle
+            key={port.handle}
+            type="target"
+            position={Position.Left}
+            id={port.handle}
+            title={`${port.effectLabel} · ${port.label} (${port.type})`}
+            className={effectHandleClass}
+            style={{
+              top: `${((inputCount + j + 1) / (handleCount + 1)) * 100}%`,
+            }}
           />
         ))}
 

@@ -10,6 +10,7 @@ import { create } from "zustand"
 
 import { evalTransform } from "@/lib/graph/transforms"
 import { nodeRegistry } from "@/lib/registry/node-registry"
+import { parseEffectHandle } from "@/lib/registry/effects-registry"
 import type {
   CanvasEdge,
   CanvasNode,
@@ -371,7 +372,8 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
       }),
     }),
 
-  updateNodeEffects: (nodeId, effects) =>
+  updateNodeEffects: (nodeId, effects) => {
+    const validEffectIds = new Set((effects ?? []).map((e) => e.id))
     set({
       nodes: get().nodes.map((node) =>
         node.id === nodeId
@@ -384,7 +386,14 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
             }
           : node,
       ),
-    }),
+      // Drop wires that targeted ports of an effect that no longer exists.
+      edges: get().edges.filter((edge) => {
+        if (edge.target !== nodeId) return true
+        const parsed = parseEffectHandle(edge.targetHandle)
+        return !parsed || validEffectIds.has(parsed.effectId)
+      }),
+    })
+  },
 
   updateEdgeTransform: (edgeId, transform) => {
     get().pushHistory()
@@ -548,6 +557,37 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
       const transformed = edge.data?.transform
         ? evalTransform(String(edge.data.transform), value)
         : value
+
+      const effectTarget = parseEffectHandle(edge.targetHandle)
+
+      if (effectTarget) {
+        // Write into the wrapped effect's own props, not the host node props.
+        const { effectId, portKey } = effectTarget
+        set({
+          nodes: get().nodes.map((node) =>
+            node.id === edge.target
+              ? {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    effects: (node.data.effects ?? []).map((effect) =>
+                      effect.id === effectId
+                        ? {
+                            ...effect,
+                            props: {
+                              ...effect.props,
+                              [portKey]: transformed,
+                            },
+                          }
+                        : effect,
+                    ),
+                  },
+                }
+              : node,
+          ),
+        })
+        continue
+      }
 
       set({
         nodes: get().nodes.map((node) =>

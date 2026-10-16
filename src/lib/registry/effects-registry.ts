@@ -143,6 +143,160 @@ export const effectsRegistry: Record<string, EffectDef> = {
     ],
     inputs: [{ key: "paused", label: "Paused", type: "boolean" }],
   },
+  "voice-glow": {
+    id: "voice-glow",
+    label: "Voice Glow",
+    pkg: "voice-glow",
+    exportName: "VoiceBeam",
+    kind: "wrapper",
+    hosts: ["card", "input", "textarea", "button"],
+    stackable: true,
+    description: "A colorful beam that rises and blooms with voice intensity.",
+    defaultProps: {
+      type: "default",
+      look: "glow",
+      colorVariant: "colorful",
+      theme: "auto",
+      active: true,
+      paused: false,
+      level: 0,
+      strength: 1,
+      sensitivity: 3.1,
+    },
+    configurableProps: [
+      {
+        key: "type",
+        label: "Type",
+        inputType: "select",
+        options: ["default", "pill", "mobile"],
+        default: "default",
+      },
+      {
+        key: "look",
+        label: "Look",
+        inputType: "select",
+        options: ["glow", "dots", "lines"],
+        default: "glow",
+      },
+      {
+        key: "colorVariant",
+        label: "Color",
+        inputType: "select",
+        options: ["colorful", "mono", "ocean", "sunset", "forest", "candy", "ice", "gold"],
+        default: "colorful",
+      },
+      {
+        key: "theme",
+        label: "Theme",
+        inputType: "select",
+        options: ["auto", "dark", "light"],
+        default: "auto",
+      },
+      {
+        key: "strength",
+        label: "Strength",
+        inputType: "number",
+        default: 1,
+        min: 0,
+        max: 2,
+        step: 0.05,
+      },
+      {
+        key: "sensitivity",
+        label: "Sensitivity",
+        inputType: "number",
+        default: 3.1,
+        min: 0.5,
+        max: 10,
+        step: 0.1,
+      },
+      { key: "active", label: "Active", inputType: "boolean", default: true },
+      { key: "paused", label: "Paused", inputType: "boolean", default: false },
+      {
+        key: "level",
+        label: "Level",
+        inputType: "number",
+        default: 0,
+        min: 0,
+        max: 1,
+        step: 0.05,
+      },
+    ],
+    inputs: [
+      { key: "active", label: "Active", type: "boolean" },
+      { key: "paused", label: "Paused", type: "boolean" },
+      { key: "level", label: "Level", type: "number" },
+    ],
+  },
+  "img-fx": {
+    id: "img-fx",
+    label: "Image FX",
+    pkg: "img-fx",
+    exportName: "ImageGeneration",
+    kind: "wrapper",
+    hosts: ["card"],
+    conflictGroup: "ring",
+    description: "A WebGL image-generation shader that paints behind a card.",
+    defaultProps: {
+      preset: "pixels-organic",
+      theme: "auto",
+      strength: 1,
+      speed: 1,
+      pixelScale: 1,
+      autoReveal: false,
+      paused: false,
+    },
+    configurableProps: [
+      {
+        key: "preset",
+        label: "Preset",
+        inputType: "select",
+        options: ["pixels-organic", "pixels-mechanic", "sweep-gradient"],
+        default: "pixels-organic",
+      },
+      {
+        key: "theme",
+        label: "Theme",
+        inputType: "select",
+        options: ["auto", "dark", "light"],
+        default: "auto",
+      },
+      {
+        key: "strength",
+        label: "Strength",
+        inputType: "number",
+        default: 1,
+        min: 0,
+        max: 2,
+        step: 0.05,
+      },
+      {
+        key: "speed",
+        label: "Speed",
+        inputType: "number",
+        default: 1,
+        min: 0.1,
+        max: 4,
+        step: 0.05,
+      },
+      {
+        key: "pixelScale",
+        label: "Pixel Scale",
+        inputType: "number",
+        default: 1,
+        min: 0.5,
+        max: 4,
+        step: 0.05,
+      },
+      { key: "autoReveal", label: "Auto Reveal", inputType: "boolean", default: false },
+      { key: "paused", label: "Paused", inputType: "boolean", default: false },
+    ],
+    inputs: [
+      { key: "paused", label: "Paused", type: "boolean" },
+      { key: "strength", label: "Strength", type: "number" },
+      { key: "speed", label: "Speed", type: "number" },
+    ],
+  },
   "thinking-orbs": {
     id: "thinking-orbs",
     label: "Thinking Orbs",
@@ -306,4 +460,53 @@ export function canAddEffect(
     .filter((e) => effectsRegistry[e.id]?.conflictGroup === def.conflictGroup)
     .map((e) => e.id)
   return { ok: true, replaceIds }
+}
+
+/** Handle-id namespace for effect input ports on the host node. */
+export const EFFECT_HANDLE_PREFIX = "effect:"
+
+/** `effect:<effectId>:<portKey>` — unique per effect + port on a single node. */
+export function effectPortHandle(effectId: string, portKey: string): string {
+  return `${EFFECT_HANDLE_PREFIX}${effectId}:${portKey}`
+}
+
+export function parseEffectHandle(
+  handle: string | null | undefined,
+): { effectId: string; portKey: string } | null {
+  if (!handle || !handle.startsWith(EFFECT_HANDLE_PREFIX)) return null
+  const rest = handle.slice(EFFECT_HANDLE_PREFIX.length)
+  const idx = rest.indexOf(":")
+  if (idx === -1) return null
+  return { effectId: rest.slice(0, idx), portKey: rest.slice(idx + 1) }
+}
+
+/** Flattened input ports for every applied effect, tagged with their host handle id. */
+export function effectInputPorts(
+  effects: EffectConfig[] | undefined,
+): Array<PortDef & { effectId: string; effectLabel: string; handle: string }> {
+  return (effects ?? []).flatMap((effect) => {
+    const def = effectsRegistry[effect.id]
+    if (!def) return []
+    return def.inputs.map((port) => ({
+      ...port,
+      effectId: effect.id,
+      effectLabel: def.label,
+      handle: effectPortHandle(effect.id, port.key),
+    }))
+  })
+}
+
+/** Resolve the port definition targeted by an `effect:` handle. */
+export function resolveEffectInputPort(
+  effects: EffectConfig[] | undefined,
+  handle: string | null | undefined,
+): PortDef | undefined {
+  const parsed = parseEffectHandle(handle)
+  if (!parsed) return undefined
+  if (!(effects ?? []).some((effect) => effect.id === parsed.effectId)) {
+    return undefined
+  }
+  return effectsRegistry[parsed.effectId]?.inputs.find(
+    (port) => port.key === parsed.portKey,
+  )
 }

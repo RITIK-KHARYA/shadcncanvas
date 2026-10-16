@@ -19,6 +19,26 @@ export function buildPropsString(props: Record<string, unknown>): string {
     .join(" ")
 }
 
+/**
+ * Like buildPropsString, but props present in `overrides` are emitted as
+ * dynamic expressions (`key={expr}`) instead of their literal default.
+ */
+export function buildPropsStringWithOverrides(
+  props: Record<string, unknown>,
+  overrides: Map<string, string>,
+): string {
+  const parts: string[] = []
+  for (const [key, value] of Object.entries(props)) {
+    if (value === undefined || key === "options" || key === "fields") continue
+    const expr = overrides.get(key)
+    parts.push(expr !== undefined ? `${key}={${expr}}` : formatJsxProp(key, value))
+  }
+  for (const [key, expr] of overrides.entries()) {
+    if (!(key in props)) parts.push(`${key}={${expr}}`)
+  }
+  return parts.join(" ")
+}
+
 export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }

@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { getComponentDragData } from "@/lib/dnd";
 import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graph";
 import { nodeRegistry } from "@/lib/registry";
+import { resolveEffectInputPort } from "@/lib/registry/effects-registry";
 import { useGraphStore, recordNodeDragHistory } from "@/store/graph-store";
 import type { CanvasEdge, CanvasNode } from "@/types/graph";
 
@@ -121,9 +122,14 @@ function CanvasFlow() {
       const outputDef = sourceConfig?.outputs.find(
         (output) => output.key === connection.sourceHandle,
       );
-      const inputDef = targetConfig?.inputs.find(
-        (input) => input.key === connection.targetHandle,
-      );
+      const inputDef =
+        targetConfig?.inputs.find(
+          (input) => input.key === connection.targetHandle,
+        ) ??
+        resolveEffectInputPort(
+          targetNode.data.effects,
+          connection.targetHandle,
+        );
 
       if (!outputDef || !inputDef) {
         toast.error("Invalid connection handles");
@@ -189,6 +195,7 @@ function CanvasFlow() {
       zoomOnPinch
       panOnScroll={false}
       selectionOnDrag={false}
+      onlyRenderVisibleElements
       proOptions={{ hideAttribution: true }}
     >
       <Background gap={20} size={1} color="var(--border)" />
