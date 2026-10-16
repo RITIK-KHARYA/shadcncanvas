@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 
 import { CommentsPanel } from "@/components/inspector/CommentsPanel"
+import { EffectsPanel } from "@/components/inspector/EffectsPanel"
 import { PrototypePanel } from "@/components/inspector/PrototypePanel"
 import { PropertiesPanel } from "@/components/inspector/properties/PropertiesPanel"
 import { SidebarHeader } from "@/components/inspector/SidebarHeader"
@@ -42,7 +43,7 @@ export function EditorSidebar() {
       <SidebarHeader node={selectedNode} selectedCount={selectedNodeIds.length} />
       <SidebarTabs value={tab} onChange={setTab} />
 
-      <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto">
+      <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto">
         {tab === "design" &&
           (selectedNode && !multiSelected ? (
             <PropertiesPanel node={selectedNode} />
@@ -52,6 +53,15 @@ export function EditorSidebar() {
             </p>
           ) : (
             <ThemePanel />
+          ))}
+
+        {tab === "effects" &&
+          (selectedNode && !multiSelected ? (
+            <EffectsPanel node={selectedNode} />
+          ) : (
+            <p className="px-4 py-16 text-center text-xs text-muted-foreground">
+              Select a single object to attach effects.
+            </p>
           ))}
 
         {tab === "prototype" && <PrototypePanel node={activeWireNode} />}

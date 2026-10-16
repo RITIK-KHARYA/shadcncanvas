@@ -38,7 +38,7 @@ export function CommandItemsEditor({
     <div className="space-y-2">
       <Label className="text-xs">Command items</Label>
       {items.map((item, index) => (
-        <div key={index} className="space-y-1.5 rounded-md border p-2">
+        <div key={index} className="space-y-1.5 rounded-lg border border-hairline bg-surface p-2">
           <Input
             className="h-8"
             placeholder="Label"

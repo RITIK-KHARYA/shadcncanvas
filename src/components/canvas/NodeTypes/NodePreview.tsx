@@ -133,9 +133,13 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { EffectsLayer } from "@/lib/registry/effect-components";
 import type { NodeSizeMode, NodeState } from "@/types/graph";
 import type { FormField, NodePreviewProps } from "./types";
 import { nodeStyleToCss } from "@/theme/style-utils";
+
+import { ThinkingOrb, type OrbState, type OrbSize } from "thinking-orbs";
+import { BotAvatar, type BotAvatarState, type BotAvatarType } from "bot-avatars";
 
 import { EChartsGridBarChart } from "@/components/evilcharts/blocks/grid-echarts-bar-chart";
 import { EChartsMonospaceBarChart } from "@/components/evilcharts/blocks/monospace-echarts-bar-chart";
@@ -187,6 +191,7 @@ export function NodePreview({
   state,
   sizeMode = "default",
   style,
+  effects,
   onOutputChange,
   onOutputsChange,
 }: NodePreviewProps) {
@@ -1189,6 +1194,46 @@ export function NodePreview({
       );
       break;
 
+    case "thinking-orb": {
+      const orbState = (
+        typeof state.state === "string" && state.state
+          ? state.state
+          : String(props.state ?? "working")
+      ) as OrbState;
+      const sizeValue = Number(props.size ?? 64);
+      const orbSize = ([64, 32, 20] as number[]).includes(sizeValue)
+        ? (sizeValue as OrbSize)
+        : 64;
+      content = (
+        <ThinkingOrb
+          state={orbState}
+          size={orbSize}
+          theme={String(props.theme ?? "auto") as "auto" | "dark" | "light"}
+          speed={Number(props.speed ?? 1)}
+          paused={wiredBoolean(props, state, "paused")}
+          className={cn(isCustom && "h-full w-full")}
+        />
+      );
+      break;
+    }
+
+    case "bot-avatar": {
+      const botState = (
+        typeof state.state === "string" && state.state
+          ? state.state
+          : String(props.state ?? "default")
+      ) as BotAvatarState;
+      content = (
+        <BotAvatar
+          type={String(props.type ?? "clover") as BotAvatarType}
+          state={botState}
+          size={Number(props.size ?? 64)}
+          paused={wiredBoolean(props, state, "paused")}
+        />
+      );
+      break;
+    }
+
     default:
       content = (
         <div className="text-xs text-muted-foreground">
@@ -1197,5 +1242,5 @@ export function NodePreview({
       );
       break;
   }
-  return wrap(content as React.ReactNode);
+  return wrap(<EffectsLayer effects={effects}>{content as React.ReactNode}</EffectsLayer>);
 }

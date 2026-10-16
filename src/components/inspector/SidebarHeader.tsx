@@ -34,8 +34,8 @@ export function SidebarHeader({
 
   if (selectedCount > 1) {
     return (
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b px-3">
-        <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-primary/10 text-[10px] font-medium text-primary">
+      <div className="flex h-10 shrink-0 items-center gap-2 border-b border-hairline px-3">
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-medium text-primary">
           {selectedCount}
         </span>
         <p className="truncate text-xs font-medium">
@@ -47,7 +47,7 @@ export function SidebarHeader({
 
   if (!node || !config) {
     return (
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b px-3">
+      <div className="flex h-10 shrink-0 items-center gap-2 border-b border-hairline px-3">
         <span className="size-2 rounded-full bg-muted-foreground/30" aria-hidden="true" />
         <p className="truncate text-xs font-medium text-muted-foreground">
           No selection
@@ -57,9 +57,9 @@ export function SidebarHeader({
   }
 
   return (
-    <div className="flex h-11 shrink-0 items-center gap-2 border-b px-3">
+    <div className="flex h-10 shrink-0 items-center gap-2 border-b border-hairline px-3">
       <span
-        className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-primary/10 text-[10px] font-semibold text-primary"
+        className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-semibold text-primary"
         aria-hidden="true"
       >
         {config.label.slice(0, 1)}

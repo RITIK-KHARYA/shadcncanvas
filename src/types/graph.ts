@@ -1,5 +1,9 @@
 import type { Edge, Node } from "@xyflow/react"
 
+import type { EffectConfig } from "@/types/registry"
+
+export type { EffectConfig } from "@/types/registry"
+
 export type PortType = "boolean" | "string" | "number"
 
 export type NodeState = Record<string, boolean | string | number | undefined>
@@ -36,6 +40,7 @@ export type GraphNodeData = {
   layout: NodeLayout
   name?: string
   style?: NodeStyleOverride
+  effects?: EffectConfig[]
 }
 
 export type CanvasNode = Node<GraphNodeData, "baseNode">

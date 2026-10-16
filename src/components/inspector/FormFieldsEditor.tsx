@@ -49,7 +49,7 @@ export function FormFieldsEditor({ fields, onChange }: FormFieldsEditorProps) {
     <div className="space-y-2">
       <Label className="text-xs">Form fields</Label>
       {fields.map((field, index) => (
-        <div key={index} className="space-y-1.5 rounded-md border p-2">
+        <div key={index} className="space-y-1.5 rounded-lg border border-hairline bg-surface p-2">
           <Input
             className="h-8"
             placeholder="Name"
@@ -160,7 +160,7 @@ export function TabsEditor({ tabs, onChange }: { tabs: TabItem[]; onChange: (tab
     <div className="space-y-2">
       <Label className="text-xs">Tabs</Label>
       {tabs.map((tab, index) => (
-        <div key={index} className="space-y-1.5 rounded-md border p-2">
+        <div key={index} className="space-y-1.5 rounded-lg border border-hairline bg-surface p-2">
           <Input className="h-8" placeholder="Label" value={tab.label} onChange={(e) => updateTab(index, { label: e.target.value })} />
           <Input className="h-8" placeholder="ID" value={tab.id} onChange={(e) => updateTab(index, { id: e.target.value.replace(/\s+/g, "-") })} />
           <div className="flex items-center justify-between">

@@ -12,7 +12,7 @@ export function Segmented<T extends string>({
   return (
     <div
       role="radiogroup"
-      className="grid grid-flow-col auto-cols-fr gap-0.5 rounded-md bg-muted p-0.5"
+      className="grid grid-flow-col auto-cols-fr gap-0.5 rounded-xl bg-surface p-0.5"
     >
       {options.map((option) => (
         <button
@@ -22,7 +22,7 @@ export function Segmented<T extends string>({
           aria-checked={value === option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "h-6 rounded-[calc(var(--radius)-2px)] px-2 text-xs font-medium transition-colors",
+            "h-6 rounded-[calc(var(--radius)-4px)] px-2 text-xs font-medium transition-colors",
             value === option.value
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",

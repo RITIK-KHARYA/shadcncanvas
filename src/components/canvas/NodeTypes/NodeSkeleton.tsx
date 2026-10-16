@@ -40,17 +40,17 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
   switch (componentType) {
     case "button":
     case "badge":
-      content = <Skeleton className={cn("h-8 w-24 rounded-md", wide)} />;
+      content = <Skeleton className={cn("h-8 w-24 rounded-lg", wide)} />;
       break;
 
     case "input":
     case "select":
     case "native-select":
-      content = <Skeleton className={cn("h-9 w-48 rounded-md", wide)} />;
+      content = <Skeleton className={cn("h-9 w-48 rounded-lg", wide)} />;
       break;
 
     case "textarea":
-      content = <Skeleton className={cn("h-20 w-48 rounded-md", wide)} />;
+      content = <Skeleton className={cn("h-20 w-48 rounded-lg", wide)} />;
       break;
 
     case "checkbox":
@@ -83,7 +83,7 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
     case "empty":
       content = (
         <div
-          className={cn("w-56 space-y-3 rounded-lg border bg-card p-4", wide)}
+          className={cn("w-56 space-y-3 rounded-lg border border-hairline bg-card/70 backdrop-blur-xl p-4", wide)}
         >
           <div className="space-y-2">
             <Skeleton className="h-4 w-1/2" />
@@ -91,16 +91,16 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
           </div>
           {componentType === "empty" ? (
             <div className="flex flex-col items-center gap-2 py-2">
-              <Skeleton className="size-8 rounded-md" />
+              <Skeleton className="size-8 rounded-lg" />
               <Skeleton className="h-3 w-24" />
             </div>
           ) : (
             <>
-              <Skeleton className="h-8 w-full rounded-md" />
+              <Skeleton className="h-8 w-full rounded-lg" />
               {componentType === "form" && (
                 <>
-                  <Skeleton className="h-8 w-full rounded-md" />
-                  <Skeleton className="h-8 w-20 rounded-md" />
+                  <Skeleton className="h-8 w-full rounded-lg" />
+                  <Skeleton className="h-8 w-20 rounded-lg" />
                 </>
               )}
             </>
@@ -113,17 +113,17 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
       content = (
         <div className={cn("w-56 space-y-2", wide)}>
           <div className="flex gap-1">
-            <Skeleton className="h-8 w-16 rounded-md" />
-            <Skeleton className="h-8 w-16 rounded-md" />
+            <Skeleton className="h-8 w-16 rounded-lg" />
+            <Skeleton className="h-8 w-16 rounded-lg" />
           </div>
-          <Skeleton className="h-12 w-full rounded-md" />
+          <Skeleton className="h-12 w-full rounded-lg" />
         </div>
       );
       break;
 
     case "button-group":
       content = (
-        <div className="flex overflow-hidden rounded-md">
+        <div className="flex overflow-hidden rounded-lg">
           {[0, 1, 2].map((i) => (
             <Skeleton
               key={i}
@@ -138,7 +138,7 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
       content = (
         <div
           className={cn(
-            "w-64 space-y-2 rounded-lg border bg-background p-3",
+            "w-64 space-y-2 rounded-lg border border-hairline bg-surface/70 backdrop-blur-xl p-3",
             wide,
           )}
         >
@@ -234,8 +234,8 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
       const cmdItems = Array.isArray(props?.items) ? (props?.items as unknown[]) : [];
       const count = Math.max(1, cmdItems.length || 4);
       content = (
-        <div className={cn("w-64 space-y-2 rounded-lg border p-2", wide)}>
-          <Skeleton className="h-9 w-full rounded-sm" />
+        <div className={cn("w-64 space-y-2 rounded-lg border border-hairline p-2", wide)}>
+          <Skeleton className="h-9 w-full rounded-lg" />
           <Lines count={count} className="px-1" />
         </div>
       );
@@ -245,7 +245,7 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
     case "dialog":
     case "drawer":
     case "hover-card":
-      content = <Skeleton className="h-8 w-28 rounded-md" />;
+      content = <Skeleton className="h-8 w-28 rounded-lg" />;
       break;
 
     case "item":
@@ -254,7 +254,7 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
           {[0, 1].map((i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 rounded-md border p-2.5"
+              className="flex items-center gap-2.5 rounded-lg border border-hairline p-2.5"
             >
               <Skeleton className="size-8 shrink-0 rounded-sm" />
               <div className="flex-1 space-y-1.5">
@@ -297,15 +297,15 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
     case "direction":
       content = (
         <div className="flex items-center gap-2">
-          <Skeleton className="size-8 rounded-md" />
-          <Skeleton className="h-8 w-24 rounded-md" />
+          <Skeleton className="size-8 rounded-lg" />
+          <Skeleton className="h-8 w-24 rounded-lg" />
         </div>
       );
       break;
 
     case "toast":
       content = (
-        <div className="flex items-center gap-2.5 rounded-md border bg-card px-3 py-2.5">
+        <div className="flex items-center gap-2.5 rounded-lg border border-hairline bg-card/70 backdrop-blur-xl px-3 py-2.5">
           <Skeleton className="size-4 shrink-0 rounded-full" />
           <Skeleton className="h-3 w-28" />
         </div>
@@ -314,7 +314,7 @@ export function NodeSkeleton({ componentType, fill, style, props }: NodeSkeleton
 
     case "apiCall":
       content = (
-        <div className={cn("w-56 space-y-2 rounded-lg border p-3", wide)}>
+        <div className={cn("w-56 space-y-2 rounded-lg border border-hairline p-3", wide)}>
           <Skeleton className="h-3 w-16" />
           <Skeleton className="h-3 w-full" />
         </div>

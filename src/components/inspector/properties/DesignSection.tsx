@@ -105,7 +105,7 @@ export function DesignSection({ node, config }: { node: CanvasNode; config: Node
               />
               <Input
                 type="number"
-                className="h-7 w-14 bg-background text-xs shadow-none"
+                className="h-8 w-14 border-transparent bg-surface text-xs shadow-none"
                 value={style.borderRadius ?? 0}
                 min={0}
                 max={32}
@@ -129,7 +129,7 @@ export function DesignSection({ node, config }: { node: CanvasNode; config: Node
               value={String(style.borderStyle ?? "solid")}
               onValueChange={(v) => set({ borderStyle: v as NodeStyleOverride["borderStyle"] })}
             >
-              <SelectTrigger className="h-7 w-full bg-background text-xs shadow-none">
+              <SelectTrigger className="h-8 w-full border-transparent bg-surface text-xs shadow-none">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -188,7 +188,7 @@ export function DesignSection({ node, config }: { node: CanvasNode; config: Node
                 value={String(style.fontFamily ?? "inherit")}
                 onValueChange={(v) => set({ fontFamily: v as NodeStyleOverride["fontFamily"] })}
               >
-                <SelectTrigger className="h-7 w-full bg-background text-xs shadow-none">
+                <SelectTrigger className="h-8 w-full border-transparent bg-surface text-xs shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -215,7 +215,7 @@ export function DesignSection({ node, config }: { node: CanvasNode; config: Node
                 value={String(style.fontWeight ?? "normal")}
                 onValueChange={(v) => set({ fontWeight: v as NodeStyleOverride["fontWeight"] })}
               >
-                <SelectTrigger className="h-7 w-full bg-background text-xs shadow-none">
+                <SelectTrigger className="h-8 w-full border-transparent bg-surface text-xs shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -257,7 +257,7 @@ export function DesignSection({ node, config }: { node: CanvasNode; config: Node
               value={String(style.shadow ?? "none")}
               onValueChange={(v) => set({ shadow: v as NodeStyleOverride["shadow"] })}
             >
-              <SelectTrigger className="h-7 w-full bg-background text-xs shadow-none">
+              <SelectTrigger className="h-8 w-full border-transparent bg-surface text-xs shadow-none">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

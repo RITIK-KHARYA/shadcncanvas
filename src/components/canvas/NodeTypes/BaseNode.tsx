@@ -16,7 +16,7 @@ import { NodePreview } from "./NodePreview";
 import { NodeSkeleton } from "./NodeSkeleton";
 
 const handleClass =
-  "!h-3 !w-3 !border-2 !border-primary !bg-background hover:!bg-primary hover:!scale-110 transition-transform";
+  "!h-2.5 !w-2.5 !border-2 !border-primary !rounded-full !bg-background hover:!bg-primary hover:!scale-110 transition-transform";
 
 export const DEFAULT_NODE_WIDTH = 240;
 export const DEFAULT_NODE_HEIGHT = 120;
@@ -70,7 +70,7 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
 
   if (!config) {
     return (
-      <div className="rounded-lg border-2 border-destructive bg-background p-3">
+      <div className="rounded-xl border border-hairline bg-surface p-3">
         Unknown type: {data.componentType}
       </div>
     );
@@ -93,15 +93,15 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
         minWidth={MIN_NODE_WIDTH}
         minHeight={MIN_NODE_HEIGHT}
         lineClassName="!border-primary/60"
-        handleClassName="!h-2 !w-2 !border-2 !border-primary !bg-background !rounded-sm"
+        handleClassName="!h-2 !w-2 !border-2 !border-primary !rounded-full !bg-background"
         onResizeStart={handleResizeStart}
         onResize={handleResize}
       />
       <div
         className={cn(
-          "rounded-lg border-2 bg-card p-3 shadow-sm",
+          "rounded-lg border bg-card/70 backdrop-blur-xl p-3 shadow-sm",
           isCustom ? "overflow-hidden" : "w-fit",
-          selected ? "border-primary ring-2 ring-primary/20" : "border-border",
+          selected ? "border-primary ring-2 ring-primary/30" : "border-hairline",
         )}
         style={{
           ...(isCustom
@@ -137,6 +137,7 @@ export function BaseNode({ id, data, selected }: NodeProps<CanvasNode>) {
               state={data.state}
               sizeMode={layout.sizeMode}
               style={data.style}
+              effects={data.effects}
               onOutputChange={emitOutput}
               onOutputsChange={emitOutputs}
             />

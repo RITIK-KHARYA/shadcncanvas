@@ -34,7 +34,7 @@ function TextField({
       </Label>
       <input
         id={id}
-        className="flex h-7 w-full rounded-md border bg-background px-2 py-1 font-mono text-[10px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="flex h-8 w-full rounded-lg border-transparent bg-surface px-2 py-1 font-mono text-[10px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -151,7 +151,7 @@ export function ThemePanel() {
   }, []);
 
   return (
-    <section className="border-t px-4 py-3">
+    <section className="border-t border-hairline px-4 py-3">
       <div className="flex items-center justify-between">
         <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
           Theme
@@ -183,7 +183,7 @@ export function ThemePanel() {
             value={themeState.preset || "default"}
             onValueChange={applyThemePreset}
           >
-            <SelectTrigger className="h-7 bg-background text-xs shadow-none">
+            <SelectTrigger className="h-8 border-transparent bg-surface text-xs shadow-none">
               <SelectValue placeholder="Preset" />
             </SelectTrigger>
             <SelectContent>
@@ -209,7 +209,7 @@ export function ThemePanel() {
               }));
             }}
           >
-            <SelectTrigger className="h-7 bg-background text-xs shadow-none">
+            <SelectTrigger className="h-8 border-transparent bg-surface text-xs shadow-none">
               <SelectValue placeholder="Mode" />
             </SelectTrigger>
             <SelectContent>
@@ -221,7 +221,7 @@ export function ThemePanel() {
       </div>
 
       {/* History and Checkpoint Operations */}
-      <div className="flex items-center justify-between gap-2 border-t pt-3">
+      <div className="flex items-center justify-between gap-2 border-t border-hairline pt-3">
         <div className="flex gap-1.5">
           <Button
             variant="outline"
@@ -253,7 +253,7 @@ export function ThemePanel() {
       </div>
 
       {/* HSL Adjustments */}
-      <div className="space-y-2 border-t pt-3">
+      <div className="space-y-2 border-t border-hairline pt-3">
         <h4 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           HSL Adjustments
         </h4>
@@ -331,7 +331,7 @@ export function ThemePanel() {
       </div>
 
       {/* Specific Properties Customization */}
-      <div className="space-y-3 border-t pt-3">
+      <div className="space-y-3 border-t border-hairline pt-3">
         <h4 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Color Properties (OKLCH)
         </h4>
@@ -349,7 +349,7 @@ export function ThemePanel() {
       </div>
 
       {/* Sidebar & Charts Customization */}
-      <div className="space-y-3 border-t pt-3">
+      <div className="space-y-3 border-t border-hairline pt-3">
         <h4 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Sidebar & Charts
         </h4>
@@ -367,7 +367,7 @@ export function ThemePanel() {
       </div>
 
       {/* Sizing, Typography & Shadows */}
-      <div className="space-y-3 border-t pt-3">
+      <div className="space-y-3 border-t border-hairline pt-3">
         <h4 className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Spacing, Shadows & Fonts
         </h4>

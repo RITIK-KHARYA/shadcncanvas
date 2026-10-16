@@ -7,7 +7,7 @@ function Marker({ className, ...props }: React.ComponentProps<"mark">) {
     <mark
       data-slot="marker"
       className={cn(
-        "rounded-sm bg-yellow-200 px-0.5 text-inherit dark:bg-yellow-500/30",
+        "rounded-md bg-yellow-200 px-0.5 text-inherit dark:bg-yellow-500/30",
         className,
       )}
       {...props}

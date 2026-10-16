@@ -13,6 +13,7 @@ import { nodeRegistry } from "@/lib/registry/node-registry"
 import type {
   CanvasEdge,
   CanvasNode,
+  EffectConfig,
   NodeLayout,
   NodeState,
   NodeStyleOverride,
@@ -61,6 +62,7 @@ type GraphStore = {
   updateNodeState: (nodeId: string, newState: NodeState) => void
   updateNodeStyle: (nodeId: string, patch: Partial<NodeStyleOverride>) => void
   resetNodeStyle: (nodeId: string, key?: keyof NodeStyleOverride) => void
+  updateNodeEffects: (nodeId: string, effects: EffectConfig[]) => void
   updateEdgeTransform: (edgeId: string, transform: string) => void
   propagate: (
     nodeId: string,
@@ -367,6 +369,21 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
         delete next[key]
         return { ...node, data: { ...node.data, style: next } }
       }),
+    }),
+
+  updateNodeEffects: (nodeId, effects) =>
+    set({
+      nodes: get().nodes.map((node) =>
+        node.id === nodeId
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                effects: effects.length > 0 ? effects : undefined,
+              },
+            }
+          : node,
+      ),
     }),
 
   updateEdgeTransform: (edgeId, transform) => {

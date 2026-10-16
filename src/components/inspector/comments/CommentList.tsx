@@ -17,7 +17,7 @@ export function CommentList({
   }
 
   return (
-    <div className="divide-y divide-border">
+    <div className="divide-y divide-hairline">
       {comments.map((comment) => (
         <CommentItem
           key={comment.id}

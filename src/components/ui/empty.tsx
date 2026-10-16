@@ -37,7 +37,7 @@ function EmptyMedia({
       className={cn(
         "flex shrink-0 items-center justify-center mb-2",
         variant === "icon" &&
-          "bg-muted text-foreground flex size-8 rounded-md [&_svg:not([class*='size-'])]:size-4",
+          "bg-muted text-foreground flex size-8 rounded-lg [&_svg:not([class*='size-'])]:size-4",
         variant === "default" && "mb-0",
         className,
       )}

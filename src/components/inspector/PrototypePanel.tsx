@@ -63,7 +63,7 @@ export function PrototypePanel({ node }: { node: CanvasNode | null }) {
         const direction = edge.source === node.id ? "out" : "in"
 
         return (
-          <div key={edge.id} className="border-t px-4 py-2.5">
+          <div key={edge.id} className="border-t border-hairline px-4 py-2.5">
             <p className="flex items-center gap-1.5 truncate text-xs font-medium">
               <span
                 className="inline-block size-1.5 shrink-0 rounded-full"

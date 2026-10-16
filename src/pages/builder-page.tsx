@@ -51,7 +51,7 @@ export function BuilderPage() {
         />
       </Helmet>
       <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-card/60 px-4">
+        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-hairline bg-card/40 px-4 backdrop-blur-xl">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <Box
               className="size-5 shrink-0 text-muted-foreground"
@@ -61,7 +61,7 @@ export function BuilderPage() {
               aria-label="Project name"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              className="h-8 max-w-72 border-transparent bg-background/70 font-medium"
+              className="h-8 max-w-72 border-transparent bg-surface font-medium"
             />
             <span className="hidden text-xs text-muted-foreground sm:inline">
               {lastSaved
@@ -116,8 +116,8 @@ export function BuilderPage() {
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 grid-cols-[250px_minmax(540px,1fr)_300px]">
-          <aside className="flex min-h-0 flex-col border-r bg-sidebar text-sidebar-foreground">
+        <div className="grid min-h-0 flex-1 grid-cols-[220px_minmax(540px,1fr)_272px]">
+          <aside className="flex min-h-0 flex-col border-r border-hairline bg-sidebar text-sidebar-foreground">
             <ComponentLibrary />
           </aside>
 
@@ -128,7 +128,7 @@ export function BuilderPage() {
             <Canvas />
           </section>
 
-          <aside className="flex min-h-0 flex-col border-l bg-sidebar text-sidebar-foreground">
+          <aside className="flex min-h-0 flex-col border-l border-hairline bg-sidebar text-sidebar-foreground">
             <EditorSidebar />
           </aside>
         </div>

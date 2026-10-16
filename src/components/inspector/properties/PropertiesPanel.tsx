@@ -29,7 +29,7 @@ export function PropertiesPanel({ node }: { node: CanvasNode | null }) {
   const config = nodeRegistry[node.data.componentType];
   if (!config) {
     return (
-      <div className="border-t px-4 py-3">
+      <div className="border-t border-hairline px-4 py-3">
         <p className="text-xs text-destructive">
           Unknown node type: {node.data.componentType}
         </p>

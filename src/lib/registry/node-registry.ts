@@ -1,4 +1,5 @@
 import type { NodeConfig } from "@/types/registry";
+import { effectsRegistry } from "./effects-registry";
 
 export const nodeRegistry: Record<string, NodeConfig> = {
   button: {
@@ -778,6 +779,24 @@ export const nodeRegistry: Record<string, NodeConfig> = {
       { key: "isError", label: "Error", type: "boolean" },
     ],
   },
+  "thinking-orb": {
+    type: "thinking-orb",
+    label: "Thinking Orb",
+    category: "ai",
+    defaultProps: { ...effectsRegistry["thinking-orbs"].defaultProps },
+    configurableProps: [...effectsRegistry["thinking-orbs"].configurableProps],
+    inputs: [...effectsRegistry["thinking-orbs"].inputs],
+    outputs: [],
+  },
+  "bot-avatar": {
+    type: "bot-avatar",
+    label: "Bot Avatar",
+    category: "ai",
+    defaultProps: { ...effectsRegistry["bot-avatars"].defaultProps },
+    configurableProps: [...effectsRegistry["bot-avatars"].configurableProps],
+    inputs: [...effectsRegistry["bot-avatars"].inputs],
+    outputs: [],
+  },
   "grid-bar": {
     type: "grid-bar",
     label: "ECharts Grid Bar",
@@ -1054,6 +1073,8 @@ export const nodeRegistry: Record<string, NodeConfig> = {
 
 for (const config of Object.values(nodeRegistry)) {
   if (config.type === "toast") continue;
+  // AI nodes are animated indicators themselves — a loading skeleton would hide them.
+  if (config.category === "ai") continue;
   if (!config.inputs.some((input) => input.key === "loading")) {
     config.inputs.push({ key: "loading", label: "Loading", type: "boolean" });
   }
@@ -1068,6 +1089,8 @@ export const categoryLabels: Record<NodeConfig["category"], string> = {
   display: "Display",
   data: "Data",
   charts: "Charts",
+  ai: "AI",
+  effects: "Effects",
 };
 
 export function getNodesByCategory() {

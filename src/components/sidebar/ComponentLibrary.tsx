@@ -18,7 +18,7 @@ function DraggableComponentItem({ config }: { config: NodeConfig }) {
       role="listitem"
       draggable
       onDragStart={onDragStart}
-      className="flex h-9 cursor-grab items-center gap-2 rounded-sm border px-2.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground active:cursor-grabbing"
+      className="flex h-8 cursor-grab items-center gap-2 rounded-lg px-2.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground active:cursor-grabbing"
     >
       <Component
         className="size-4 shrink-0 text-muted-foreground"
@@ -36,10 +36,10 @@ export function ComponentLibrary() {
   const normalizedQuery = query.trim().toLowerCase();
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-neutral-950/70">
-      <div className="border-b p-4">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-sidebar">
+      <div className="border-b border-hairline px-3 py-3">
         <h1 className="text-sm font-semibold">Components</h1>
-        <div className="relative mt-3">
+        <div className="relative mt-2.5">
           <Search
             className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
@@ -47,14 +47,14 @@ export function ComponentLibrary() {
           <Input
             aria-label="Search components"
             placeholder="Search shadcn/ui"
-            className="h-8 pl-8"
+            className="h-8 border-transparent bg-surface pl-8"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-2">
+      <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto p-2">
         {Array.from(groups.entries()).map(([category, items]) => {
           const filtered = items.filter(
             (item) =>
@@ -66,11 +66,11 @@ export function ComponentLibrary() {
           if (filtered.length === 0) return null;
 
           return (
-            <section key={category} className="mb-5">
-              <h2 className="mb-2 px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <section key={category} className="mb-4">
+              <h2 className="mb-1.5 px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 {categoryLabels[category]}
               </h2>
-              <div className="grid gap-1.5">
+              <div className="grid gap-1">
                 {filtered.map((config) => (
                   <DraggableComponentItem key={config.type} config={config} />
                 ))}

@@ -1,6 +1,6 @@
 export { wouldCreateCycle } from "./graph/cycle"
 export { evalTransform, applyTransform, edgeStrokeColor, EDGE_TRANSFORMS } from "./graph/transforms"
-export { nodeRegistry, categoryLabels, getNodesByCategory, nodeSchemas, validateNode, getFieldErrors, UI_COMPONENTS } from "./registry"
+export { nodeRegistry, categoryLabels, getNodesByCategory, nodeSchemas, validateNode, getFieldErrors, UI_COMPONENTS, effectsRegistry, effectsForHost, getEffect, canAddEffect } from "./registry"
 export { generateNodeCode, generateFullCode } from "./codegen"
 export { formatJsxProp, buildPropsString, capitalize, indent, deriveStateName } from "./codegen/helpers"
 export { cn } from "./utils"

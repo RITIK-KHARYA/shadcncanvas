@@ -40,6 +40,16 @@ export const UI_COMPONENTS: Record<string, UiComponentDef> = {
   direction: { exportName: "DirectionProvider", importPath: "direction" },
   toast: { exportName: "toast", importPath: "sonner" },
   apiCall: { exportName: "Button", importPath: "button" },
+  "thinking-orb": {
+    exportName: "ThinkingOrb",
+    importPath: "thinking-orbs",
+    pkg: "thinking-orbs",
+  },
+  "bot-avatar": {
+    exportName: "BotAvatar",
+    importPath: "bot-avatars",
+    pkg: "bot-avatars",
+  },
   "grid-bar": {
     exportName: "EChartsGridBarChart",
     importPath: "evilcharts/blocks/grid-echarts-bar-chart",

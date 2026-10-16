@@ -58,7 +58,7 @@ export function ColorField({
             id={id}
             type="button"
             aria-label={`Edit ${label || "color"}`}
-            className="flex h-7 w-full items-center gap-1.5 rounded-md border bg-background px-1.5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="flex h-8 w-full items-center gap-1.5 rounded-lg border-transparent bg-surface px-1.5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             <span
               className="size-3.5 shrink-0 rounded-sm border border-border"
@@ -86,7 +86,7 @@ export function ColorField({
               />
             ))}
           </div>
-          <label className="flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-dashed text-[10px] text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground">
+          <label className="flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-hairline border-dashed text-[10px] text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground">
             Custom…
             <input
               type="color"

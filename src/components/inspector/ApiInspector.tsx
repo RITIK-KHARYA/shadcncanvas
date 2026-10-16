@@ -86,7 +86,7 @@ export function ApiInspector({ node }: { node: CanvasNode }) {
     <>
       <div
         role="alert"
-        className="mx-3 mt-3 flex gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] leading-relaxed text-amber-700 dark:text-amber-400"
+        className="mx-3 mt-3 flex gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] leading-relaxed text-amber-700 dark:text-amber-400"
       >
         <TriangleAlert
           className="mt-0.5 size-3.5 shrink-0"
@@ -251,7 +251,7 @@ export function ApiInspector({ node }: { node: CanvasNode }) {
                   {status}
                 </span>
               </div>
-              <pre className="scrollbar-thin max-h-40 overflow-auto rounded-md border bg-muted/40 p-2 font-mono text-[11px] wrap-break-word whitespace-pre-wrap">
+              <pre className="scrollbar-thin max-h-40 overflow-auto rounded-lg border border-hairline bg-muted/40 p-2 font-mono text-[11px] wrap-break-word whitespace-pre-wrap">
                 {responseText || "—"}
               </pre>
             </div>

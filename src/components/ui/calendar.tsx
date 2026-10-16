@@ -29,7 +29,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("bg-background group/calendar p-2", className)}
+      className={cn("bg-surface group/calendar p-2", className)}
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
@@ -66,7 +66,7 @@ function Calendar({
           defaultClassNames.dropdowns,
         ),
         dropdown_root: cn(
-          "relative rounded-md border shadow-xs has-focus:border-ring border-input bg-background",
+          "relative rounded-lg border shadow-xs has-focus:border-ring border-hairline bg-background",
           defaultClassNames.dropdown_root,
         ),
         dropdown: cn(
@@ -77,13 +77,13 @@ function Calendar({
           "select-none font-medium text-sm",
           captionLayout === "label"
             ? "text-sm"
-            : "rounded-md border border-input bg-background pl-2 pr-1 flex h-7 items-center gap-1 text-sm font-medium [&>svg]:size-3.5 [&>svg]:opacity-50",
+            : "rounded-lg border border-hairline bg-surface pl-2 pr-1 flex h-7 items-center gap-1 text-sm font-medium [&>svg]:size-3.5 [&>svg]:opacity-50",
           defaultClassNames.caption_label,
         ),
         month_grid: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
-          "text-muted-foreground rounded-md flex-1 w-8 font-normal text-[0.8rem] select-none",
+          "text-muted-foreground rounded-lg flex-1 w-8 font-normal text-[0.8rem] select-none",
           defaultClassNames.weekday,
         ),
         week: cn("flex w-full mt-2", defaultClassNames.week),
@@ -92,20 +92,20 @@ function Calendar({
           defaultClassNames.week_number,
         ),
         day: cn(
-          "relative w-8 h-8 text-center text-sm p-0 select-none z-10 rounded-md [&:last-child[data-selected=true]_button]:bg-primary",
+          "relative w-8 h-8 text-center text-sm p-0 select-none z-10 rounded-lg [&:last-child[data-selected=true]_button]:bg-primary",
           props.showWeekNumber
             ? "[&:nth-child(2)[data-selected=true]_button]:bg-primary"
             : "",
           defaultClassNames.day,
         ),
         range_start: cn(
-          "bg-accent rounded-l-md",
+          "bg-accent rounded-l-lg",
           defaultClassNames.range_start,
         ),
         range_middle: cn("rounded-none", defaultClassNames.range_middle),
-        range_end: cn("bg-accent rounded-r-md", defaultClassNames.range_end),
+        range_end: cn("bg-accent rounded-r-lg", defaultClassNames.range_end),
         today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+          "bg-accent text-accent-foreground rounded-lg data-[selected=true]:rounded-none",
           defaultClassNames.today,
         ),
         disabled: cn(

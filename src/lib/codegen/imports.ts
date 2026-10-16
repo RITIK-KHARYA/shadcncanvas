@@ -1,6 +1,6 @@
-import { UI_COMPONENTS } from "@/lib/registry"
+import { UI_COMPONENTS, getEffect } from "@/lib/registry"
 
-export function buildImports(types: string[]): string {
+export function buildImports(types: string[], effectIds: string[] = []): string {
   const lines = new Set<string>()
 
   for (const type of types) {
@@ -31,6 +31,8 @@ export function buildImports(types: string[]): string {
     } else if (type === "toast") {
       lines.add(`import { toast } from "sonner"`);
       lines.add(`import { useEffect } from "react"`);
+    } else if (ui.pkg) {
+      lines.add(`import { ${ui.exportName} } from "${ui.pkg}"`);
     } else if (ui.importPath.startsWith("evilcharts/")) {
       lines.add(
         `import { ${ui.exportName} } from "@/components/${ui.importPath}"`,
@@ -39,6 +41,13 @@ export function buildImports(types: string[]): string {
       lines.add(
         `import { ${ui.exportName} } from "@/components/ui/${ui.importPath}"`,
       )
+    }
+  }
+
+  for (const id of effectIds) {
+    const def = getEffect(id)
+    if (def && def.kind === "wrapper") {
+      lines.add(`import { ${def.exportName} } from "${def.pkg}"`)
     }
   }
 

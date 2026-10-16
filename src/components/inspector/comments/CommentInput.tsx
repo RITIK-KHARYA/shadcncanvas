@@ -14,7 +14,7 @@ export function CommentInput({ onSubmit }: { onSubmit: (text: string) => void })
   }
 
   return (
-    <div className="flex items-center gap-1.5 border-t px-3 py-2.5">
+    <div className="flex items-center gap-1.5 border-t border-hairline px-3 py-2.5">
       <Input
         aria-label="Reply"
         placeholder="Reply…"

@@ -28,7 +28,7 @@ export function CollapsibleSection({
     <Collapsible
       open={expanded}
       onOpenChange={() => toggleSection(id, defaultExpanded)}
-      className="border-t"
+      className="border-t border-hairline"
     >
       <div className="flex items-center justify-between px-3 py-2">
         <CollapsibleTrigger className="flex min-w-0 flex-1 items-center gap-1 text-left focus-visible:outline-none">

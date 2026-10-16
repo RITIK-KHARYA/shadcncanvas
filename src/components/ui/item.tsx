@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
 
 const itemVariants = cva(
-  "group/item flex items-center border border-transparent w-full text-sm rounded-md transition-colors hover:bg-accent [a]:hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none [&_svg:not([class*='size-'])]:size-4 flex-wrap outline-none has-[>[data-slot=item-actions]]:items-center",
+  "group/item flex items-center border border-transparent w-full text-sm rounded-lg transition-colors hover:bg-accent [a]:hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-2 focus-visible:outline-none [&_svg:not([class*='size-'])]:size-4 flex-wrap outline-none has-[>[data-slot=item-actions]]:items-center",
   {
     variants: {
       variant: {
         default: "bg-transparent",
-        outline: "border-border",
+        outline: "border-hairline bg-surface",
         muted: "bg-muted/50 border-transparent",
       },
       size: {
@@ -85,9 +85,9 @@ function ItemMedia({
       className={cn(
         "flex shrink-0 items-center justify-center gap-2 group-has-[>[data-slot=item-description]]/item:self-start [&_svg:not([class*='size-'])]:size-4",
         variant === "icon" &&
-          "bg-muted size-8 rounded-sm border [&_svg:not([class*='size-'])]:size-4",
+          "bg-muted size-8 rounded-md border [&_svg:not([class*='size-'])]:size-4",
         variant === "image" &&
-          "size-10 rounded-sm overflow-hidden [&_img]:size-full [&_img]:object-cover",
+          "size-10 rounded-md overflow-hidden [&_img]:size-full [&_img]:object-cover",
         variant === "default" && "bg-transparent self-center",
         className,
       )}

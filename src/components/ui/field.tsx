@@ -119,9 +119,9 @@ function FieldSeparator({
       )}
       {...props}
     >
-      <span className="bg-border line h-px w-full" />
+      <span className="bg-hairline line h-px w-full" />
       {children && <span>{children}</span>}
-      <span className="bg-border line h-px w-full" />
+      <span className="bg-hairline line h-px w-full" />
     </div>
   )
 }

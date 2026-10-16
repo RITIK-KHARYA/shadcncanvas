@@ -1,13 +1,32 @@
 import type { CanvasEdge, CanvasNode } from "@/types/graph";
 import type { ThemeTokens } from "@/store/theme-store";
 import { themeTokensToStyle } from "@/store/theme-store";
-import { nodeRegistry, UI_COMPONENTS } from "@/lib/registry";
-import type { FormField } from "@/types/registry";
+import { nodeRegistry, UI_COMPONENTS, getEffect, effectOrder } from "@/lib/registry";
+import type { EffectConfig, FormField } from "@/types/registry";
 import { buildPropsString, indent } from "./helpers";
 import { buildWiringBlock } from "./wiring";
 import { buildImports } from "./imports";
 import { nodeStyleToCss } from "@/theme/style-utils";
 import type { NodeStyleOverride } from "@/types/graph";
+
+/** Nests the node's JSX inside its wrapper effects (registry order, first outermost). */
+function wrapWithEffects(jsx: string, effects?: EffectConfig[]): string {
+  if (!effects || effects.length === 0) return jsx;
+
+  const ordered = [...effects]
+    .filter((e) => getEffect(e.id)?.kind === "wrapper")
+    .sort((a, b) => effectOrder(a.id) - effectOrder(b.id));
+
+  let out = jsx;
+  for (let i = ordered.length - 1; i >= 0; i--) {
+    const effect = ordered[i];
+    const def = getEffect(effect.id);
+    if (!def) continue;
+    const propsString = buildPropsString(effect.props);
+    out = `<${def.exportName}${propsString ? ` ${propsString}` : ""}>\n${indent(out, 2)}\n</${def.exportName}>`;
+  }
+  return out;
+}
 
 function buildThemeBlock(theme?: ThemeTokens): string {
   if (!theme) return "";
@@ -33,6 +52,17 @@ function buildInlineStyleAttr(style?: NodeStyleOverride): string {
 }
 
 export function generateNodeCode(
+  node: CanvasNode,
+  triggerOverrides?: Map<string, string>,
+  propOverrides?: Map<string, Map<string, string>>,
+): string {
+  return wrapWithEffects(
+    generateNodeElementCode(node, triggerOverrides, propOverrides),
+    node.data.effects,
+  );
+}
+
+function generateNodeElementCode(
   node: CanvasNode,
   triggerOverrides?: Map<string, string>,
   propOverrides?: Map<string, Map<string, string>>,
@@ -432,7 +462,10 @@ export function generateFullCode(
   theme?: ThemeTokens,
 ): string {
   const types = [...new Set(nodes.map((n) => n.data.componentType))];
-  const imports = buildImports(types);
+  const effectIds = [
+    ...new Set(nodes.flatMap((n) => n.data.effects?.map((e) => e.id) ?? [])),
+  ];
+  const imports = buildImports(types, effectIds);
   const wiring = buildWiringBlock(edges, nodes);
   const componentsCode = nodes
     .map((node) => indent(generateNodeCode(node, wiring.triggerOverrides, wiring.propOverrides), 6))
