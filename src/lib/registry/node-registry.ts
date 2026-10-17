@@ -247,7 +247,7 @@ export const nodeRegistry: Record<string, NodeConfig> = {
   skeleton: {
     type: "skeleton",
     label: "Skeleton",
-    category: "feedback",
+    category: "loading",
     defaultProps: { width: "12rem", height: "2.5rem" },
     configurableProps: [
       {
@@ -782,7 +782,7 @@ export const nodeRegistry: Record<string, NodeConfig> = {
   "thinking-orb": {
     type: "thinking-orb",
     label: "Thinking Orb",
-    category: "ai",
+    category: "loading",
     defaultProps: { ...effectsRegistry["thinking-orbs"].defaultProps },
     configurableProps: [...effectsRegistry["thinking-orbs"].configurableProps],
     inputs: [...effectsRegistry["thinking-orbs"].inputs],
@@ -791,7 +791,7 @@ export const nodeRegistry: Record<string, NodeConfig> = {
   "bot-avatar": {
     type: "bot-avatar",
     label: "Bot Avatar",
-    category: "ai",
+    category: "loading",
     defaultProps: { ...effectsRegistry["bot-avatars"].defaultProps },
     configurableProps: [...effectsRegistry["bot-avatars"].configurableProps],
     inputs: [...effectsRegistry["bot-avatars"].inputs],
@@ -1081,6 +1081,7 @@ for (const config of Object.values(nodeRegistry)) {
 }
 
 export const categoryLabels: Record<NodeConfig["category"], string> = {
+  loading: "Loading",
   form: "Form",
   layout: "Layout",
   feedback: "Feedback",
@@ -1093,6 +1094,21 @@ export const categoryLabels: Record<NodeConfig["category"], string> = {
   effects: "Effects",
 };
 
+/** Fixed sidebar grouping order — categories are shown in this sequence. */
+export const categoryOrder: NodeConfig["category"][] = [
+  "loading",
+  "form",
+  "layout",
+  "navigation",
+  "overlay",
+  "display",
+  "feedback",
+  "data",
+  "charts",
+  "ai",
+  "effects",
+];
+
 export function getNodesByCategory() {
   const groups = new Map<NodeConfig["category"], NodeConfig[]>();
 
@@ -1102,6 +1118,10 @@ export function getNodesByCategory() {
     groups.set(config.category, list);
   }
 
-  return groups;
+  return new Map(
+    categoryOrder
+      .filter((category) => groups.has(category))
+      .map((category) => [category, groups.get(category)!]),
+  );
 }
 

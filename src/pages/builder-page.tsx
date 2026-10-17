@@ -1,10 +1,24 @@
-import { Box, Copy, Download, LogOut, Redo2, Trash2, Undo2 } from "lucide-react";
+import {
+  Box,
+  Copy,
+  Download,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
+  Redo2,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { useState } from "react";
 import { Canvas } from "@/components/canvas/Canvas";
 import { EditorSidebar } from "@/components/inspector/EditorSidebar";
 import { ComponentLibrary } from "@/components/sidebar/ComponentLibrary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useBuilderActions } from "@/hooks/use-builder-actions";
 import { useCanvasThemeRef } from "@/hooks/use-canvas-theme";
 import { useProjectPersistence } from "@/hooks/use-project-persistence";
@@ -23,6 +37,9 @@ export function BuilderPage() {
   const canRedo = useGraphStore((s) => s.canRedo);
   const undo = useGraphStore((s) => s.undo);
   const redo = useGraphStore((s) => s.redo);
+
+  const [libraryOpen, setLibraryOpen] = useState(true);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
 
   return (
     <>
@@ -53,6 +70,24 @@ export function BuilderPage() {
       <main className="flex h-screen min-h-[720px] flex-col overflow-hidden bg-background text-foreground">
         <header className="flex h-12 shrink-0 items-center gap-3 border-b border-hairline bg-card/40 px-4 backdrop-blur-xl">
           <div className="flex min-w-0 flex-1 items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={
+                libraryOpen ? "Hide components panel" : "Show components panel"
+              }
+              title={
+                libraryOpen ? "Hide components panel" : "Show components panel"
+              }
+              aria-expanded={libraryOpen}
+              onClick={() => setLibraryOpen((open) => !open)}
+            >
+              {libraryOpen ? (
+                <PanelLeftClose aria-hidden="true" />
+              ) : (
+                <PanelLeftOpen aria-hidden="true" />
+              )}
+            </Button>
             <Box
               className="size-5 shrink-0 text-muted-foreground"
               aria-hidden="true"
@@ -113,12 +148,40 @@ export function BuilderPage() {
               <LogOut aria-hidden="true" />
               Log Out
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={
+                inspectorOpen ? "Hide inspector panel" : "Show inspector panel"
+              }
+              title={
+                inspectorOpen ? "Hide inspector panel" : "Show inspector panel"
+              }
+              aria-expanded={inspectorOpen}
+              onClick={() => setInspectorOpen((open) => !open)}
+            >
+              {inspectorOpen ? (
+                <PanelRightClose aria-hidden="true" />
+              ) : (
+                <PanelRightOpen aria-hidden="true" />
+              )}
+            </Button>
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 grid-cols-[220px_minmax(540px,1fr)_272px]">
-          <aside className="flex min-h-0 flex-col border-r border-hairline bg-sidebar text-sidebar-foreground">
-            <ComponentLibrary />
+        <div className="grid min-h-0 flex-1 grid-cols-[272px_minmax(540px,1fr)_272px]">
+          <aside className="flex min-h-0 flex-col py-3 pl-3">
+            <div
+              inert={!libraryOpen}
+              className={cn(
+                "flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-hairline/60 bg-sidebar text-sidebar-foreground shadow-sm transition-[opacity,transform] duration-300 ease-out",
+                libraryOpen
+                  ? "translate-x-0 opacity-100"
+                  : "pointer-events-none -translate-x-2 opacity-0",
+              )}
+            >
+              <ComponentLibrary />
+            </div>
           </aside>
 
           <section
@@ -128,8 +191,18 @@ export function BuilderPage() {
             <Canvas />
           </section>
 
-          <aside className="flex min-h-0 flex-col border-l border-hairline bg-sidebar text-sidebar-foreground">
-            <EditorSidebar />
+          <aside className="flex min-h-0 flex-col py-3 pr-3">
+            <div
+              inert={!inspectorOpen}
+              className={cn(
+                "flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-hairline/60 bg-sidebar text-sidebar-foreground shadow-sm transition-[opacity,transform] duration-300 ease-out",
+                inspectorOpen
+                  ? "translate-x-0 opacity-100"
+                  : "pointer-events-none translate-x-2 opacity-0",
+              )}
+            >
+              <EditorSidebar />
+            </div>
           </aside>
         </div>
       </main>

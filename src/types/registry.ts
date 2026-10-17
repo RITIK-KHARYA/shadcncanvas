@@ -16,6 +16,7 @@ export type PortDef = {
 }
 
 export type NodeCategory =
+  | "loading"
   | "form"
   | "layout"
   | "feedback"
