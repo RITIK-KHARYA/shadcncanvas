@@ -30,6 +30,27 @@ export type EffectDef = {
   description: string
 }
 
+/**
+ * The nine shipped ThinkingOrb states, paired with gallery copy.
+ * Rendered as individually draggable cards in the sidebar Loader tab so each
+ * animation can be observed and dropped onto the canvas on its own.
+ */
+export const thinkingOrbVariants: {
+  state: string
+  label: string
+  description: string
+}[] = [
+  { state: "working", label: "Working", description: "Particles on tilted orbits." },
+  { state: "searching", label: "Searching", description: "A scan meridian sweeps a dotted globe." },
+  { state: "solving", label: "Solving", description: "Bands scramble in quarter turns, then click back." },
+  { state: "listening", label: "Listening", description: "A waveform rolls through latitude rings." },
+  { state: "connecting", label: "Connecting", description: "A constellation wires itself, packets running the edges." },
+  { state: "weaving", label: "Weaving", description: "Three strands plait around the sphere." },
+  { state: "composing", label: "Composing", description: "An undulating multi-band sash." },
+  { state: "breathing", label: "Breathing", description: "A face-on ring slowly morphing." },
+  { state: "shaping", label: "Shaping", description: "A dotted outline morphs circle → triangle → square." },
+]
+
 export const effectsRegistry: Record<string, EffectDef> = {
   "border-beam": {
     id: "border-beam",

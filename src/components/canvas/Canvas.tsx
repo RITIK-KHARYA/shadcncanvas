@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 import { BaseNode } from "@/components/canvas/NodeTypes/BaseNode";
 import { cn } from "@/lib/utils";
-import { getComponentDragData } from "@/lib/dnd";
+import { getComponentDragData, getComponentDragProps } from "@/lib/dnd";
 import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graph";
 import { nodeRegistry } from "@/lib/registry";
 import { resolveEffectInputPort } from "@/lib/registry/effects-registry";
@@ -84,13 +84,15 @@ function CanvasFlow() {
         y: event.clientY,
       });
 
+      const initialProps = getComponentDragProps(event.dataTransfer);
+
       const newNode: CanvasNode = {
         id: crypto.randomUUID(),
         type: "baseNode",
         position,
         data: {
           componentType,
-          props: { ...config.defaultProps },
+          props: { ...config.defaultProps, ...initialProps },
           state: {},
           layout: { sizeMode: "default" },
         },

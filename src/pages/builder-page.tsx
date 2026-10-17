@@ -5,8 +5,6 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
-  PanelRightClose,
-  PanelRightOpen,
   Redo2,
   Trash2,
   Undo2,
@@ -38,8 +36,7 @@ export function BuilderPage() {
   const undo = useGraphStore((s) => s.undo);
   const redo = useGraphStore((s) => s.redo);
 
-  const [libraryOpen, setLibraryOpen] = useState(true);
-  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [panelsOpen, setPanelsOpen] = useState(true);
 
   return (
     <>
@@ -74,15 +71,13 @@ export function BuilderPage() {
               variant="ghost"
               size="icon"
               aria-label={
-                libraryOpen ? "Hide components panel" : "Show components panel"
+                panelsOpen ? "Hide side panels" : "Show side panels"
               }
-              title={
-                libraryOpen ? "Hide components panel" : "Show components panel"
-              }
-              aria-expanded={libraryOpen}
-              onClick={() => setLibraryOpen((open) => !open)}
+              title={panelsOpen ? "Hide side panels" : "Show side panels"}
+              aria-expanded={panelsOpen}
+              onClick={() => setPanelsOpen((open) => !open)}
             >
-              {libraryOpen ? (
+              {panelsOpen ? (
                 <PanelLeftClose aria-hidden="true" />
               ) : (
                 <PanelLeftOpen aria-hidden="true" />
@@ -148,34 +143,28 @@ export function BuilderPage() {
               <LogOut aria-hidden="true" />
               Log Out
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={
-                inspectorOpen ? "Hide inspector panel" : "Show inspector panel"
-              }
-              title={
-                inspectorOpen ? "Hide inspector panel" : "Show inspector panel"
-              }
-              aria-expanded={inspectorOpen}
-              onClick={() => setInspectorOpen((open) => !open)}
-            >
-              {inspectorOpen ? (
-                <PanelRightClose aria-hidden="true" />
-              ) : (
-                <PanelRightOpen aria-hidden="true" />
-              )}
-            </Button>
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 grid-cols-[272px_minmax(540px,1fr)_272px]">
-          <aside className="flex min-h-0 flex-col py-3 pl-3">
+        <div
+          className={cn(
+            "grid min-h-0 flex-1 transition-[grid-template-columns] duration-300 ease-out",
+            panelsOpen
+              ? "grid-cols-[272px_minmax(540px,1fr)_272px]"
+              : "grid-cols-[0px_minmax(540px,1fr)_0px]",
+          )}
+        >
+          <aside
+            className={cn(
+              "flex min-h-0 min-w-0 flex-col overflow-hidden transition-[padding] duration-300 ease-out",
+              panelsOpen ? "py-3 pl-3" : "p-0",
+            )}
+          >
             <div
-              inert={!libraryOpen}
+              inert={!panelsOpen}
               className={cn(
                 "flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-hairline/60 bg-sidebar text-sidebar-foreground shadow-sm transition-[opacity,transform] duration-300 ease-out",
-                libraryOpen
+                panelsOpen
                   ? "translate-x-0 opacity-100"
                   : "pointer-events-none -translate-x-2 opacity-0",
               )}
@@ -191,12 +180,17 @@ export function BuilderPage() {
             <Canvas />
           </section>
 
-          <aside className="flex min-h-0 flex-col py-3 pr-3">
+          <aside
+            className={cn(
+              "flex min-h-0 min-w-0 flex-col overflow-hidden transition-[padding] duration-300 ease-out",
+              panelsOpen ? "py-3 pr-3" : "p-0",
+            )}
+          >
             <div
-              inert={!inspectorOpen}
+              inert={!panelsOpen}
               className={cn(
                 "flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-hairline/60 bg-sidebar text-sidebar-foreground shadow-sm transition-[opacity,transform] duration-300 ease-out",
-                inspectorOpen
+                panelsOpen
                   ? "translate-x-0 opacity-100"
                   : "pointer-events-none translate-x-2 opacity-0",
               )}

@@ -7,6 +7,7 @@ export {
   getEffect,
   canAddEffect,
   effectOrder,
+  thinkingOrbVariants,
   type EffectDef,
   type EffectKind,
   type AddEffectResult,
