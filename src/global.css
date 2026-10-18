@@ -26,6 +26,13 @@
     --color-hairline: var(--hairline);
     --color-surface: var(--surface);
     --color-surface-strong: var(--surface-strong);
+    --color-lp-panel: var(--lp-panel);
+    --color-lp-ink: var(--lp-ink);
+    --color-lp-on-ink: var(--lp-on-ink);
+    --color-lp-hairline: var(--lp-hairline);
+    --color-lp-muted: var(--lp-muted);
+    --color-lp-signal: var(--lp-signal);
+    --color-lp-verdigris: var(--lp-verdigris);
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
@@ -42,6 +49,7 @@
     --font-sans: var(--font-sans);
     --font-mono: var(--font-mono);
     --font-serif: var(--font-serif);
+    --font-display: "Inter Tight", var(--font-sans);
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
@@ -217,184 +225,104 @@
 }
 
 /* ============================================================
-   Landing v2 — brutalist / glassmorphic / dot-matrix ("Nothing OS")
-   Self-contained design tokens so it never fights the app theme.
+   Landing — "signal desk" schematic.
+   Self-contained LIGHT token set so it never fights the app's
+   dark theme. Scoped to .lp-root only.
    ============================================================ */
 .lp-root {
-    --lp-bg: #050505;
-    --lp-fg: #fafafa;
-    --lp-muted: rgba(250, 250, 250, 0.55);
-    --lp-faint: rgba(250, 250, 250, 0.32);
-    --lp-line: rgba(250, 250, 250, 0.1);
-    --lp-line-strong: rgba(250, 250, 250, 0.18);
-    --lp-glass: rgba(250, 250, 250, 0.025);
-    --lp-glass-hover: rgba(250, 250, 250, 0.05);
+    --lp-panel: #EDEEEC;
+    --lp-ink: #141718;
+    --lp-on-ink: #EDEEEC;
+    --lp-hairline: #d3d6d2;
+    --lp-muted: #5c625e;
+    --lp-signal: #c4622d;
+    --lp-verdigris: #2e7d74;
 
-    color-scheme: dark;
-    background: var(--lp-bg);
-    color: var(--lp-fg);
+    color-scheme: light;
+    background-color: var(--lp-panel);
+    /* The product's own 28px canvas grid, used as the page backdrop. */
+    background-image:
+        linear-gradient(#dcdfdb 1px, transparent 1px),
+        linear-gradient(90deg, #dcdfdb 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--lp-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
     position: relative;
-    overflow-x: hidden;
     overflow-x: clip;
 }
 
-/* Subtle dot-grid backdrop */
-.lp-root::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-image: radial-gradient(rgba(250, 250, 250, 0.06) 1px, transparent 1px);
-    background-size: 22px 22px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
+.lp-root ::selection {
+    background: var(--lp-signal);
+    color: #fff;
 }
 
-@layer base {
-    .lp-root * {
-        border-color: var(--lp-line);
-    }
+/* The canvas grid, reusable wherever a landing surface needs it. */
+.lp-grid-bg {
+    background-color: var(--lp-panel);
+    background-image:
+        linear-gradient(#dcdfdb 1px, transparent 1px),
+        linear-gradient(90deg, #dcdfdb 1px, transparent 1px);
+    background-size: 28px 28px;
 }
 
-.lp-glass {
-    background: var(--lp-glass);
-    border: 1px solid var(--lp-line);
-    backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    transition: background 0.4s ease, border-color 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+html:has(.lp-root) {
+    scroll-behavior: smooth;
 }
 
-.lp-glass:hover {
-    background: var(--lp-glass-hover);
-    border-color: var(--lp-line-strong);
-}
-
-/* Dot-matrix typography: text filled with a dot grid */
-.lp-dotmatrix {
-    font-family: var(--font-mono);
-    background-image: radial-gradient(currentColor 1px, transparent 1.5px);
-    background-size: 5px 5px;
-    background-position: 0 0;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.02em;
-}
-
-.lp-mono-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--lp-faint);
-}
-
-.lp-tracking-tight {
-    letter-spacing: -0.03em;
-}
-
-/* Footer gradient waves — fade into the page so they emerge from the bottom edge */
-.lp-waves {
-    mask-image: linear-gradient(to top, black 45%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to top, black 45%, transparent 100%);
-    pointer-events: none;
-}
-
-/* ============================================================
-   Node-flow SVG (hero illustration) — monochrome, dot-matrix.
-   ============================================================ */
-.nf-dot {
-    fill: rgba(250, 250, 250, 0.1);
-}
-
-.nf-node rect {
-    fill: var(--lp-glass);
-    stroke: var(--lp-line-strong);
-    stroke-width: 1;
-}
-
-.nf-node text {
-    fill: var(--lp-fg);
-    font-size: 13px;
-    font-family: var(--font-sans);
-}
-
-.nf-node-export rect {
-    fill: var(--lp-fg);
-    stroke: none;
-}
-
-.nf-node-export .nf-export-text {
-    fill: var(--lp-bg);
-    font-family: var(--font-mono);
-    font-size: 22px;
-}
-
-.nf-handle {
-    fill: var(--lp-fg);
-}
-
-.nf-line {
+/* ---------- Hero node graph ---------- */
+.lp-graph-edge {
     fill: none;
-    stroke: var(--lp-fg);
-    stroke-opacity: 0.28;
+    stroke: rgba(237, 238, 236, 0.26);
     stroke-width: 1.5;
-    stroke-dasharray: 220;
-    stroke-dashoffset: 220;
-    animation: nf-draw 1.1s ease forwards;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: lp-draw 1.2s ease forwards;
 }
 
-.nf-line-2 { animation-delay: 0.15s; }
-.nf-line-3 { animation-delay: 0.3s; }
+.lp-graph-edge--flow {
+    stroke: rgba(196, 98, 45, 0.75);
+    animation-delay: 0.5s;
+}
 
-@keyframes nf-draw {
+@keyframes lp-draw {
     to { stroke-dashoffset: 0; }
 }
 
-.nf-packet {
-    fill: var(--lp-fg);
-    offset-rotate: 0deg;
-    animation: nf-travel 2.6s linear infinite;
+/* The signal riding the live wire — a static marker that breathes. */
+.lp-signal-dot {
+    fill: var(--lp-signal);
 }
 
-.nf-packet-1 { offset-path: path("M150 66 C 220 66, 220 130, 290 130"); }
-.nf-packet-2 {
-    offset-path: path("M150 150 C 220 150, 220 150, 290 148");
-    animation-delay: 0.7s;
-}
-.nf-packet-3 {
-    offset-path: path("M150 234 C 220 234, 220 166, 290 162");
-    animation-delay: 1.4s;
+.lp-signal-halo {
+    fill: rgba(196, 98, 45, 0.22);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: lp-pulse 2.8s ease-in-out infinite;
 }
 
-@keyframes nf-travel {
-    from { offset-distance: 0%; opacity: 0; }
-    12% { opacity: 1; }
-    88% { opacity: 1; }
-    to { offset-distance: 100%; opacity: 0; }
-}
+@keyframes lp-pulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
 
-.nf-node {
-    animation: nf-fade-up 0.6s ease both;
-}
-.nf-node-1 { animation-delay: 0.05s; }
-.nf-node-2 { animation-delay: 0.15s; }
-.nf-node-3 { animation-delay: 0.25s; }
-
-@keyframes nf-fade-up {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    50% {
+        transform: scale(1.6);
+        opacity: 0.3;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .nf-packet { animation: none; opacity: 0.6; }
-    .nf-line { animation: none; stroke-dashoffset: 0; }
-    .nf-node { animation: none; opacity: 1; transform: none; }
-    .lp-root::before { background-size: 26px 26px; }
+    .lp-graph-edge {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+
+    .lp-signal-halo {
+        animation: none;
+    }
 }
