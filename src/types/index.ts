@@ -17,10 +17,3 @@ export type {
   CanvasEdge,
   TransformType,
 } from "./graph"
-
-export type {
-  ThemeStyleProps,
-  ThemeStyles,
-  ThemeEditorState,
-  ThemeHistoryEntry,
-} from "./theme"

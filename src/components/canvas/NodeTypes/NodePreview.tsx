@@ -136,7 +136,7 @@ import { cn } from "@/lib/utils";
 import { EffectsLayer } from "@/lib/registry/effect-components";
 import type { NodeSizeMode, NodeState } from "@/types/graph";
 import type { FormField, NodePreviewProps } from "./types";
-import { nodeStyleToCss } from "@/theme/style-utils";
+import { nodeStyleToCss } from "@/lib/node-style";
 
 import { ThinkingOrb, type OrbState, type OrbSize } from "thinking-orbs";
 import { BotAvatar, type BotAvatarState, type BotAvatarType } from "bot-avatars";

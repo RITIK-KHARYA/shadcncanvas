@@ -1,2 +1,8 @@
 export { wouldCreateCycle } from "./cycle"
-export { evalTransform, applyTransform, edgeStrokeColor, EDGE_TRANSFORMS } from "./transforms"
+export {
+  evalTransform,
+  applyTransform,
+  edgeDashArray,
+  edgeStrokeColor,
+  EDGE_TRANSFORMS,
+} from "./transforms"

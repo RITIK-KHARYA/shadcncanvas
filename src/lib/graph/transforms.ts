@@ -24,9 +24,12 @@ export function evalTransform(
 /** @deprecated use evalTransform */
 export const applyTransform = evalTransform
 
-export function edgeStrokeColor(transform?: string): string {
-  if (transform === "invert") return "#f97316"
-  return "#22c55e"
+export function edgeStrokeColor(_transform?: string): string {
+  return "var(--muted-foreground)"
+}
+
+export function edgeDashArray(transform?: string): string | undefined {
+  return transform && transform !== "passthrough" ? "6 4" : undefined
 }
 
 export const EDGE_TRANSFORMS = [

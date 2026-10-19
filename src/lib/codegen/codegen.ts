@@ -1,12 +1,10 @@
 import type { CanvasEdge, CanvasNode } from "@/types/graph";
-import type { ThemeTokens } from "@/store/theme-store";
-import { themeTokensToStyle } from "@/store/theme-store";
 import { nodeRegistry, UI_COMPONENTS, getEffect, effectOrder } from "@/lib/registry";
 import type { EffectConfig, FormField } from "@/types/registry";
 import { buildPropsString, buildPropsStringWithOverrides, indent } from "./helpers";
 import { buildWiringBlock } from "./wiring";
 import { buildImports } from "./imports";
-import { nodeStyleToCss } from "@/theme/style-utils";
+import { nodeStyleToCss } from "@/lib/node-style";
 import type { NodeStyleOverride } from "@/types/graph";
 
 /** Nests the node's JSX inside its wrapper effects (registry order, first outermost). */
@@ -34,19 +32,6 @@ function wrapWithEffects(
     out = `<${def.exportName}${propsString ? ` ${propsString}` : ""}>\n${indent(out, 2)}\n</${def.exportName}>`;
   }
   return out;
-}
-
-function buildThemeBlock(theme?: ThemeTokens): string {
-  if (!theme) return "";
-  const vars = themeTokensToStyle(theme);
-  const css = Object.entries(vars)
-    .map(([k, v]) => `  ${k}: ${v};`)
-    .join("\n");
-  return `\n/* Canvas theme tokens */\n/*
-:root {
-${css}
-}
-*/\n`;
 }
 
 function buildInlineStyleAttr(style?: NodeStyleOverride): string {
@@ -469,7 +454,6 @@ ${itemLines}
 export function generateFullCode(
   nodes: CanvasNode[],
   edges: CanvasEdge[],
-  theme?: ThemeTokens,
 ): string {
   const types = [...new Set(nodes.map((n) => n.data.componentType))];
   const effectIds = [
@@ -499,7 +483,6 @@ export function generateFullCode(
     : "";
 
   return `${reactImport}${imports}
-${buildThemeBlock(theme)}
 export default function GeneratedComponent() {
 ${wiringBlock}  return (
     <div className="space-y-4 p-4">

@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { nodeStyleToCss } from "@/theme/style-utils";
+import { nodeStyleToCss } from "@/lib/node-style";
 import type { NodeStyleOverride } from "@/types/graph";
 
 type NodeSkeletonProps = {

@@ -6,7 +6,6 @@ import { PrototypePanel } from "@/components/inspector/PrototypePanel"
 import { PropertiesPanel } from "@/components/inspector/properties/PropertiesPanel"
 import { SidebarHeader } from "@/components/inspector/SidebarHeader"
 import { SidebarTabs, type SidebarTab } from "@/components/inspector/SidebarTabs"
-import { ThemePanel } from "@/components/inspector/ThemePanel"
 import { useGraphStore } from "@/store/graph-store"
 
 export function EditorSidebar() {
@@ -52,7 +51,9 @@ export function EditorSidebar() {
               Select a single object to edit its properties.
             </p>
           ) : (
-            <ThemePanel />
+            <p className="px-4 py-16 text-center text-xs text-muted-foreground">
+              Select an object to edit its properties.
+            </p>
           ))}
 
         {tab === "effects" &&
