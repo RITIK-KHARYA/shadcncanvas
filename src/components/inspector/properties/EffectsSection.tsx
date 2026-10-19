@@ -4,9 +4,9 @@ import type { CanvasNode } from "@/types/graph"
 import { cn } from "@/lib/utils"
 
 const TYPE_DOT: Record<string, string> = {
-  boolean: "bg-orange-500",
-  string: "bg-green-500",
-  number: "bg-blue-500",
+  boolean: "bg-foreground",
+  string: "bg-foreground/60",
+  number: "bg-foreground/30",
 }
 
 export function EffectsSection({

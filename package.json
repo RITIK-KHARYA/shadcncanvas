@@ -55,7 +55,9 @@
     "react-is": "^19.3.0",
     "react-resizable-panels": "^4.13.1",
     "react-router-dom": "^7.18.4",
+    "react-selecto": "^1.26.3",
     "recharts": "^3.10.1",
+    "selecto": "^1.26.3",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3",
@@ -66,6 +68,7 @@
     "vgpu": "^0.3.1",
     "voice-glow": "^0.3.0",
     "zod": "^4.6.5",
+    "zundo": "^2.3.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

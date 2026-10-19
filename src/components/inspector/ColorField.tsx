@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { toHexColor } from "@/theme/colors"
+import { toHexColor } from "@/lib/color"
 import { cn } from "@/lib/utils"
 
 export const COLOR_SWATCHES = [

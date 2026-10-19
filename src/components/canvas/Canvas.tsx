@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { BaseNode } from "@/components/canvas/NodeTypes/BaseNode";
 import { cn } from "@/lib/utils";
 import { getComponentDragData, getComponentDragProps } from "@/lib/dnd";
-import { edgeStrokeColor, wouldCreateCycle } from "@/lib/graph";
+import { edgeDashArray, edgeStrokeColor, wouldCreateCycle } from "@/lib/graph";
 import { nodeRegistry } from "@/lib/registry";
 import { resolveEffectInputPort } from "@/lib/registry/effects-registry";
 import { useGraphStore, recordNodeDragHistory } from "@/store/graph-store";
@@ -39,16 +39,18 @@ function CanvasFlow() {
 
   const styledEdges = useMemo(
     () =>
-      edges.map((edge: CanvasEdge) => ({
-        ...edge,
-        animated: true,
-        style: {
-          strokeWidth: 2,
-          stroke: edgeStrokeColor(
-            String(edge.data?.transform ?? "passthrough"),
-          ),
-        },
-      })),
+      edges.map((edge: CanvasEdge) => {
+        const transform = String(edge.data?.transform ?? "passthrough");
+        return {
+          ...edge,
+          animated: true,
+          style: {
+            strokeWidth: 2,
+            stroke: edgeStrokeColor(transform),
+            strokeDasharray: edgeDashArray(transform),
+          },
+        };
+      }),
     [edges],
   );
 

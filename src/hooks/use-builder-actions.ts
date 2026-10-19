@@ -4,7 +4,8 @@ import { signOut } from "@/lib/auth-client"
 import { generateFullCode, generateNodeCode } from "@/lib/codegen"
 import { exportProjectZip } from "@/lib/exportZip"
 import { useGraphStore } from "@/store/graph-store"
-import type { ThemeTokens } from "@/store/theme-store"
+import { useThemeModeStore } from "@/store/theme-mode-store"
+import { useAuth } from "./use-auth"
 
 const LOGOUT_REDIRECT = "/auth"
 
@@ -23,15 +24,16 @@ export type BuilderActions = {
  */
 export function useBuilderActions({
   projectName,
-  tokens,
 }: {
   projectName: string
-  tokens: ThemeTokens
 }): BuilderActions {
+  const mode = useThemeModeStore((s) => s.mode)
   const nodes = useGraphStore((s) => s.nodes)
   const edges = useGraphStore((s) => s.edges)
   const selectedNodeId = useGraphStore((s) => s.selectedNodeId)
   const clearCanvas = useGraphStore((s) => s.clearCanvas)
+
+  const { requireAuth } = useAuth();
 
   const hasCanvasContent = nodes.length > 0 || edges.length > 0
 
@@ -50,42 +52,46 @@ export function useBuilderActions({
   }, [clearCanvas, hasCanvasContent])
 
   const onCopyCode = useCallback(async () => {
-    const code = selectedNode
-      ? generateNodeCode(selectedNode)
-      : generateFullCode(nodes, edges, tokens)
+    requireAuth(async () => {
+      const code = selectedNode
+        ? generateNodeCode(selectedNode)
+        : generateFullCode(nodes, edges)
 
-    if (!code.trim()) {
-      toast.error("Nothing to copy — add nodes to the canvas first")
-      return
-    }
+      if (!code.trim()) {
+        toast.error("Nothing to copy — add nodes to the canvas first")
+        return
+      }
 
-    try {
-      await navigator.clipboard.writeText(code)
-      toast.success(
-        selectedNode
-          ? "Node code copied to clipboard"
-          : "Full code copied to clipboard",
-      )
-    } catch (err) {
-      console.error("Copy failed:", err)
-      toast.error("Failed to copy — check browser permissions")
-    }
-  }, [edges, nodes, selectedNode, tokens])
+      try {
+        await navigator.clipboard.writeText(code)
+        toast.success(
+          selectedNode
+            ? "Node code copied to clipboard"
+            : "Full code copied to clipboard",
+        )
+      } catch (err) {
+        console.error("Copy failed:", err)
+        toast.error("Failed to copy — check browser permissions")
+      }
+    });
+  }, [edges, nodes, selectedNode, requireAuth])
 
   const onExportZip = useCallback(async () => {
-    if (nodes.length === 0) {
-      toast.error("Nothing to export — add nodes to the canvas first")
-      return
-    }
+    requireAuth(async () => {
+      if (nodes.length === 0) {
+        toast.error("Nothing to export — add nodes to the canvas first")
+        return
+      }
 
-    try {
-      await exportProjectZip({ nodes, edges, theme: tokens, projectName })
-      toast.success("ZIP exported")
-    } catch (err) {
-      console.error("Export failed:", err)
-      toast.error("Export failed")
-    }
-  }, [edges, nodes, projectName, tokens])
+      try {
+        await exportProjectZip({ nodes, edges, mode, projectName })
+        toast.success("ZIP exported")
+      } catch (err) {
+        console.error("Export failed:", err)
+        toast.error("Export failed")
+      }
+    });
+  }, [edges, mode, nodes, projectName, requireAuth])
 
   const onLogout = useCallback(async () => {
     try {

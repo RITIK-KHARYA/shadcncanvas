@@ -1,21 +1,3 @@
-const NON_COLOR_KEYS = [
-  "font-sans",
-  "font-serif",
-  "font-mono",
-  "radius",
-  "spacing",
-  "shadow-opacity",
-  "shadow-blur",
-  "shadow-spread",
-  "shadow-offset-x",
-  "shadow-offset-y",
-  "letter-spacing",
-]
-
-export function isColorProperty(key: string): boolean {
-  return !NON_COLOR_KEYS.includes(key)
-}
-
 function rgbToHsl(r: number, g: number, b: number, a: number, precision: number): string {
   const max = Math.max(r, g, b)
   const min = Math.min(r, g, b)
@@ -159,27 +141,6 @@ export function colorFormatter(value: string, _format: "hsl", precision: string 
     return `hsl(${prec(h)} ${prec(s)}% ${prec(l)}%)`
   }
   return value
-}
-
-export function adjustHslColor(
-  hslString: string,
-  adjustments: { hueShift: number; saturationScale: number; lightnessScale: number }
-): string {
-  const match = hslString.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+))?\s*\)/i)
-  if (!match) return hslString
-  let h = parseFloat(match[1])
-  let s = parseFloat(match[2])
-  let l = parseFloat(match[3])
-  const a = match[4] ? parseFloat(match[4]) : undefined
-  h = (h + adjustments.hueShift) % 360
-  if (h < 0) h += 360
-  s = Math.max(0, Math.min(100, s * adjustments.saturationScale))
-  l = Math.max(0, Math.min(100, l * adjustments.lightnessScale))
-  const prec = (num: number) => parseFloat(num.toFixed(4))
-  if (a !== undefined) {
-    return `hsl(${prec(h)} ${prec(s)}% ${prec(l)}% / ${prec(a)})`
-  }
-  return `hsl(${prec(h)} ${prec(s)}% ${prec(l)}%)`
 }
 
 export function toHexColor(value: string): string | null {
