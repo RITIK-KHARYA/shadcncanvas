@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react"
 import { Route, Routes } from "react-router-dom"
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { LandingV2 } from "./components/landing-v2/landing"
 import { RequireAuth } from "./components/auth/require-auth"
 import { AuthPage } from "./pages/auth-page"
@@ -33,6 +34,7 @@ export default function App() {
         </Route>
       </Routes>
       <Analytics />
+      <SpeedInsights />
     </>
   )
 }
