@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react"
 import { Route, Routes } from "react-router-dom"
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { LandingV2 } from "./components/landing-v2/landing"
 import { AuthPage } from "./pages/auth-page"
 import { AuthProvider } from "@/components/auth/AuthProvider"
@@ -33,6 +34,7 @@ export default function App() {
       </Routes>
       <GlobalLoginDialog />
       <Analytics />
+      <SpeedInsights />
     </AuthProvider>
   )
 }
