@@ -9,3 +9,7 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// Ambient declarations for Express + Connect (used by server/dev.ts and vite.config.ts).
+declare module "express";
+declare module "connect";

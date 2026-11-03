@@ -29,9 +29,12 @@ const MAX_HISTORY = 40
 
 const activeApiControllers = new Map<string, AbortController>()
 
+import { addConnection, removeConnection, listConnections, type Connection as ComponentConnection } from "../lib/connection-engine.ts"
+
 type GraphStore = {
   nodes: CanvasNode[]
   edges: CanvasEdge[]
+  connections: ComponentConnection[]
   selectedNodeId: string | null
   selectedNodeIds: string[]
   selectedEdgeId: string | null
@@ -45,6 +48,12 @@ type GraphStore = {
   redo: () => void
   addNode: (node: CanvasNode) => void
   addEdge: (connection: Connection) => void
+  addConnection: (connection: Omit<ComponentConnection, "id" | "createdAt">) => ComponentConnection
+  removeConnection: (connId: string) => boolean
+  listConnections: () => ComponentConnection[]
+  mergeRemoteNodes: (nodes: CanvasNode[]) => void
+  mergeRemoteConnections: (connections: ComponentConnection[]) => void
+  mergeRemoteEdges: (edges: CanvasEdge[]) => void
   clearCanvas: () => void
   onNodesChange: (changes: NodeChange<CanvasNode>[]) => void
   onEdgesChange: (changes: EdgeChange<CanvasEdge>[]) => void
@@ -78,6 +87,12 @@ function cloneSnapshot(nodes: CanvasNode[], edges: CanvasEdge[]): Snapshot {
   return structuredClone({ nodes, edges })
 }
 
+function edgeKey(
+  edge: Pick<CanvasEdge, "source" | "target" | "sourceHandle" | "targetHandle">,
+) {
+  return `${edge.source}::${edge.sourceHandle ?? ""}::${edge.target}::${edge.targetHandle ?? ""}`
+}
+
 function syncHistoryFlags(state: { history: Snapshot[]; future: Snapshot[] }) {
   return {
     canUndo: state.history.length > 0,
@@ -88,6 +103,7 @@ function syncHistoryFlags(state: { history: Snapshot[]; future: Snapshot[] }) {
 export const useGraphStore = create<GraphStore>((set, get) => ({
   nodes: [],
   edges: [],
+  connections: [],
   selectedNodeId: null,
   selectedNodeIds: [],
   selectedEdgeId: null,
@@ -207,6 +223,47 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     ) {
       get().propagate(connection.source, connection.sourceHandle, value)
     }
+  },
+
+  addConnection: (connection) => {
+    get().pushHistory()
+    const conn = addConnection(connection)
+    set({ connections: [...get().connections, conn] })
+    return conn
+  },
+
+  removeConnection: (connId) => {
+    const removed = removeConnection(connId)
+    if (removed) {
+      set({
+        connections: get().connections.filter((c) => c.id !== connId),
+      })
+    }
+    return removed
+  },
+
+  listConnections: () => {
+    return listConnections()
+  },
+
+  mergeRemoteNodes: (incoming) => {
+    const existing = new Set(get().nodes.map((node) => node.id))
+    const fresh = incoming.filter((node) => !existing.has(node.id))
+    if (fresh.length > 0) set({ nodes: [...get().nodes, ...fresh] })
+  },
+
+  mergeRemoteConnections: (incoming) => {
+    const existing = new Set(get().connections.map((conn) => conn.id))
+    const fresh = incoming.filter((conn) => !existing.has(conn.id))
+    if (fresh.length > 0) {
+      set({ connections: [...get().connections, ...fresh] })
+    }
+  },
+
+  mergeRemoteEdges: (incoming) => {
+    const seen = new Set(get().edges.map(edgeKey))
+    const fresh = incoming.filter((edge) => !seen.has(edgeKey(edge)))
+    if (fresh.length > 0) set({ edges: [...get().edges, ...fresh] })
   },
 
   clearCanvas: () => {

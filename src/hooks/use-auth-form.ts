@@ -2,7 +2,7 @@ import { useCallback, useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { authClient } from "@/lib/auth-client"
 
-const REDIRECT = "/app"
+const DEFAULT_REDIRECT = "/dashboard"
 
 export type SocialProvider = "github" | "discord" | "google"
 export type AuthMode = "sign-in" | "sign-up"
@@ -24,7 +24,7 @@ export type AuthForm = {
  * All of the auth page's behaviour: field state, the sign-in / sign-up mode
  * switch, provider sign-in, and submit handling with error mapping.
  */
-export function useAuthForm(): AuthForm {
+export function useAuthForm(redirectTo = DEFAULT_REDIRECT): AuthForm {
   const navigate = useNavigate()
 
   const [email, setEmail] = useState("")
@@ -42,14 +42,14 @@ export function useAuthForm(): AuthForm {
 
     const { error: authError } = await authClient.signIn.social({
       provider,
-      callbackURL: REDIRECT,
+      callbackURL: redirectTo,
     })
 
     if (authError) {
       setPending({})
       setError(authError.message ?? "Something went wrong.")
     }
-  }, [])
+  }, [redirectTo])
 
   const submit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -62,23 +62,23 @@ export function useAuthForm(): AuthForm {
           ? await authClient.signIn.email({
               email,
               password,
-              callbackURL: REDIRECT,
+              callbackURL: redirectTo,
             })
           : await authClient.signUp.email({
               email,
               password,
               name: email.split("@")[0] || "User",
-              callbackURL: REDIRECT,
+              callbackURL: redirectTo,
             })
 
       if (authError) {
         setPending({})
         setError(authError.message ?? "Something went wrong.")
       } else {
-        navigate(REDIRECT)
+        navigate(redirectTo)
       }
     },
-    [email, mode, navigate, password],
+    [email, mode, navigate, password, redirectTo],
   )
 
   const toggleMode = useCallback(() => {

@@ -8,7 +8,7 @@ import {
   type NodeTypes,
 } from "@xyflow/react";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { BaseNode } from "@/components/canvas/NodeTypes/BaseNode";
@@ -34,8 +34,18 @@ function CanvasFlow() {
   const setSelectedNodeId = useGraphStore((s) => s.setSelectedNodeId);
   const setSelectedNodeIds = useGraphStore((s) => s.setSelectedNodeIds);
   const setSelectedEdgeId = useGraphStore((s) => s.setSelectedEdgeId);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // The MCP bridge can add nodes after the initial fitView (empty canvas).
+  const nodeCount = nodes.length;
+  const previousNodeCount = useRef(nodeCount);
+  useEffect(() => {
+    if (previousNodeCount.current === 0 && nodeCount > 0) {
+      fitView({ padding: 0.2, duration: 400 });
+    }
+    previousNodeCount.current = nodeCount;
+  }, [fitView, nodeCount]);
 
   const styledEdges = useMemo(
     () =>

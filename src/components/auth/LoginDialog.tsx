@@ -18,7 +18,7 @@ export type LoginDialogProps = {
   onSuccess?: () => void;
 };
 
-const REDIRECT = "/app";
+const REDIRECT = "/dashboard";
 
 export function LoginDialog({ open, onOpenChange, onSuccess }: LoginDialogProps) {
   const [email, setEmail] = useState("");

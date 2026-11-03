@@ -2,6 +2,7 @@ import {
   Box,
   Copy,
   Download,
+  LayoutDashboard,
   LogOut,
   Moon,
   PanelLeftClose,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { Suspense, lazy, useState } from "react";
+import { Link } from "react-router-dom";
 import { useStore } from "zustand";
 import { Canvas } from "@/components/canvas/Canvas";
 import { EditorSidebar } from "@/components/inspector/EditorSidebar";
@@ -23,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useBuilderActions } from "@/hooks/use-builder-actions";
+import { useMcpBridge } from "@/hooks/use-mcp-bridge";
 import { useProjectPersistence } from "@/hooks/use-project-persistence";
 import { useGraphStore } from "@/store/graph-store";
 import { useThemeModeStore } from "@/store/theme-mode-store";
@@ -44,6 +47,7 @@ const MODES: EditorMode[] = ["board", "design"];
 
 export function BuilderPage() {
   const { projectName, setProjectName, lastSaved } = useProjectPersistence();
+  useMcpBridge();
   const { isAuthenticated } = useAuth();
 
   const { hasCanvasContent, onClearCanvas, onCopyCode, onExportZip, onLogout } =
@@ -250,6 +254,12 @@ export function BuilderPage() {
                 </Button>
               </>
             )}
+            <Button asChild variant="outline" size="sm">
+              <Link to="/dashboard">
+                <LayoutDashboard aria-hidden="true" />
+                Dashboard
+              </Link>
+            </Button>
             {isAuthenticated && (
               <Button size="sm" onClick={onLogout}>
                 <LogOut aria-hidden="true" />

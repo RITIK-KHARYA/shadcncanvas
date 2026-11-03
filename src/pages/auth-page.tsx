@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Github, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,18 @@ import { Label } from "@/components/ui/label";
 import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 
-const REDIRECT = "/app";
+const DEFAULT_REDIRECT = "/dashboard";
 
 export function AuthPage() {
+  const location = useLocation();
+  const from = (
+    location.state as { from?: { pathname?: string; search?: string } } | null
+  )?.from;
+  const redirectTo =
+    from?.pathname && from.pathname !== "/auth"
+      ? `${from.pathname}${from.search ?? ""}`
+      : DEFAULT_REDIRECT;
+
   const { data, isPending } = authClient.useSession();
   const {
     email,
@@ -22,10 +31,10 @@ export function AuthPage() {
     signInWith,
     submit,
     toggleMode,
-  } = useAuthForm();
+  } = useAuthForm(redirectTo);
 
   if (!isPending && data?.session) {
-    return <Navigate to={REDIRECT} replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (
@@ -56,8 +65,8 @@ export function AuthPage() {
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
               {mode === "sign-in"
-                ? "Continue to the builder to start dragging components."
-                : "Sign up to save and continue building."}
+                ? "Continue to your dashboard and pick up where you left off."
+                : "Create an account to save your workspace and open the dashboard."}
             </p>
           </div>
 
