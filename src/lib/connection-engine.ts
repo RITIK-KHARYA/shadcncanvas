@@ -217,7 +217,6 @@ export function suggestConnections(
 
   for (const target of targets) {
     if (target.id === sourceId) continue
-    if (target.id === sourceId) continue
 
     for (const outPort of source.outputs) {
       for (const inPort of target.inputs) {
