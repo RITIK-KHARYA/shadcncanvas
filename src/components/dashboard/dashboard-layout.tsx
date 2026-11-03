@@ -251,7 +251,11 @@ export function DashboardLayout() {
                   <Menu aria-hidden="true" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-0" showCloseButton={false}>
+              <SheetContent
+                side="left"
+                className="w-72 bg-sidebar p-0"
+                showCloseButton={false}
+              >
                 <SheetTitle className="sr-only">Dashboard navigation</SheetTitle>
                 <SheetDescription className="sr-only">
                   Switch between dashboard sections or open the builder.

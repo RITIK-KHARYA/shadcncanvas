@@ -15,7 +15,7 @@ import {
 import { PageHeader } from "@/components/dashboard/dashboard-widgets";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { authClient, signOut } from "@/lib/auth-client";
-import { formatRelativeTime, getInitials } from "@/lib/dashboard";
+import { formatSavedStatus, getInitials } from "@/lib/dashboard";
 import { cn } from "@/lib/utils";
 import { useThemeModeStore } from "@/store/theme-mode-store";
 
@@ -128,8 +128,8 @@ export function SettingsPage() {
             <div className="rounded-xl border border-hairline bg-surface/50 px-3 py-2.5">
               <p className="text-sm font-medium">{dataSummary.projectName}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {dataSummary.nodes} components · {dataSummary.edges} edges · saved{" "}
-                {formatRelativeTime(dataSummary.lastSaved).toLowerCase()}
+                {dataSummary.nodes} components · {dataSummary.edges} edges ·{" "}
+                {formatSavedStatus(dataSummary.lastSaved)}
               </p>
             </div>
             <Button asChild size="sm" variant="outline">

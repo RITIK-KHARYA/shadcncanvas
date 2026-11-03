@@ -23,6 +23,12 @@ export function formatRelativeTime(value?: string | null) {
   }).format(new Date(value));
 }
 
+export function formatSavedStatus(value?: string | null) {
+  if (!value || Number.isNaN(new Date(value).getTime())) return "Not saved yet";
+  const relative = formatRelativeTime(value);
+  return relative === "Just now" ? "Saved just now" : `Saved ${relative}`;
+}
+
 export function getInitials(name?: string | null, email?: string | null) {
   const source = name?.trim() || email?.split("@")[0] || "User";
   return source

@@ -5,10 +5,12 @@
 // by the Vite dev server (attached as final middleware).
 
 import express from "express"
+import { toNodeHandler } from "better-auth/node"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { nodeRegistry } from "../src/lib/registry/node-registry.ts"
 import { useGraphStore } from "../src/store/graph-store.ts"
+import { auth } from "./auth.ts"
 import { emitEvent, sseHandler } from "./mcp-event-hub.ts"
 import type { CanvasNode } from "../src/types/graph.ts"
 
@@ -48,6 +50,19 @@ async function main() {
 
   // ── Express API server on port 5173 ───────────────────────────────────
   const app = express()
+
+  // Better Auth needs the raw request stream. Mount it before the JSON body
+  // parser so the same-origin auth calls work on both dev ports (5173 and
+  // 5174) without the Vite proxy/plug-in being in the path.
+  const authHandler = toNodeHandler(auth)
+  app.use((req: any, res: any, next: any) => {
+    if (req.path.startsWith("/api/auth")) {
+      void authHandler(req, res)
+      return
+    }
+    next()
+  })
+
   app.use(express.json())
 
   // GET /api/health

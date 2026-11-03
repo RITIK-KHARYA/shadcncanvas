@@ -30,7 +30,7 @@ import {
 } from "@/components/dashboard/dashboard-widgets";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { authClient } from "@/lib/auth-client";
-import { formatRelativeTime, greetingForHour } from "@/lib/dashboard";
+import { formatSavedStatus, greetingForHour } from "@/lib/dashboard";
 
 const QUICK_ACTIONS = [
   {
@@ -77,7 +77,7 @@ export function OverviewPage() {
     session?.user?.name?.trim().split(/\s+/)[0] ||
     session?.user?.email?.split("@")[0] ||
     "builder";
-  const savedLabel = formatRelativeTime(data.lastSaved);
+  const savedLabel = formatSavedStatus(data.lastSaved);
 
   return (
     <div className="space-y-6">
@@ -128,7 +128,7 @@ export function OverviewPage() {
         <StatCard
           label="Workspace"
           value={data.hasContent ? "Active" : "Empty"}
-          hint={data.hasContent ? `Saved ${savedLabel.toLowerCase()}` : "Waiting for a first component"}
+          hint={data.hasContent ? savedLabel : "Waiting for a first component"}
           icon={Check}
           color="var(--chart-4)"
         />
@@ -158,7 +158,7 @@ export function OverviewPage() {
                       {data.projectName}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Last saved {savedLabel.toLowerCase()}
+                      {savedLabel}
                     </p>
                   </div>
                   <Button asChild size="sm" variant="outline">

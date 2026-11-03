@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { EmptyState, PageHeader } from "@/components/dashboard/dashboard-widgets";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
-import { formatRelativeTime } from "@/lib/dashboard";
+import { formatSavedStatus } from "@/lib/dashboard";
 import {
   buildTemplateGraph,
   DASHBOARD_TEMPLATES,
@@ -132,8 +132,8 @@ export function ProjectsPage() {
                     <span className="truncate">{data.projectName}</span>
                   </CardTitle>
                   <CardDescription>
-                    Saved {formatRelativeTime(data.lastSaved).toLowerCase()} ·{" "}
-                    {data.nodes} components · {data.edges} edges
+                    {formatSavedStatus(data.lastSaved)} · {data.nodes} components ·{" "}
+                    {data.edges} edges
                   </CardDescription>
                 </div>
                 <Badge variant="outline" className="capitalize">
