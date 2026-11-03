@@ -20,6 +20,8 @@ Visual builder for [shadcn/ui](https://ui.shadcn.com/) components. Drag componen
 - **History Management** - Undo/redo functionality for all canvas operations
 - **Drag & Drop** - Intuitive palette-to-canvas component placement
 - **Persistence** - Auto-save projects to browser localStorage
+- **Dashboard** - Overview, projects, analytics, and settings views for saved workspaces
+- **MCP Integration** - shadcncanvas MCP server/tools for component discovery, safe wiring, and form planning
 - **Collaborative Ready** - Architecture supports real-time collaboration
 
 ---
@@ -77,7 +79,35 @@ flowchart LR
 | **Drag & Drop** | React Flow built-in |
 | **Icons** | Lucide React |
 | **Animations** | Framer Motion |
-| **Analytics** | Vercel Analytics |
+| **Analytics** | Vercel Analytics, Vercel Speed Insights |
+| **MCP** | Model Context Protocol server/tools |
+| **Testing** | Vitest |
+
+---
+
+## What's New
+
+- **Dashboard** - Added overview, projects, analytics, and settings views backed by local workspace data.
+- **MCP Server** - Added `bun run mcp:stdio` plus tooling for component discovery, safe wiring, and form planning.
+- **Tests** - Added Vitest coverage for dashboard formatting, template graph building, and connection-engine behavior.
+- **Polish** - Improved saved-status wording, sidebar styling, and dev auth handler behavior.
+
+---
+
+## MCP Server
+
+The repository includes a shadcncanvas MCP server that lets assistants and tools inspect components, suggest type-safe connections, and plan form wiring.
+
+```bash
+bun run mcp:stdio
+```
+
+Key capabilities:
+- `list_components` / `list_categories` / `get_component_schema`
+- `suggest_connection`, `find_safe_connections`, `validate_connection`
+- `suggest_form` for form-field wiring plans
+
+These tools are shared with the web UI through `src/lib/connection-engine.ts`, so the MCP and canvas use the same registry/schema rules.
 
 ---
 
@@ -105,6 +135,7 @@ src/
   components/            # UI + feature components
     ui/                  # 54+ shadcn/ui components (Radix UI based)
     canvas/              # React Flow canvas
+    dashboard/           # Dashboard layout and widgets
     inspector/           # Props inspector
     sidebar/             # Component palette
     landing-v2/          # Landing page
@@ -112,19 +143,18 @@ src/
   pages/                 # Route-level components
     builder-page.tsx     # Builder (lazy-loaded)
     auth-page.tsx        # Sign in / sign up
+    dashboard/           # Dashboard routes
   hooks/                 # Shared React hooks
-  lib/                   # Utilities (cn, auth client, codegen, export, persistence)
+  lib/                   # Utilities (cn, auth client, codegen, export, persistence, dashboard, connection engine)
   store/                 # Zustand stores
   theme/                 # OKLCH theme tokens + apply logic
   types/                 # Shared TypeScript types
-  utils/                 # Codegen, validation, helpers
   prisma/                # Generated Prisma client / contract types
   App.tsx                # React Router setup
   main.tsx               # Entry point
   global.css             # Global styles + OKLCH tokens + canvas grid
 
-server/                  # Server-side auth handlers (Vite plugin)
-api/                     # Serverless endpoints
+server/                  # Server-side handlers (auth, MCP stdio, dev server, event hub)
 scripts/                 # Build/maintenance scripts
 public/                  # Static assets copied verbatim into the build
 ```
